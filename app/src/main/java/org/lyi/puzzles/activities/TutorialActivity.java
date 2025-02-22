@@ -103,7 +103,7 @@ public class TutorialActivity extends AppCompatActivity {
 
         try {
             ImageView imageView = (ImageView) findViewById(R.id.image1);
-            Glide.with(TutorialActivity.this).load(R.mipmap.ic_splash).into(imageView);//.into(imageView);//@mipmap/ic_splash).into(imageView);
+            Glide.with(TutorialActivity.this).load(R.mipmap.ic_launcher_foreground).into(imageView);//.into(imageView);//@mipmap/ic_launcher_foreground).into(imageView);
         } catch (NullPointerException ne) {
 
         }
@@ -225,7 +225,7 @@ public class TutorialActivity extends AppCompatActivity {
             switch (position) {
                 case 0:
                     imageView = (ImageView) findViewById(R.id.image1);
-                    Glide.with(TutorialActivity.this).load(R.mipmap.ic_splash).into(imageView);
+                    Glide.with(TutorialActivity.this).load(R.mipmap.ic_launcher_foreground).into(imageView);
                     break;
                 case 1:
                     imageView = (ImageView) findViewById(R.id.image2);
