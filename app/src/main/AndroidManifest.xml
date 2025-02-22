@@ -32,7 +32,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.lyi.2048.activities.MainActivity" />
+                android:value="org.lyi.puzzles.activities.MainActivity" />
         </activity>
         <activity
             android:name=".activities.MainActivity"
@@ -44,7 +44,7 @@
             android:parentActivityName=".activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.lyi.2048.activities.MainActivity" />
+                android:value="org.lyi.puzzles.activities.MainActivity" />
         </activity>
         <activity
             android:name=".activities.HelpActivity"
@@ -53,14 +53,14 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.lyi.2048.activities.MainActivity" />
+                android:value="org.lyi.puzzles.activities.MainActivity" />
         </activity>
         <activity
-            android:name="org.lyi.2048.activities.StatsActivity"
+            android:name="org.lyi.puzzles.activities.StatsActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.lyi.2048.activities.MainActivity" />
+                android:value="org.lyi.puzzles.activities.MainActivity" />
         </activity>
         <activity
             android:name=".activities.SettingsActivity"
@@ -69,7 +69,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.lyi.2048.activities.MainActivity" />
+                android:value="org.lyi.puzzles.activities.MainActivity" />
         </activity>
         <activity
             android:exported="true"
@@ -84,11 +84,11 @@
                 android:resource="@xml/air_actions" />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.lyi.2048.activities.MainActivity" />
+                android:value="org.lyi.puzzles.activities.MainActivity" />
         </activity>
 
         <service
-            android:name="org.lyi.2048.backup.PFABackupService"
+            android:name="org.lyi.puzzles.backup.PFABackupService"
             android:enabled="true"
             android:exported="true"
             android:process=":backup"
