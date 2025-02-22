@@ -6,9 +6,9 @@ plugins {
 }
 
 android {
-    namespace 'org.lyi.2048'
+    namespace 'org.lyi.puzzles'
     defaultConfig {
-        applicationId 'org.lyi.2048'
+        applicationId 'org.lyi.puzzles'
         minSdkVersion 21
         targetSdkVersion 34
         compileSdk 34
@@ -45,7 +45,7 @@ android {
     dataBinding {
         enabled = true
     }
-    namespace 'org.lyi.2048'
+    namespace 'org.lyi.puzzles'
 
     lint {
         lintConfig = file("lint.xml")

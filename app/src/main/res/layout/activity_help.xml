@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        tools:context="org.lyi.2048.activities.MainActivity">
+        tools:context="org.lyi.puzzles.activities.MainActivity">
 
         <include layout="@layout/toolbar" />
 
