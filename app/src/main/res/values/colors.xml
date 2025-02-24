@@ -1,49 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#024265</color>
-    <color name="colorPrimaryDark">#024265</color>
-    <color name="colorAccent">#0274B2</color>
+    <color name="colorPrimary">#2196F3</color>
+    <color name="colorPrimaryDark">#1976D2</color>
+    <color name="colorAccent">#1E88E5</color>
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
     <color name="middlegrey">#A8A8A8</color>
+    <color name="darkgrey">#424242</color>
     <color name="yellow">#f6d126</color>
 
     <!-- own definded colors -->
-    <color name="button_empty">#E6E6E6</color>
-    <color name="button2">#B7C6F1</color>
-    <color name="button4">#8aa5ce</color>
-    <color name="button8">#5D84AB</color>
-    <color name="button16">#0274B2</color>
+    <color name="light_blue_50">#E3F2FD</color>
+    <color name="light_blue_100">#BBDEFB</color>
+    <color name="light_blue_200">#90CAF9</color>
+    <color name="light_blue_300">#64B5F6</color>
+    <color name="light_blue_400">#42A5F5</color>
+    <color name="light_blue_500">#2196F3</color>
+    <color name="light_blue_600">#1E88E5</color>
+    <color name="light_blue_700">#1976D2</color>
+    <color name="light_blue_800">#1565C0</color>
+    <color name="light_blue_900">#0D47A1</color>
+    <color name="light_blue_A100">#82B1FF</color>
+    <color name="light_blue_A200">#448AFF</color>
+    <color name="light_blue_A400">#2979FF</color>
+    <color name="light_blue_A700">#2962FF</color>
+
+    <color name="blue_grey_50">#ECEFF1</color>
+    <color name="blue_grey_100">#CFD8DC</color>
+    <color name="blue_grey_200">#B0BEC5</color>
+    <color name="blue_grey_300">#90A4AE</color>
+    <color name="blue_grey_400">#78909C</color>
+    <color name="blue_grey_500">#607D8B</color>
+    <color name="blue_grey_600">#546E7A</color>
+    <color name="blue_grey_700">#455A64</color>
+    <color name="blue_grey_800">#37474F</color>
+    <color name="blue_grey_900">#263238</color>
+
+    <!-- Material 3 表面颜色 -->
+    <color name="surface">#FFFFFF</color>
+    <color name="on_surface">#000000</color>
+    <color name="surface_dark">#121212</color>
+    <color name="on_surface_dark">#FFFFFF</color>
+    
+    <!-- Material 3 错误颜色 -->
+    <color name="error">#B00020</color>
+    <color name="on_error">#FFFFFF</color>
+
+    <color name="button_empty">#E0E0E0</color>
+    <!--
+    <color name="button2">#BB86FC</color>
+    <color name="button4">#6200EE</color>
+    <color name="button8">#3700B3</color>
+    <color name="button16">#03DAC5</color>
     <color name="button32">#2F6388</color>
     <color name="button64">#024265</color>
     <color name="button128">#020232</color>
-    <color name="button256">#3C3C3C</color>
-    <color name="button512">#646464</color>
-    <color name="button1024">#A8A8A8</color>
-    <color name="button2048">#C8C8C8</color>
-    <color name="button4096">#FFFFFF</color>
-    <color name="button8192">#C8E6FF</color>
-    <color name="button16384">#96B4FF</color>
-    <color name="button32768">#6482FF</color>
-
-    <!-- own definded colors 2 -->
-    <color name="button_empty_2">#A8A8A8</color>
-    <color name="button2_2">#EEE4DA</color>
-    <color name="button4_2">#ECE0C3</color>
-    <color name="button8_2">#FEB588</color>
-    <color name="button16_2">#F79663</color>
-    <color name="button32_2">#F77D63</color>
-    <color name="button64_2">#F76142</color>
-    <color name="button128_2">#EFCE73</color>
-    <color name="button256_2">#E6CA5B</color>
-    <color name="button512_2">#EECA52</color>
-    <color name="button1024_2">#EEC642</color>
-    <color name="button2048_2">#E6BE29</color>
-    <color name="button4096_2">#EF696B</color>
-    <color name="button8192_2">#E74D52</color>
-    <color name="button16384_2">#DE413A</color>
-    <color name="button32768_2">#73B2D6</color>
-
+    <color name="button256">#020232</color>
+    <color name="button512">#000000</color>
+    <color name="button1024">#000000</color>
+    <color name="button2048">#000000</color>
+    <color name="button4096">#000000</color>
+    <color name="button8192">#000000</color>
+    <color name="button16384">#000000</color>
+    <color name="button32768">#000000</color>
+    -->
 
     <!-- dots inactive colors -->
     <color name="dot_dark_screen">#026499</color>
