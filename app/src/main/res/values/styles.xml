@@ -6,8 +6,10 @@
     </style>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.Material3.DayNight.DarkActionBar">
+    <style name="AppTheme" parent="Theme.Material3.Light">
         <!-- Customize your theme here. -->
+        <item name="windowActionBar">true</item>
+        <item name="actionBarStyle">@style/ThemeOverlay.Material3.Dark.ActionBar</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -26,7 +28,7 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.Material3.Light" />
 
-    <style name="AppTheme.NoActionBar" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="AppTheme.NoActionBar" parent="Theme.Material3.Light.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

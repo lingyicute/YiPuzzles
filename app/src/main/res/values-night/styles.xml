@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="Theme.Material3.DayNight.DarkActionBar">
+    <style name="AppTheme" parent="Theme.Material3.Dark">
+        <item name="windowActionBar">true</item>
+        <item name="actionBarStyle">@style/ThemeOverlay.Material3.Dark.ActionBar</item>
         <item name="android:windowBackground">#282828</item>
         <item name="colorPrimary">@color/light_blue_200</item>
         <item name="colorPrimaryDark">@color/light_blue_700</item>
