@@ -107,37 +107,67 @@
 
                 </LinearLayout>
 
-                <Button
-                    android:id="@+id/button_newGame"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginRight="20dp"
                     android:layout_weight="2"
-                    android:background="@drawable/standalone_button"
-                    android:clickable="false"
-                    android:text="@string/new_Game_Button"
-                    android:textColor="@color/white"
-                    android:textSize="25sp"
-                    android:textStyle="normal" />
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:weightSum="2">
 
-                <Button
-                    android:id="@+id/button_continueGame"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_weight="2"
-                    android:background="@drawable/standalone_button"
-                    android:clickable="false"
-                    android:text="@string/continue_Game_Button"
-                    android:textColor="@color/white"
-                    android:textSize="25sp"
-                    android:textStyle="normal" />
+                    <org.lyi.puzzles.SquareFrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.6"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginStart="20dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_continueGame"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:clickable="false"
+                            app:icon="@drawable/ic_play_arrow_24dp"
+                            app:iconGravity="textStart"
+                            app:iconPadding="0dp"
+                            app:iconSize="24dp"
+                            android:insetLeft="0dp"
+                            android:insetTop="0dp"
+                            android:insetRight="0dp"
+                            android:insetBottom="0dp"
+                            android:padding="0dp"
+                            app:cornerRadius="16dp"
+                            style="@style/Widget.Material3.Button.Icon" />
+
+                    </org.lyi.puzzles.SquareFrameLayout>
+
+                    <org.lyi.puzzles.SquareFrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.6"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="20dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_newGame"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:clickable="false"
+                            app:icon="@drawable/ic_refresh_24dp"
+                            app:iconGravity="textStart"
+                            app:iconPadding="0dp"
+                            app:iconSize="24dp"
+                            android:insetLeft="0dp"
+                            android:insetTop="0dp"
+                            android:insetRight="0dp"
+                            android:insetBottom="0dp"
+                            android:padding="0dp"
+                            app:cornerRadius="16dp"
+                            style="@style/Widget.Material3.Button.Icon" />
+
+                    </org.lyi.puzzles.SquareFrameLayout>
+                </LinearLayout>
 
                 <!--  <Button
                 android:layout_width="wrap_content"

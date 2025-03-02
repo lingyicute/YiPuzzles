@@ -108,35 +108,49 @@
 
                 </LinearLayout>
 
-                <Button
-                    android:id="@+id/button_newGame"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
+                    android:layout_weight="6"
                     android:layout_marginTop="5dp"
-                    android:layout_weight="3"
-                    android:background="@color/colorPrimary"
-                    android:clickable="false"
-                    android:text="@string/new_Game_Button"
-                    android:textColor="@color/white"
-                    android:textStyle="normal" />
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:weightSum="2">
 
-                <Button
-                    android:id="@+id/button_continueGame"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_weight="3"
-                    android:background="@color/colorPrimary"
-                    android:clickable="false"
-                    android:text="@string/continue_Game_Button"
-                    android:textColor="@color/white"
-                    android:textStyle="normal" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_continueGame"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.9"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginStart="20dp"
+                        android:clickable="false"
+                        android:text="@string/continue_Game_Button"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        app:icon="@drawable/ic_play_arrow_24dp"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        app:cornerRadius="16dp"
+                        style="@style/Widget.Material3.Button.Icon" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_newGame"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.9"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="20dp"
+                        android:clickable="false"
+                        android:text="@string/new_Game_Button"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        app:icon="@drawable/ic_refresh_24dp"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        app:cornerRadius="16dp"
+                        style="@style/Widget.Material3.Button.Icon" />
+                </LinearLayout>
 
                 <!--  <Button
                 android:layout_width="wrap_content"

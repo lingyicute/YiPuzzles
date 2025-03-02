@@ -20,9 +20,6 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v3
 
-      - name: Clean
-        run: bash ./gradlew clean
-
       - name: Build apk
         run: bash ./gradlew assembleRelease
 
@@ -31,4 +28,3 @@ jobs:
         with:
           name: apk
           path: app/build/outputs/apk/release/
-        
