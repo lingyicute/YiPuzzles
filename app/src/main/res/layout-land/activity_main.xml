@@ -132,6 +132,7 @@
                         app:iconGravity="textStart"
                         app:iconPadding="8dp"
                         app:cornerRadius="16dp"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
                         style="@style/Widget.Material3.Button.Icon" />
 
                     <com.google.android.material.button.MaterialButton
@@ -149,6 +150,7 @@
                         app:iconGravity="textStart"
                         app:iconPadding="8dp"
                         app:cornerRadius="16dp"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
                         style="@style/Widget.Material3.Button.Icon" />
                 </LinearLayout>
 
