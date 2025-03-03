@@ -39,8 +39,6 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
 
 import org.lyi.puzzles.R;
-import org.lyi.puzzles.activities.AboutActivity;
-import org.lyi.puzzles.activities.HelpActivity;
 import org.lyi.puzzles.activities.MainActivity;
 import org.lyi.puzzles.activities.SettingsActivity;
 import org.lyi.puzzles.activities.StatsActivity;
@@ -177,14 +175,6 @@ public abstract class BaseActivity extends AppCompatActivity implements OnNaviga
                 break;
             case R.id.nav_tutorial:
                 intent = new Intent(this, TutorialActivity.class);
-                createBackStack(intent);
-                break;
-            case R.id.nav_about:
-                intent = new Intent(this, AboutActivity.class);
-                createBackStack(intent);
-                break;
-            case R.id.nav_help:
-                intent = new Intent(this, HelpActivity.class);
                 createBackStack(intent);
                 break;
             case R.id.nav_statistics:

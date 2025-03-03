@@ -2,7 +2,7 @@
 
     <ListPreference
         android:key="currentTheme"
-        android:title="Select theme"
+        android:title="主题"
         android:entries="@array/theme_list"
         android:entryValues="@array/theme_list_values"
         android:defaultValue="system"

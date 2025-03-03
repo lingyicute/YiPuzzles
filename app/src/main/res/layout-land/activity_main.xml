@@ -153,83 +153,8 @@
                         app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
                         style="@style/Widget.Material3.Button.Icon" />
                 </LinearLayout>
-
-                <!--  <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="coachMark"
-                android:visibility="visible"
-                android:onClick="coachMark"/> -->
-                <!--
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:weightSum="2">
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginRight="1dp"
-                    android:text="@string/menu_highscore"
-                    android:textStyle="normal"
-                    android:id="@+id/highscoreButton"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_weight="1"
-                    android:onClick="onClick"
-                    android:capitalize="none"
-                    android:clickable="false"/>
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="1dp"
-                    android:layout_marginRight="30dp"
-                    android:text="@string/menu_settings"
-                    android:textStyle="normal"
-                    android:id="@+id/settingsButton"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_weight="1"
-                    android:onClick="onClick"
-                    android:capitalize="none"
-                    android:clickable="false"/>
             </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:weightSum="2">
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginRight="1dp"
-                    android:text="@string/menu_about"
-                    android:textStyle="normal"
-                    android:id="@+id/aboutButton"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_weight="1"
-                    android:onClick="onClick"
-                    android:capitalize="none"
-                    android:clickable="false"/>
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="1dp"
-                    android:layout_marginRight="30dp"
-                    android:text="@string/menu_help"
-                    android:textStyle="normal"
-                    android:id="@+id/helpButton"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_weight="1"
-                    android:onClick="onClick"
-                    android:capitalize="none"
-                    android:clickable="false"/>
-            </LinearLayout>
--->
-            </LinearLayout>
-
         </LinearLayout>
-
     </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
