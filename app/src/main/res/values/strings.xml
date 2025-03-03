@@ -45,7 +45,7 @@
     <!-- ###TUTORIAL### -->
     <string name="next">下一页</string>
     <string name="skip">跳过</string>
-    <string name="Tutorial_Titel">欢迎来玩梨的 2048！</string>
+    <string name="Tutorial_Titel">欢迎来玩 2048！</string>
     <string name="Tutorial_Instruction">下面是一些简简单单的教程～</string>
     <string name="Tutorial_Titel_Move">基本操作</string>
     <string name="Tutorial_Move">向目标方向滑动手指即可移动所有数字到可到达的位置。</string>
