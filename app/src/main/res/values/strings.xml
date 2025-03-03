@@ -31,26 +31,24 @@
     <!-- ### CHOOSE DIALOG ### -->
     <string name="new_Game_Button">开始新游戏</string>
     <string name="continue_Game_Button">继续游戏</string>
-    <string name="Record_Button">记录</string>
-    <string name="Points_Button">分数</string>
+    <string name="Record_Button">纪录</string>
+    <string name="Points_Button">得分</string>
     <string name="Winning_Message">恭喜你，赢啦！还要继续玩吗？</string>
     <string name="Yes_Message">是</string>
     <string name="No_Message">否</string>
     <string name="Titel_V_Message">胜利</string>
     <string name="Titel_L_Message">当前得分：%1$d</string>
-    <string name="Lost_Message">糟糕，没法继续了呢。你本次的得分为：%1$d。
-
-是否开始新游戏？（你可以回去撤销先前的步骤哦～）</string>
+    <string name="Lost_Message">糟糕，没法继续了呢。本次的得分为 %1$d。想要新开一局吗？</string>
 
     <!-- ###TUTORIAL### -->
     <string name="next">下一页</string>
     <string name="skip">跳过</string>
-    <string name="Tutorial_Titel">欢迎来玩 2048！</string>
-    <string name="Tutorial_Instruction">下面是一些简简单单的教程～</string>
+    <string name="Tutorial_Titel">YiPuzzles</string>
+    <string name="Tutorial_Instruction">欢迎来玩梨的 2048！</string>
     <string name="Tutorial_Titel_Move">基本操作</string>
-    <string name="Tutorial_Move">向目标方向滑动手指即可移动所有数字到可到达的位置。</string>
+    <string name="Tutorial_Move">向目标方向滑动手指即可移动所有的数字。</string>
     <string name="Tutorial_Titel_Add">游戏目标</string>
-    <string name="Tutorial_Add">相同的数字会彼此合成，你的目标是合成出 2048！</string>
+    <string name="Tutorial_Add">相同的数字会彼此合成，试着合成出 2048 吧！</string>
 
     <!-- ###STATISTICS### -->
     <string name="Stat_High_Number">最高数字</string>
