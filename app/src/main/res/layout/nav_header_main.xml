@@ -25,8 +25,7 @@
             android:textColor="@color/colorPrimary"
             android:textSize="72sp"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/imageView" />
+            android:layout_centerVertical="true" />
 
     </RelativeLayout>
 
