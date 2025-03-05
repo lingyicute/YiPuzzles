@@ -24,7 +24,7 @@
         <item name="colorOnSurfaceVariant">@color/blue_grey_700</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.Material3.Light" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.Material3.Dark" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.Material3.Light" />
 
@@ -107,6 +107,10 @@
         <item name="button16384Text">@color/white</item>
         <item name="button32768">@color/light_blue_A700</item>
         <item name="button32768Text">@color/white</item>
+    </style>
+
+    <style name="AppTheme.NavigationView">
+        <item name="android:layout_marginTop">16dp</item>
     </style>
 
 </resources>

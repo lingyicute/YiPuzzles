@@ -5,8 +5,8 @@
         <item name="windowActionBar">true</item>
         <item name="actionBarStyle">@style/ThemeOverlay.Material3.Dark.ActionBar</item>
         <item name="android:windowBackground">#282828</item>
-        <item name="colorPrimary">@color/light_blue_200</item>
-        <item name="colorPrimaryDark">@color/light_blue_700</item>
+        <item name="colorPrimary">@color/blue_grey_800</item>
+        <item name="colorPrimaryDark">@color/blue_grey_900</item>
         <item name="colorAccent">@color/light_blue_A200</item>
         <item name="colorPrimaryContainer">@color/blue_grey_800</item>
         <item name="colorOnPrimaryContainer">@color/light_blue_50</item>
