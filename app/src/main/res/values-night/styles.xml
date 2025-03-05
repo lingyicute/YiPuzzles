@@ -22,12 +22,12 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.Material3.Dark" />
 
     <style name="ThemeOverlay.ColorSchemeDefault" parent="AppTheme.ColorSchemeDefault">
-        <item name="buttonEmpty">@color/darkgrey</item>
+        <item name="buttonEmpty">@color/light_blue_500</item>
         <item name="buttonEmptyText">@color/white</item>
     </style>
     
     <style name="ThemeOverlay.ColorSchemeOriginal" parent="ColorSchemeOriginal">
-        <item name="buttonEmpty">@color/darkgrey</item>
+        <item name="buttonEmpty">@color/light_blue_500</item>
         <item name="buttonEmptyText">@color/white</item>
     </style>
 </resources>
