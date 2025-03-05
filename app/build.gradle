@@ -11,7 +11,7 @@ android {
         applicationId 'org.lyi.puzzles'
         minSdkVersion 21
         targetSdkVersion 34
-        compileSdk 34
+        compileSdk 35
         versionCode 12
         versionName "1.6.0"
     }
