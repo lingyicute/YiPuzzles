@@ -109,8 +109,4 @@
         <item name="button32768Text">@color/white</item>
     </style>
 
-    <style name="AppTheme.NavigationView">
-        <item name="android:layout_marginTop">16dp</item>
-    </style>
-
 </resources>
