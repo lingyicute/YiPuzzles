@@ -163,10 +163,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme.NavigationView"
         app:headerLayout="@layout/nav_header_main"
-        app:menu="@menu/main_drawer"
-        app:itemIconPadding="16dp"
-        app:itemSpacing="8dp" />
+        app:menu="@menu/main_drawer" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
