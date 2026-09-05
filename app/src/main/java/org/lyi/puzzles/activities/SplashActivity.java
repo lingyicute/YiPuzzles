@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.splashscreen.SplashScreen;
 
 import org.lyi.puzzles.helpers.FirstLaunchManager;
 
@@ -37,6 +38,8 @@ public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Android 12 style splash screen (backported by androidx.core.splashscreen)
+        SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
 
         Intent mainIntent = new Intent(SplashActivity.this, TutorialActivity.class);

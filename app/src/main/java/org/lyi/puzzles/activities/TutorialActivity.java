@@ -20,30 +20,26 @@ package org.lyi.puzzles.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.color.MaterialColors;
 
 import org.lyi.puzzles.R;
+import org.lyi.puzzles.helpers.EdgeToEdgeHelper;
 import org.lyi.puzzles.helpers.FirstLaunchManager;
+import org.lyi.puzzles.helpers.TileColors;
 
 /**
  * In this activity a ViewPager is filled with the four pages of the tutorial.
@@ -58,7 +54,7 @@ public class TutorialActivity extends AppCompatActivity {
     private MyViewPagerAdapter myViewPagerAdapter;
     private LinearLayout dotsLayout;
     private TextView[] dots;
-    private Button btnSkip, btnNext;
+    private MaterialButton btnSkip, btnNext;
     private FirstLaunchManager firstLaunchManager;
 
     // layouts of all welcome sliders
@@ -74,27 +70,21 @@ public class TutorialActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdgeHelper.enableEdgeToEdgeDisplay(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tutorial);
-
-        // Making notification bar transparent
-        if (Build.VERSION.SDK_INT >= 21) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        }
+        EdgeToEdgeHelper.applySystemBarPadding(findViewById(R.id.main_content), true, true);
 
         firstLaunchManager = new FirstLaunchManager(this);
 
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         dotsLayout = (LinearLayout) findViewById(R.id.layoutDots);
-        btnSkip = (Button) findViewById(R.id.btn_skip);
-        btnNext = (Button) findViewById(R.id.btn_next);
+        btnSkip = (MaterialButton) findViewById(R.id.btn_skip);
+        btnNext = (MaterialButton) findViewById(R.id.btn_next);
 
 
         // adding bottom dots
         addBottomDots(0);
-
-        // making notification bar transparent
-        changeStatusBarColor();
 
         myViewPagerAdapter = new MyViewPagerAdapter();
         viewPager.setAdapter(myViewPagerAdapter);
@@ -134,13 +124,14 @@ public class TutorialActivity extends AppCompatActivity {
     private void addBottomDots(int currentPage) {
         dots = new TextView[layouts.length];
 
-        int activeColor = ContextCompat.getColor(this, R.color.dot_light_screen);
-        int inactiveColor = ContextCompat.getColor(this, R.color.dot_dark_screen);
+        // Material 3 page indicator: primary for the active page, outline variant otherwise
+        int activeColor = MaterialColors.getColor(dotsLayout, com.google.android.material.R.attr.colorPrimary);
+        int inactiveColor = MaterialColors.getColor(dotsLayout, com.google.android.material.R.attr.colorOutlineVariant);
 
         dotsLayout.removeAllViews();
         for (int i = 0; i < dots.length; i++) {
             dots[i] = new TextView(this);
-            dots[i].setText(Html.fromHtml("&#8226;"));
+            dots[i].setText("\u2022");
             dots[i].setTextSize(35);
             dots[i].setTextColor(inactiveColor);
             dotsLayout.addView(dots[i]);
@@ -196,17 +187,6 @@ public class TutorialActivity extends AppCompatActivity {
     };
 
     /**
-     * Making notification bar transparent
-     */
-    private void changeStatusBarColor() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(Color.TRANSPARENT);
-        }
-    }
-
-    /**
      * View pager adapter
      */
     public class MyViewPagerAdapter extends PagerAdapter {
@@ -229,21 +209,21 @@ public class TutorialActivity extends AppCompatActivity {
                     break;
                 case 1:
                     imageView = (ImageView) findViewById(R.id.image2);
-                    if (PreferenceManager.getDefaultSharedPreferences(TutorialActivity.this).getString("pref_color", "1").equals("1"))
+                    if (!TileColors.currentScheme(TutorialActivity.this).equals(TileColors.SCHEME_ORIGINAL))
                         Glide.with(TutorialActivity.this).load(R.drawable.tutorial_move_s).into(imageView);
                     else
                         Glide.with(TutorialActivity.this).load(R.drawable.tutorial_move_o).into(imageView);
                     break;
                 case 2:
                     imageView = (ImageView) findViewById(R.id.image3);
-                    if (PreferenceManager.getDefaultSharedPreferences(TutorialActivity.this).getString("pref_color", "1").equals("1"))
+                    if (!TileColors.currentScheme(TutorialActivity.this).equals(TileColors.SCHEME_ORIGINAL))
                         Glide.with(TutorialActivity.this).load(R.drawable.tutorial_swipe_s).into(imageView);
                     else
                         Glide.with(TutorialActivity.this).load(R.drawable.tutorial_swipe_o).into(imageView);
                     break;
                 case 3:
                     imageView = (ImageView) findViewById(R.id.image4);
-                    if (PreferenceManager.getDefaultSharedPreferences(TutorialActivity.this).getString("pref_color", "1").equals("1"))
+                    if (!TileColors.currentScheme(TutorialActivity.this).equals(TileColors.SCHEME_ORIGINAL))
                         Glide.with(TutorialActivity.this).load(R.drawable.tutorial_add_s).into(imageView);
                     else
                         Glide.with(TutorialActivity.this).load(R.drawable.tutorial_add_o).into(imageView);

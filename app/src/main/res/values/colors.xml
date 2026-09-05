@@ -1,14 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#024265</color>
-    <color name="colorPrimaryDark">#024265</color>
-    <color name="colorAccent">#0274B2</color>
+    <!-- ================================================================
+         Material 3 baseline colour scheme (seed #0274B2).
+         Used on devices without dynamic colour (Android < 12) or when the
+         user disables "Dynamic colours" in the settings.
+         ================================================================ -->
+    <color name="seed">#0274B2</color>
+
+    <!-- Light scheme -->
+    <color name="md_theme_light_primary">#00658E</color>
+    <color name="md_theme_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_light_primaryContainer">#C7E7FF</color>
+    <color name="md_theme_light_onPrimaryContainer">#001E2E</color>
+    <color name="md_theme_light_secondary">#4F616E</color>
+    <color name="md_theme_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_light_secondaryContainer">#D2E5F5</color>
+    <color name="md_theme_light_onSecondaryContainer">#0B1D29</color>
+    <color name="md_theme_light_tertiary">#63597C</color>
+    <color name="md_theme_light_onTertiary">#FFFFFF</color>
+    <color name="md_theme_light_tertiaryContainer">#E9DDFF</color>
+    <color name="md_theme_light_onTertiaryContainer">#1F1635</color>
+    <color name="md_theme_light_error">#BA1A1A</color>
+    <color name="md_theme_light_onError">#FFFFFF</color>
+    <color name="md_theme_light_errorContainer">#FFDAD6</color>
+    <color name="md_theme_light_onErrorContainer">#410002</color>
+    <color name="md_theme_light_background">#F7F9FC</color>
+    <color name="md_theme_light_onBackground">#191C1E</color>
+    <color name="md_theme_light_surface">#F7F9FC</color>
+    <color name="md_theme_light_onSurface">#191C1E</color>
+    <color name="md_theme_light_surfaceVariant">#DDE3EA</color>
+    <color name="md_theme_light_onSurfaceVariant">#41484D</color>
+    <color name="md_theme_light_outline">#71787E</color>
+    <color name="md_theme_light_outlineVariant">#C1C7CE</color>
+    <color name="md_theme_light_inverseSurface">#2E3133</color>
+    <color name="md_theme_light_inverseOnSurface">#EFF1F3</color>
+    <color name="md_theme_light_inversePrimary">#85CFFF</color>
+    <color name="md_theme_light_surfaceTint">#00658E</color>
+    <color name="md_theme_light_scrim">#000000</color>
+    <color name="md_theme_light_surfaceDim">#D8DADD</color>
+    <color name="md_theme_light_surfaceBright">#F7F9FC</color>
+    <color name="md_theme_light_surfaceContainerLowest">#FFFFFF</color>
+    <color name="md_theme_light_surfaceContainerLow">#F2F4F7</color>
+    <color name="md_theme_light_surfaceContainer">#ECEEF1</color>
+    <color name="md_theme_light_surfaceContainerHigh">#E6E8EB</color>
+    <color name="md_theme_light_surfaceContainerHighest">#E0E3E5</color>
+
+    <!-- Dark scheme -->
+    <color name="md_theme_dark_primary">#85CFFF</color>
+    <color name="md_theme_dark_onPrimary">#00344C</color>
+    <color name="md_theme_dark_primaryContainer">#004C6C</color>
+    <color name="md_theme_dark_onPrimaryContainer">#C7E7FF</color>
+    <color name="md_theme_dark_secondary">#B6C9D8</color>
+    <color name="md_theme_dark_onSecondary">#21323E</color>
+    <color name="md_theme_dark_secondaryContainer">#374955</color>
+    <color name="md_theme_dark_onSecondaryContainer">#D2E5F5</color>
+    <color name="md_theme_dark_tertiary">#CDC0E9</color>
+    <color name="md_theme_dark_onTertiary">#342B4B</color>
+    <color name="md_theme_dark_tertiaryContainer">#4B4163</color>
+    <color name="md_theme_dark_onTertiaryContainer">#E9DDFF</color>
+    <color name="md_theme_dark_error">#FFB4AB</color>
+    <color name="md_theme_dark_onError">#690005</color>
+    <color name="md_theme_dark_errorContainer">#93000A</color>
+    <color name="md_theme_dark_onErrorContainer">#FFDAD6</color>
+    <color name="md_theme_dark_background">#101416</color>
+    <color name="md_theme_dark_onBackground">#E0E3E5</color>
+    <color name="md_theme_dark_surface">#101416</color>
+    <color name="md_theme_dark_onSurface">#E0E3E5</color>
+    <color name="md_theme_dark_surfaceVariant">#41484D</color>
+    <color name="md_theme_dark_onSurfaceVariant">#C1C7CE</color>
+    <color name="md_theme_dark_outline">#8B9298</color>
+    <color name="md_theme_dark_outlineVariant">#41484D</color>
+    <color name="md_theme_dark_inverseSurface">#E0E3E5</color>
+    <color name="md_theme_dark_inverseOnSurface">#2E3133</color>
+    <color name="md_theme_dark_inversePrimary">#00658E</color>
+    <color name="md_theme_dark_surfaceTint">#85CFFF</color>
+    <color name="md_theme_dark_scrim">#000000</color>
+    <color name="md_theme_dark_surfaceDim">#101416</color>
+    <color name="md_theme_dark_surfaceBright">#36393C</color>
+    <color name="md_theme_dark_surfaceContainerLowest">#0B0F11</color>
+    <color name="md_theme_dark_surfaceContainerLow">#191C1E</color>
+    <color name="md_theme_dark_surfaceContainer">#1D2022</color>
+    <color name="md_theme_dark_surfaceContainerHigh">#272A2D</color>
+    <color name="md_theme_dark_surfaceContainerHighest">#323538</color>
+
+    <!-- Splash screen backgrounds (splash themes can't use theme attributes) -->
+    <color name="splash_background_light">@color/md_theme_light_surface</color>
+    <color name="splash_background_dark">@color/md_theme_dark_surface</color>
+
+    <!-- Basic colours -->
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
-    <color name="middlegrey">#A8A8A8</color>
-    <color name="yellow">#f6d126</color>
 
-    <!-- own definded colors -->
+    <!-- ================================================================
+         Static tile palettes (selectable in the settings).
+         The "Material You" palette is generated at runtime from the theme
+         colours, see helpers/TileColors.kt
+         ================================================================ -->
+
+    <!-- Classic blue palette (former default) -->
     <color name="button_empty">#E6E6E6</color>
     <color name="button2">#B7C6F1</color>
     <color name="button4">#8aa5ce</color>
@@ -26,8 +115,8 @@
     <color name="button16384">#96B4FF</color>
     <color name="button32768">#6482FF</color>
 
-    <!-- own definded colors 2 -->
-    <color name="button_empty_2">#A8A8A8</color>
+    <!-- Original 2048 palette -->
+    <color name="button_empty_2">#CDC1B4</color>
     <color name="button2_2">#EEE4DA</color>
     <color name="button4_2">#ECE0C3</color>
     <color name="button8_2">#FEB588</color>
@@ -43,12 +132,4 @@
     <color name="button8192_2">#E74D52</color>
     <color name="button16384_2">#DE413A</color>
     <color name="button32768_2">#73B2D6</color>
-
-
-    <!-- dots inactive colors -->
-    <color name="dot_dark_screen">#026499</color>
-
-    <!-- dots active colors -->
-    <color name="dot_light_screen">#79bfe6</color>
-
 </resources>

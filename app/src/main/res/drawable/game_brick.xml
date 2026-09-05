@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Single tile of the game board (Material 3 medium corner radius) -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <corners android:radius="7dp" />
-
-    <solid android:color="@color/button_empty" />
-
+    <corners android:radius="12dp" />
+    <solid android:color="?attr/colorSurfaceContainerHighest" />
 </shape>

@@ -73,7 +73,7 @@
     <string name="settings_name">Настройки</string>
     <string name="settings_display">Блокировка экрана</string>
     <string name="settings_color_system">Системная</string>
-    <string name="settings_color_scheme_default">По умолчанию</string>
+    <string name="settings_color_scheme_material_you">Material You</string>
     <string name="Winning_Message">Вы выиграли! Хотите продолжить игру?</string>
     <string name="swipe_left">Сдвиг влево</string>
     <string name="Tutorial_Titel">Привет!</string>

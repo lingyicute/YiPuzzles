@@ -24,6 +24,7 @@ import android.widget.ExpandableListView;
 import org.lyi.puzzles.R;
 import org.lyi.puzzles.activities.adapter.HelpExpandableListAdapter;
 import org.lyi.puzzles.activities.helper.BaseActivity;
+import org.lyi.puzzles.helpers.EdgeToEdgeHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +41,10 @@ public class HelpActivity extends BaseActivity {
         LinkedHashMap<String, List<String>> expandableListDetail = buildData();
 
         ExpandableListView generalExpandableListView = findViewById(R.id.generalExpandableListView);
-        generalExpandableListView.setAdapter(new HelpExpandableListAdapter(this, new ArrayList<>(expandableListDetail.keySet()), expandableListDetail));
+        HelpExpandableListAdapter adapter = new HelpExpandableListAdapter(this, new ArrayList<>(expandableListDetail.keySet()), expandableListDetail);
+        generalExpandableListView.setAdapter(adapter);
+        // keep the list clear of the navigation bar (edge-to-edge)
+        EdgeToEdgeHelper.applyBottomSystemBarPadding(generalExpandableListView);
 
         overridePendingTransition(0, 0);
     }

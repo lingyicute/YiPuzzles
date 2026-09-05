@@ -1,53 +1,56 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ListPreference
-        android:key="currentTheme"
-        android:title="Select theme"
-        android:entries="@array/theme_list"
-        android:entryValues="@array/theme_list_values"
-        android:defaultValue="system"
-        android:summary="%s"
-        />
+    <PreferenceCategory
+        android:title="@string/settings_category_appearance"
+        app:iconSpaceReserved="false">
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="pref_animationActivated"
-        android:title="@string/settings_animation" />
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="switch_preference_1"
-        android:title="@string/settings_display" />
-    <ListPreference
-        android:defaultValue="1"
-        android:dialogIcon="@drawable/ic_menu_tutorial"
-        android:enabled="true"
-        android:entries="@array/color_list"
-        android:entryValues="@array/color_list_values"
-        android:key="pref_color"
-        android:summary="%s"
-        android:title="@string/settings_color" />
+        <ListPreference
+            android:defaultValue="system"
+            android:entries="@array/theme_list"
+            android:entryValues="@array/theme_list_values"
+            android:icon="@drawable/ic_dark_mode"
+            android:key="currentTheme"
+            android:title="@string/settings_theme"
+            app:useSimpleSummaryProvider="true" />
 
-    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
-    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
-    <!-- <EditTextPreference
-        android:capitalize="words"
-        android:defaultValue="@string/pref_default_display_name"
-        android:inputType="textCapWords"
-        android:key="example_text"
-        android:maxLines="1"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="@string/pref_title_display_name" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_wallpaper"
+            android:key="pref_dynamic_colors"
+            android:summary="@string/settings_dynamic_colors_summary"
+            android:title="@string/settings_dynamic_colors" />
 
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/color_list"
+            android:entryValues="@array/color_list_values"
+            android:icon="@drawable/ic_palette"
+            android:key="pref_color"
+            android:title="@string/settings_color"
+            app:useSimpleSummaryProvider="true" />
 
-    <ListPreference
-        android:defaultValue="-1"
-        android:entries="@array/pref_example_list_titles"
-        android:entryValues="@array/pref_example_list_values"
-        android:key="example_list"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null"
-        android:title="@string/pref_title_add_friends_to_messages" />
-        -->
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/settings_category_game"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_animation"
+            android:key="pref_animationActivated"
+            android:summary="@string/settings_animation_summary"
+            android:title="@string/settings_animation" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:icon="@drawable/ic_screen_lock"
+            android:key="switch_preference_1"
+            android:summary="@string/settings_display_summary"
+            android:title="@string/settings_display" />
+
+    </PreferenceCategory>
 
 </PreferenceScreen>

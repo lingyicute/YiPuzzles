@@ -29,6 +29,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.lyi.puzzles.BuildConfig;
 import org.lyi.puzzles.R;
 import org.lyi.puzzles.activities.helper.BaseActivity;
+import org.lyi.puzzles.helpers.EdgeToEdgeHelper;
+
+import com.google.android.material.appbar.MaterialToolbar;
 
 /**
  * This activity shows the important information about the app.
@@ -40,16 +43,21 @@ import org.lyi.puzzles.activities.helper.BaseActivity;
 public class AboutActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdgeHelper.enableEdgeToEdgeDisplay(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
             ab.setDisplayHomeAsUpEnabled(true);
+            ab.setTitle(R.string.about);
         }
 
         View mainContent = findViewById(R.id.main_content);
         if (mainContent != null) {
+            EdgeToEdgeHelper.applyBottomSystemBarPadding(mainContent);
             mainContent.setAlpha(0);
             mainContent.animate().alpha(1).setDuration(BaseActivity.MAIN_CONTENT_FADEIN_DURATION);
         }

@@ -20,91 +20,38 @@
 package org.lyi.puzzles.activities;
 
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.view.MenuItem;
+import android.view.View;
 
-import androidx.appcompat.app.AppCompatDelegate;
+import androidx.annotation.Nullable;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SwitchPreferenceCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.color.DynamicColors;
+
+import org.lyi.puzzles.PF2048;
 import org.lyi.puzzles.R;
 import org.lyi.puzzles.activities.helper.BaseActivity;
+import org.lyi.puzzles.helpers.TileColors;
 
 
 /**
  * As the name suggests the settings for the app are located in this activity.
- * Here you can change options like the color set of the game, activate or deactivate the animations and the screen locker.
+ * Here you can change options like the colour palette of the tiles, the light/dark theme,
+ * Material You dynamic colours, animations and the screen lock.
+ * <p>
+ * Implemented with AndroidX {@link PreferenceFragmentCompat} which renders Material 3
+ * switches, list dialogs and typography.
  *
  * @author Julian Wadephul and Saskia Jacob
  * @version 20180910
  */
 public class SettingsActivity extends BaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
-    /**
-     * A preference value change listener that updates the preference's summary
-     * to reflect its new value.
-     */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
-            String stringValue = value.toString();
-
-            if (preference instanceof ListPreference) {
-                // For list preferences, look up the correct display value in
-                // the preference's 'entries' list.
-                ListPreference listPreference = (ListPreference) preference;
-                int index = listPreference.findIndexOfValue(stringValue);
-
-                // Set the summary to reflect the new value.
-                preference.setSummary(
-                        index >= 0
-                                ? listPreference.getEntries()[index]
-                                : null);
-            } else {
-                // For all other preferences, set the summary to the value's
-                // simple string representation.
-                preference.setSummary(stringValue);
-            }
-            return true;
-        }
-    };
-
-    /**
-     * Helper method to determine if the device has an extra-large screen. For
-     * example, 10" tablets are extra-large.
-     */
-    private static boolean isXLargeTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-    }
-
-    /**
-     * Binds a preference's summary to its value. More specifically, when the
-     * preference's value is changed, its summary (line of text below the
-     * preference title) is updated to reflect the value. The summary is also
-     * immediately updated upon calling this method. The exact display format is
-     * dependent on the type of preference.
-     *
-     * @see #sBindPreferenceSummaryToValueListener
-     */
-    private static void bindPreferenceSummaryToValue(Preference preference) {
-        // Set the listener to watch for value changes.
-        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
-
-        // Trigger the listener immediately with the preference's
-        // current value.
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,22 +60,35 @@ public class SettingsActivity extends BaseActivity implements SharedPreferences.
         super.mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
         setContentView(R.layout.activity_settings);
 
-        //setupActionBar();
-
         overridePendingTransition(0, 0);
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (!key.equals("currentTheme")) return;
+    protected void onDestroy() {
+        super.mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+        super.onDestroy();
+    }
 
-        String newValue = sharedPreferences.getString("currentTheme", "system");
-        if (newValue.equals("dark")) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else if (newValue.equals("light")) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key == null) return;
+
+        switch (key) {
+            case PF2048.PREF_THEME:
+                // AppCompat recreates the activity for us
+                PF2048.applyNightMode(this);
+                break;
+            case PF2048.PREF_DYNAMIC_COLORS:
+                // The DynamicColors precondition is evaluated on activity creation, so a
+                // simple recreate() is enough to switch between wallpaper and baseline colours.
+                TileColors.invalidate();
+                recreate();
+                break;
+            case TileColors.PREF_KEY:
+                TileColors.invalidate();
+                break;
+            default:
+                break;
         }
     }
 
@@ -138,94 +98,47 @@ public class SettingsActivity extends BaseActivity implements SharedPreferences.
     }
 
     /**
-     * Set up the {@link android.app.ActionBar}, if the API is available.
+     * Shows the general preferences (see {@code res/xml/pref_general.xml}).
      */
-    /*private void setupActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            // Show the Up button in the action bar.
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-    }*/
-
-    /*@Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            //finish();
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-            return true;
-
-            // (!super.onMenuItemSelected(featureId, item)) {
-            //    NavUtils.navigateUpFromSameTask(this);
-            //}
-            //return true;
-        }
-        return super.onMenuItemSelected(featureId, item);
-    }*/
-
-    /**
-     * {@inheritDoc}
-     */
-    /*@Override
-    public boolean onIsMultiPane() {
-        return isXLargeTablet(this);
-    }*/
-
-    /**
-     * {@inheritDoc}
-     */
-    /*@Override
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.pref_headers, target);
-    }*/
-
-    /**
-     * This method stops fragment injection in malicious applications.
-     * Make sure to deny any unknown fragments here.
-     */
-    protected boolean isValidFragment(String fragmentName) {
-        return PreferenceFragment.class.getName().equals(fragmentName)
-                || GeneralPreferenceFragment.class.getName().equals(fragmentName);
-    }
-
-    /**
-     * This fragment shows general preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     * The commented method bindPrefenceSummaryToValue should be added for all preferences
-     * with a summary that is depended from the current value of the preference
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class GeneralPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_general);
-            //setHasOptionsMenu(true);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            //bindPreferenceSummaryToValue(findPreference("example_text"));
-            //bindPreferenceSummaryToValue(findPreference("example_list"));
-        }
+    public static class GeneralPreferenceFragment extends PreferenceFragmentCompat {
 
         @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            int id = item.getItemId();
-            if (id == android.R.id.home) {
-                //getActivity().finish();
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                return true;
+        public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
+            setPreferencesFromResource(R.xml.pref_general, rootKey);
+
+            // Dynamic colours only exist on Android 12+
+            SwitchPreferenceCompat dynamicColors = findPreference(PF2048.PREF_DYNAMIC_COLORS);
+            if (dynamicColors != null) {
+                boolean available = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && DynamicColors.isDynamicColorAvailable();
+                dynamicColors.setEnabled(available);
+                if (!available) {
+                    dynamicColors.setChecked(false);
+                }
             }
-            return super.onOptionsItemSelected(item);
+
+            ListPreference colorScheme = findPreference(TileColors.PREF_KEY);
+            if (colorScheme != null) {
+                colorScheme.setSummaryProvider(new Preference.SummaryProvider<ListPreference>() {
+                    @Override
+                    public CharSequence provideSummary(ListPreference preference) {
+                        CharSequence entry = preference.getEntry();
+                        if (TileColors.SCHEME_MATERIAL_YOU.equals(preference.getValue())) {
+                            return entry + " · " + getString(R.string.settings_color_summary_dynamic);
+                        }
+                        return entry;
+                    }
+                });
+            }
+        }
+
+        @Override
+        public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
+            // bottom inset padding is applied to the fragment container by BaseActivity
+            RecyclerView list = getListView();
+            if (list != null) {
+                list.setClipToPadding(false);
+            }
         }
     }
-
-
 }

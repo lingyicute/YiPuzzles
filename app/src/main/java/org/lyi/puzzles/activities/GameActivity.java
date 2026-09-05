@@ -21,13 +21,12 @@ package org.lyi.puzzles.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -37,11 +36,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
-import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.lyi.puzzles.R;
+
+import androidx.appcompat.app.ActionBar;
+
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import org.lyi.puzzles.activities.helper.BaseActivityWithoutNavBar;
 import org.lyi.puzzles.activities.helper.GameState;
 import org.lyi.puzzles.activities.helper.GameStatistics;
@@ -85,8 +89,8 @@ public class GameActivity extends BaseActivityWithoutNavBar {
     RelativeLayout number_field;
     RelativeLayout number_field_background;
     RelativeLayout touch_field;
-    ImageButton restartButton;
-    ImageButton undoButton;
+    MaterialButton restartButton;
+    MaterialButton undoButton;
     public static int points = 0;
     public static int last_points = 0;
     public static long record = 0;
@@ -157,10 +161,11 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         animationActivated = sharedPref.getBoolean("pref_animationActivated", true);
 
-        if (sharedPref.getBoolean("settings_display", true))
+        if (sharedPref.getBoolean("switch_preference_1", true))
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_game);
 
+        setupToolbar();
         initResources();
 
 
@@ -195,13 +200,26 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         }
         undo = false;
     }
+    /** Material 3 top app bar with up navigation and the board size as subtitle. */
+    private void setupToolbar() {
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(R.string.app_name);
+            int size = getIntent().getIntExtra("n", 4);
+            actionBar.setSubtitle(size + "x" + size);
+        }
+    }
+
     public void initResources() {
         number_field = (RelativeLayout) findViewById(R.id.number_field);
         number_field_background = (RelativeLayout) findViewById(R.id.number_field_background);
         touch_field = (RelativeLayout) findViewById(R.id.touch_field);
         textFieldPoints = (TextView) findViewById(R.id.points);
         textFieldRecord = (TextView) findViewById(R.id.record);
-        restartButton = (ImageButton) findViewById(R.id.restartButton);
+        restartButton = (MaterialButton) findViewById(R.id.restartButton);
         restartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -209,7 +227,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                 createNewGame();
             }
         });
-        undoButton = (ImageButton) findViewById(R.id.undoButton);
+        undoButton = (MaterialButton) findViewById(R.id.undoButton);
 
         undoButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -829,7 +847,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
                         saveStatisticsToFile(gameStatistics);
                         //MESSAGE
-                        new AlertDialog.Builder(this)
+                        new MaterialAlertDialogBuilder(this)
                                 .setTitle((this.getResources().getString(R.string.Titel_V_Message)))
                                 .setMessage((this.getResources().getString(R.string.Winning_Message)))
                                 .setNegativeButton((this.getResources().getString(R.string.No_Message)), new DialogInterface.OnClickListener() {
@@ -1042,7 +1060,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
     public void gameOver() {
         Log.i("record", "" + record + ", " + gameStatistics.getRecord());
         saveStatisticsToFile(gameStatistics);
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
                 .setTitle((this.getResources().getString(R.string.Titel_L_Message, points)))
                 .setMessage(this.getResources().getString(R.string.Lost_Message, points))
                 .setNegativeButton((this.getResources().getString(R.string.No_Message)), new DialogInterface.OnClickListener() {

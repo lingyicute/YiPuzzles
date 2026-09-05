@@ -6,33 +6,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    app:statusBarBackground="@android:color/transparent"
     tools:openDrawer="start">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
+        app:statusBarBackground="@null"
         tools:context="org.lyi.puzzles.activities.SettingsActivity">
 
         <include layout="@layout/toolbar" />
 
-        <LinearLayout
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/main_content"
+            android:name="org.lyi.puzzles.activities.SettingsActivity$GeneralPreferenceFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            android:orientation="vertical"
-            tools:context=".activities.SettingsActivity"
-            android:layout_marginTop="?attr/actionBarSize"
-            android:weightSum="1">
-
-            <fragment
-                android:id="@+id/settings_fragment"
-                android:name="org.lyi.puzzles.activities.SettingsActivity$GeneralPreferenceFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-        </LinearLayout>
+            android:tag="settings_fragment"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

@@ -23,17 +23,19 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
+import android.os.Looper;
 import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import android.view.ViewGroup;
+
+import com.google.android.material.appbar.MaterialToolbar;
 import androidx.core.app.TaskStackBuilder;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
@@ -45,6 +47,7 @@ import org.lyi.puzzles.activities.MainActivity;
 import org.lyi.puzzles.activities.SettingsActivity;
 import org.lyi.puzzles.activities.StatsActivity;
 import org.lyi.puzzles.activities.TutorialActivity;
+import org.lyi.puzzles.helpers.EdgeToEdgeHelper;
 
 /**
  * @author Christopher Beckmann, Karola Marky
@@ -78,10 +81,12 @@ public abstract class BaseActivity extends AppCompatActivity implements OnNaviga
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Material 3: draw behind the transparent system bars
+        EdgeToEdgeHelper.enableEdgeToEdgeDisplay(this);
         super.onCreate(savedInstanceState);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mHandler = new Handler();
+        mHandler = new Handler(Looper.getMainLooper());
 
         overridePendingTransition(0, 0);
     }
@@ -193,8 +198,6 @@ public abstract class BaseActivity extends AppCompatActivity implements OnNaviga
                 break;
             case R.id.nav_settings:
                 intent = new Intent(this, SettingsActivity.class);
-                intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, SettingsActivity.GeneralPreferenceFragment.class.getName());
-                intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
                 createBackStack(intent);
                 break;
             default:
@@ -205,7 +208,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnNaviga
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        MaterialToolbar toolbar = (MaterialToolbar) findViewById(R.id.toolbar);
         if (getSupportActionBar() == null) {
             setSupportActionBar(toolbar);
         }
@@ -224,6 +227,11 @@ public abstract class BaseActivity extends AppCompatActivity implements OnNaviga
 
         View mainContent = findViewById(R.id.main_content);
         if (mainContent != null) {
+            // keep bottom aligned content clear of the navigation bar
+            EdgeToEdgeHelper.applyBottomSystemBarPadding(mainContent);
+            if (mainContent instanceof ViewGroup) {
+                ((ViewGroup) mainContent).setClipToPadding(false);
+            }
             mainContent.setAlpha(0);
             mainContent.animate().alpha(1).setDuration(MAIN_CONTENT_FADEIN_DURATION);
         }

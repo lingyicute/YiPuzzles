@@ -33,4 +33,9 @@
     <attr name="button16384Text" format="color"/>
     <attr name="button32768" format="color"/>
     <attr name="button32768Text" format="color"/>
+
+    <!-- org.lyi.puzzles.views.BoardPreviewView -->
+    <declare-styleable name="BoardPreviewView">
+        <attr name="boardSize" format="integer" />
+    </declare-styleable>
 </resources>
