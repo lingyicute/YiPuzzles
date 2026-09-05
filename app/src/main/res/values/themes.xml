@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ================================================================
+         Base Material 3 theme (light). The night variant lives in
+         values-night/themes.xml. On Android 12+ these colours are replaced
+         by the wallpaper based dynamic colours (see PF2048.kt).
+         ================================================================ -->
+    <style name="Base.Theme.YiPuzzles" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Colour roles -->
+        <item name="colorPrimary">@color/md_theme_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_light_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
+        <item name="colorTertiary">@color/md_theme_light_tertiary</item>
+        <item name="colorOnTertiary">@color/md_theme_light_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/md_theme_light_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/md_theme_light_onTertiaryContainer</item>
+        <item name="colorError">@color/md_theme_light_error</item>
+        <item name="colorOnError">@color/md_theme_light_onError</item>
+        <item name="colorErrorContainer">@color/md_theme_light_errorContainer</item>
+        <item name="colorOnErrorContainer">@color/md_theme_light_onErrorContainer</item>
+        <item name="android:colorBackground">@color/md_theme_light_background</item>
+        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+        <item name="colorSurfaceVariant">@color/md_theme_light_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
+        <item name="colorOutline">@color/md_theme_light_outline</item>
+        <item name="colorOutlineVariant">@color/md_theme_light_outlineVariant</item>
+        <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
+        <item name="colorOnSurfaceInverse">@color/md_theme_light_inverseOnSurface</item>
+        <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
+        <item name="colorSurfaceDim">@color/md_theme_light_surfaceDim</item>
+        <item name="colorSurfaceBright">@color/md_theme_light_surfaceBright</item>
+        <item name="colorSurfaceContainerLowest">@color/md_theme_light_surfaceContainerLowest</item>
+        <item name="colorSurfaceContainerLow">@color/md_theme_light_surfaceContainerLow</item>
+        <item name="colorSurfaceContainer">@color/md_theme_light_surfaceContainer</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_light_surfaceContainerHigh</item>
+        <item name="colorSurfaceContainerHighest">@color/md_theme_light_surfaceContainerHighest</item>
+
+        <!-- Edge to edge: transparent system bars, content draws behind them -->
+        <!-- (light/dark system bar icons are handled by EdgeToEdge.enable() at runtime) -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+
+        <!-- Component defaults -->
+        <item name="toolbarStyle">@style/Widget.YiPuzzles.Toolbar</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.YiPuzzles.MaterialAlertDialog</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="navigationViewStyle">@style/Widget.Material3.NavigationView</item>
+        <item name="tabStyle">@style/Widget.Material3.TabLayout</item>
+    </style>
+
+    <style name="Theme.YiPuzzles" parent="Base.Theme.YiPuzzles" />
+
+    <!-- ================================================================
+         Splash screen (androidx.core.splashscreen)
+         ================================================================ -->
+    <style name="Theme.YiPuzzles.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background_light</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.YiPuzzles</item>
+    </style>
+
+    <!-- ================================================================
+         Widget styles
+         ================================================================ -->
+    <style name="Widget.YiPuzzles.Toolbar" parent="Widget.Material3.Toolbar.OnSurface">
+        <item name="titleCentered">false</item>
+    </style>
+
+    <style name="ThemeOverlay.YiPuzzles.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Material3.Corner.ExtraLarge</item>
+    </style>
+
+    <!-- Large primary action used on the home screen -->
+    <style name="Widget.YiPuzzles.Button.Primary" parent="Widget.Material3.Button">
+        <item name="android:textAppearance">?attr/textAppearanceTitleMedium</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+
+    <style name="Widget.YiPuzzles.Button.Tonal" parent="Widget.Material3.Button.TonalButton">
+        <item name="android:textAppearance">?attr/textAppearanceTitleMedium</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+
+    <!-- Score / record chips in the game screen -->
+    <style name="Widget.YiPuzzles.ScoreCard" parent="Widget.Material3.CardView.Filled">
+        <item name="cardBackgroundColor">?attr/colorSecondaryContainer</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Material3.Corner.Large</item>
+    </style>
+
+    <style name="TextAppearance.YiPuzzles.ScoreLabel" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="TextAppearance.YiPuzzles.ScoreValue" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- ================================================================
+         Static tile colour overlays. The former default ("1") is now the
+         dynamic Material You palette computed at runtime, "2" is the
+         original 2048 palette and "3" the classic blue palette.
+         ================================================================ -->
+    <style name="ThemeOverlay.YiPuzzles.Tiles.ClassicBlue" parent="">
+        <item name="buttonEmpty">@color/button_empty</item>
+        <item name="buttonEmptyText">@color/button_empty</item>
+        <item name="button2">@color/button2</item>
+        <item name="button2Text">@color/black</item>
+        <item name="button4">@color/button4</item>
+        <item name="button4Text">@color/black</item>
+        <item name="button8">@color/button8</item>
+        <item name="button8Text">@color/white</item>
+        <item name="button16">@color/button16</item>
+        <item name="button16Text">@color/white</item>
+        <item name="button32">@color/button32</item>
+        <item name="button32Text">@color/white</item>
+        <item name="button64">@color/button64</item>
+        <item name="button64Text">@color/white</item>
+        <item name="button128">@color/button128</item>
+        <item name="button128Text">@color/white</item>
+        <item name="button256">@color/button256</item>
+        <item name="button256Text">@color/white</item>
+        <item name="button512">@color/button512</item>
+        <item name="button512Text">@color/white</item>
+        <item name="button1024">@color/button1024</item>
+        <item name="button1024Text">@color/white</item>
+        <item name="button2048">@color/button2048</item>
+        <item name="button2048Text">@color/white</item>
+        <item name="button4096">@color/button4096</item>
+        <item name="button4096Text">@color/black</item>
+        <item name="button8192">@color/button8192</item>
+        <item name="button8192Text">@color/black</item>
+        <item name="button16384">@color/button16384</item>
+        <item name="button16384Text">@color/white</item>
+        <item name="button32768">@color/button32768</item>
+        <item name="button32768Text">@color/white</item>
+    </style>
+
+    <style name="ThemeOverlay.YiPuzzles.Tiles.Original" parent="">
+        <item name="buttonEmpty">@color/button_empty_2</item>
+        <item name="buttonEmptyText">@color/button_empty_2</item>
+        <item name="button2">@color/button2_2</item>
+        <item name="button2Text">@color/black</item>
+        <item name="button4">@color/button4_2</item>
+        <item name="button4Text">@color/black</item>
+        <item name="button8">@color/button8_2</item>
+        <item name="button8Text">@color/white</item>
+        <item name="button16">@color/button16_2</item>
+        <item name="button16Text">@color/white</item>
+        <item name="button32">@color/button32_2</item>
+        <item name="button32Text">@color/white</item>
+        <item name="button64">@color/button64_2</item>
+        <item name="button64Text">@color/white</item>
+        <item name="button128">@color/button128_2</item>
+        <item name="button128Text">@color/white</item>
+        <item name="button256">@color/button256_2</item>
+        <item name="button256Text">@color/white</item>
+        <item name="button512">@color/button512_2</item>
+        <item name="button512Text">@color/white</item>
+        <item name="button1024">@color/button1024_2</item>
+        <item name="button1024Text">@color/white</item>
+        <item name="button2048">@color/button2048_2</item>
+        <item name="button2048Text">@color/white</item>
+        <item name="button4096">@color/button4096_2</item>
+        <item name="button4096Text">@color/white</item>
+        <item name="button8192">@color/button8192_2</item>
+        <item name="button8192Text">@color/white</item>
+        <item name="button16384">@color/button16384_2</item>
+        <item name="button16384Text">@color/white</item>
+        <item name="button32768">@color/button32768_2</item>
+        <item name="button32768Text">@color/white</item>
+    </style>
+
+</resources>

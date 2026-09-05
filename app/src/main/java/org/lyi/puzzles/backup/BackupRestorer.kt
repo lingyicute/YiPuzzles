@@ -2,7 +2,7 @@ package org.lyi.puzzles.backup
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import android.util.JsonReader
 import android.util.Log
 import org.lyi.puzzles.database.PFASQLiteHelper

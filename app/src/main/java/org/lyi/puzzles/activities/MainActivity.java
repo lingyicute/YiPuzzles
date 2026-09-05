@@ -21,33 +21,27 @@ package org.lyi.puzzles.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.text.Html;
+import androidx.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.core.app.TaskStackBuilder;
-import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import com.bumptech.glide.Glide;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.color.MaterialColors;
 
 import org.lyi.puzzles.R;
 import org.lyi.puzzles.activities.helper.BaseActivity;
 import org.lyi.puzzles.helpers.FirstLaunchManager;
+import org.lyi.puzzles.views.BoardPreviewView;
 
 import java.io.File;
 
@@ -66,7 +60,7 @@ public class MainActivity extends BaseActivity {
     private MainActivity.MyViewPagerAdapter myViewPagerAdapter;
     private LinearLayout dotsLayout;
     private TextView[] dots;
-    private ImageButton btnPrev, btnNext;
+    private MaterialButton btnPrev, btnNext;
     private FirstLaunchManager firstLaunchManager;
     private int currentPage = 0;
     private SharedPreferences.Editor editor;
@@ -105,17 +99,12 @@ public class MainActivity extends BaseActivity {
 
         overridePendingTransition(0, 0);
 
-        // Making notification bar transparent
-        if (Build.VERSION.SDK_INT >= 21) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        }
-
         firstLaunchManager = new FirstLaunchManager(this);
 
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         dotsLayout = (LinearLayout) findViewById(R.id.layoutDots);
-        btnPrev = (ImageButton) findViewById(R.id.btn_prev);
-        btnNext = (ImageButton) findViewById(R.id.btn_next);
+        btnPrev = (MaterialButton) findViewById(R.id.btn_prev);
+        btnNext = (MaterialButton) findViewById(R.id.btn_next);
 
 
         //checking resumable
@@ -133,9 +122,6 @@ public class MainActivity extends BaseActivity {
 
         // adding bottom dots
         addBottomDots(0);
-
-        // making notification bar transparent
-        changeStatusBarColor();
 
         myViewPagerAdapter = new MainActivity.MyViewPagerAdapter();
 
@@ -169,7 +155,7 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    private void addListener(Button b1, Button b2, int n) {
+    private void addListener(MaterialButton b1, MaterialButton b2, int n) {
         final int temp = n;
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -210,13 +196,14 @@ public class MainActivity extends BaseActivity {
     private void addBottomDots(int currentPage) {
         dots = new TextView[layouts.length];
 
-        int activeColor = ContextCompat.getColor(this, R.color.dot_light_screen);
-        int inactiveColor = ContextCompat.getColor(this, R.color.dot_dark_screen);
+        // Material 3 page indicator: primary for the active page, outline variant otherwise
+        int activeColor = MaterialColors.getColor(dotsLayout, com.google.android.material.R.attr.colorPrimary);
+        int inactiveColor = MaterialColors.getColor(dotsLayout, com.google.android.material.R.attr.colorOutlineVariant);
 
         dotsLayout.removeAllViews();
         for (int i = 0; i < dots.length; i++) {
             dots[i] = new TextView(this);
-            dots[i].setText(Html.fromHtml("&#8226;"));
+            dots[i].setText("\u2022");
             dots[i].setTextSize(35);
             dots[i].setTextColor(inactiveColor);
             dotsLayout.addView(dots[i]);
@@ -273,30 +260,15 @@ public class MainActivity extends BaseActivity {
     }
 
     public void updateButtons(int position) {
-        Button newGameButton = MainActivity.this.findViewById(R.id.button_newGame);
-        Button continueButton = MainActivity.this.findViewById(R.id.button_continueGame);
+        MaterialButton newGameButton = MainActivity.this.findViewById(R.id.button_newGame);
+        MaterialButton continueButton = MainActivity.this.findViewById(R.id.button_continueGame);
         try {
-            if (gameResumeable[position])
-                continueButton.setBackgroundResource(R.drawable.standalone_button);
-            else
-                continueButton.setBackgroundResource(R.drawable.inactive_button);
-
+            // MaterialButton renders its own disabled state (Material 3 tonal button)
             continueButton.setEnabled(gameResumeable[position]);
         } catch (Exception aie) {
             aie.printStackTrace();
         }
         addListener(newGameButton, continueButton, position + 4);
-    }
-
-    /**
-     * Making notification bar transparent
-     */
-    private void changeStatusBarColor() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(Color.TRANSPARENT);
-        }
     }
 
     /**
@@ -313,36 +285,11 @@ public class MainActivity extends BaseActivity {
             layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(layouts[position], container, false);
             container.addView(view);
-            ImageView imageView;
-            switch (position) {
-                case 0:
-                    imageView = (ImageView) findViewById(R.id.main_menu_img1);
-                    if (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString("pref_color", "1").equals("1"))
-                        Glide.with(MainActivity.this).load(R.drawable.layout4x4_s).into(imageView);
-                    else
-                        Glide.with(MainActivity.this).load(R.drawable.layout4x4_o).into(imageView);
-                    break;
-                case 1:
-                    imageView = (ImageView) findViewById(R.id.main_menu_img2);
-                    if (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString("pref_color", "1").equals("1"))
-                        Glide.with(MainActivity.this).load(R.drawable.layout5x5_s).into(imageView);
-                    else
-                        Glide.with(MainActivity.this).load(R.drawable.layout5x5_o).into(imageView);
-                    break;
-                case 2:
-                    imageView = (ImageView) findViewById(R.id.main_menu_img3);
-                    if (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString("pref_color", "1").equals("1"))
-                        Glide.with(MainActivity.this).load(R.drawable.layout6x6_s).into(imageView);
-                    else
-                        Glide.with(MainActivity.this).load(R.drawable.layout6x6_o).into(imageView);
-                    break;
-                case 3:
-                    imageView = (ImageView) findViewById(R.id.main_menu_img4);
-                    if (PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString("pref_color", "1").equals("1"))
-                        Glide.with(MainActivity.this).load(R.drawable.layout7x7_s).into(imageView);
-                    else
-                        Glide.with(MainActivity.this).load(R.drawable.layout7x7_o).into(imageView);
-                    break;
+            // themed board preview (follows the selected tile palette / dynamic colours)
+            int[] previewIds = {R.id.main_menu_img1, R.id.main_menu_img2, R.id.main_menu_img3, R.id.main_menu_img4};
+            BoardPreviewView preview = view.findViewById(previewIds[position]);
+            if (preview != null) {
+                preview.setBoardSize(position + 4);
             }
             return view;
         }

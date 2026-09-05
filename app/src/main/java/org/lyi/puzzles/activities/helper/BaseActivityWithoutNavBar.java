@@ -20,12 +20,15 @@ package org.lyi.puzzles.activities.helper;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.lyi.puzzles.R;
+import org.lyi.puzzles.helpers.EdgeToEdgeHelper;
 
 /**
  * @author Christopher Beckmann, Karola Marky
@@ -51,9 +54,11 @@ public abstract class BaseActivityWithoutNavBar extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Material 3: draw behind the transparent system bars
+        EdgeToEdgeHelper.enableEdgeToEdgeDisplay(this);
         super.onCreate(savedInstanceState);
 
-        mHandler = new Handler();
+        mHandler = new Handler(Looper.getMainLooper());
 
         overridePendingTransition(0, 0);
     }
@@ -74,6 +79,10 @@ public abstract class BaseActivityWithoutNavBar extends AppCompatActivity {
 
         View mainContent = findViewById(R.id.main_content);
         if (mainContent != null) {
+            EdgeToEdgeHelper.applyBottomSystemBarPadding(mainContent);
+            if (mainContent instanceof ViewGroup) {
+                ((ViewGroup) mainContent).setClipToPadding(false);
+            }
             mainContent.setAlpha(0);
             mainContent.animate().alpha(1).setDuration(MAIN_CONTENT_FADEIN_DURATION);
         }

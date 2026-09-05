@@ -19,11 +19,11 @@
 package org.lyi.puzzles.activities.adapter;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.lyi.puzzles.R;
@@ -69,7 +69,7 @@ public class HelpExpandableListAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.list_item, null);
+            convertView = layoutInflater.inflate(R.layout.list_item, parent, false);
         }
         TextView expandedListTextView = (TextView) convertView
                 .findViewById(R.id.expandedListItem);
@@ -105,12 +105,16 @@ public class HelpExpandableListAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.
                     getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.list_group, null);
+            convertView = layoutInflater.inflate(R.layout.list_group, parent, false);
         }
         TextView listTitleTextView = (TextView) convertView
                 .findViewById(R.id.listTitle);
-        listTitleTextView.setTypeface(null, Typeface.BOLD);
         listTitleTextView.setText(listTitle);
+        // rotate the chevron to indicate the expanded state (Material expressive motion)
+        ImageView indicator = convertView.findViewById(R.id.expandIndicator);
+        if (indicator != null) {
+            indicator.animate().rotation(isExpanded ? 180f : 0f).setDuration(200).start();
+        }
         return convertView;
     }
 

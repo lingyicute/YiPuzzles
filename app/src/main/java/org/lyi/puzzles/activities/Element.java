@@ -19,19 +19,18 @@
 
 package org.lyi.puzzles.activities;
 
-import static org.lyi.puzzles.helpers.ThemeResolverKt.GetColorInt;
-import static org.lyi.puzzles.helpers.ThemeResolverKt.GetColorRes;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.util.TypedValue;
 import android.view.View;
 
 import org.lyi.puzzles.R;
+import org.lyi.puzzles.helpers.TileColors;
 
 /**
  * This class extends the android.support.v7.widget.AppCompatButton class and represents a box on the game field.
@@ -61,8 +60,14 @@ public class Element extends androidx.appcompat.widget.AppCompatButton {
         super(c);
         context = c;
         setAllCaps(false);
+        // Material 3 tile: flat rounded surface, no elevation / press animation
         setBackgroundResource(R.drawable.game_brick);
-        setColor(GetColorRes(context, R.attr.buttonEmpty));
+        setStateListAnimator(null);
+        setElevation(0f);
+        int pad = Math.round(4 * c.getResources().getDisplayMetrics().density);
+        setPadding(pad, pad, pad, pad);
+        setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        setColor(TileColors.forNumber(context, 0).getBackground());
         setMaxLines(1);
         setAutoSizeTextTypeUniformWithConfiguration(1,
                 100,
@@ -82,72 +87,9 @@ public class Element extends androidx.appcompat.widget.AppCompatButton {
                 setVisibility(View.VISIBLE);
         }
 
-        switch (number) {
-            case 0:
-                setColor(GetColorRes(context, R.attr.buttonEmpty));
-                setTextColor(GetColorInt(context, R.attr.buttonEmptyText));
-                break;
-            case 2:
-                setColor(GetColorRes(context, R.attr.button2));
-                setTextColor(GetColorInt(context, R.attr.button2Text));
-                break;
-            case 4:
-                setColor(GetColorRes(context, R.attr.button4));
-                setTextColor(GetColorInt(context, R.attr.button4Text));
-                break;
-            case 8:
-                setColor(GetColorRes(context, R.attr.button8));
-                setTextColor(GetColorInt(context, R.attr.button8Text));
-                break;
-            case 16:
-                setColor(GetColorRes(context, R.attr.button16));
-                setTextColor(GetColorInt(context, R.attr.button16Text));
-                break;
-            case 32:
-                setColor(GetColorRes(context, R.attr.button32));
-                setTextColor(GetColorInt(context, R.attr.button32Text));
-                break;
-            case 64:
-                setColor(GetColorRes(context, R.attr.button64));
-                setTextColor(GetColorInt(context, R.attr.button64Text));
-                break;
-            case 128:
-                setColor(GetColorRes(context, R.attr.button128));
-                setTextColor(GetColorInt(context, R.attr.button128Text));
-                break;
-            case 256:
-                setColor(GetColorRes(context, R.attr.button256));
-                setTextColor(GetColorInt(context, R.attr.button256Text));
-                break;
-            case 512:
-                setColor(GetColorRes(context, R.attr.button512));
-                setTextColor(GetColorInt(context, R.attr.button512Text));
-                break;
-            case 1024:
-                setColor(GetColorRes(context, R.attr.button1024));
-                setTextColor(GetColorInt(context, R.attr.button1024Text));
-                break;
-            case 2048:
-                setColor(GetColorRes(context, R.attr.button2048));
-                setTextColor(GetColorInt(context, R.attr.button2048Text));
-                break;
-            case 4096:
-                setColor(GetColorRes(context, R.attr.button4096));
-                setTextColor(GetColorInt(context, R.attr.button4096Text));
-                break;
-            case 8192:
-                setColor(GetColorRes(context, R.attr.button8192));
-                setTextColor(GetColorInt(context, R.attr.button8192Text));
-                break;
-            case 16384:
-                setColor(GetColorRes(context, R.attr.button16384));
-                setTextColor(GetColorInt(context, R.attr.button16384Text));
-                break;
-            case 32768:
-                setColor(GetColorRes(context, R.attr.button32768));
-                setTextColor(GetColorInt(context, R.attr.button32768Text));
-                break;
-        }
+        TileColors.Tile tile = TileColors.forNumber(context, number);
+        setColor(tile.getBackground());
+        setTextColor(tile.getText());
     }
 
     private void setColor(int c) {

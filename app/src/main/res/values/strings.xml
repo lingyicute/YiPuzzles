@@ -65,7 +65,24 @@
     <string name="settings_color_system">System</string>
     <string name="settings_color_light">Light</string>
     <string name="settings_color_dark">Dark</string>
-    <string name="settings_color_scheme_default">Default</string>
+    <string name="settings_color_scheme_material_you">Material You</string>
+    <string name="settings_color_scheme_classic">Classic Blue</string>
+    <string name="settings_category_appearance">Appearance</string>
+    <string name="settings_category_game">Game</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_dynamic_colors">Dynamic colours</string>
+    <string name="settings_dynamic_colors_summary">Use colours from your wallpaper (Android 12+)</string>
+    <string name="settings_animation_summary">Animate moving and merging tiles</string>
+    <string name="settings_display_summary">Keep the screen on while playing</string>
+    <string name="settings_color_summary_dynamic">Tiles follow the app colours</string>
+    <string name="choose_board_size">Choose a board size</string>
+    <string name="reset_stats_confirm_title">Reset statistics?</string>
+    <string name="reset_stats_confirm_message">All statistics of every board size will be deleted. This cannot be undone.</string>
+    <string name="reset">Reset</string>
+    <string name="cancel">Cancel</string>
+    <string name="undo">Undo</string>
+    <string name="restart">Restart</string>
+    <string name="previous">Previous</string>
     <string name="settings_color_scheme_original">Original</string>
 
     <!-- ### CHOOSE DIALOG ### -->
