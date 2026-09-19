@@ -36,7 +36,7 @@ android {
 
     android.applicationVariants.configureEach { variant ->
         variant.outputs.configureEach {
-            def appName = "pfa-2048"
+            def appName = "yipuzzles"
             outputFileName = appName + "-${variant.name}-v${variant.versionName}.apk"
         }
     }
