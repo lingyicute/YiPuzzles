@@ -17,7 +17,6 @@
         tools:context="org.lyi.puzzles.activities.StatsActivity">
 
         <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true"

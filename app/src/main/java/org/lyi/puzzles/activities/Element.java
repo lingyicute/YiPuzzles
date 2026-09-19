@@ -49,7 +49,6 @@ public class Element extends androidx.appcompat.widget.AppCompatButton {
     public int posY = 0;
     public int dPosX = 0;
     public int dPosY = 0;
-    public boolean activated;
     public boolean animateMoving = false;
     Context context;
     int color;
@@ -77,7 +76,6 @@ public class Element extends androidx.appcompat.widget.AppCompatButton {
 
     public void drawItem() {
         dNumber = number;
-        activated = (number != 0);
         if (number == 0) {
             setVisibility(View.INVISIBLE);
             setText("");
@@ -129,18 +127,6 @@ public class Element extends androidx.appcompat.widget.AppCompatButton {
         return dPosY;
     }
 
-    public int getdNumber() {
-        return dNumber;
-    }
-
-    public int getPosX() {
-        return posX;
-    }
-
-    public int getPosY() {
-        return posY;
-    }
-
     public Element copy() {
         Element temp = new Element(context);
         temp.number = number;
@@ -149,10 +135,8 @@ public class Element extends androidx.appcompat.widget.AppCompatButton {
         temp.posY = posY;
         temp.dPosX = dPosX;
         temp.dPosY = dPosY;
-        temp.activated = activated;
         temp.animateMoving = animateMoving;
         temp.color = color;
-        //temp.setBackgroundResource(backGroundResource);
         temp.setColor(color);
         temp.setVisibility(getVisibility());
         temp.setLayoutParams(getLayoutParams());

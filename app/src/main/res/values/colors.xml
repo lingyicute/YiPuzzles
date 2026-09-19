@@ -5,7 +5,6 @@
          Used on devices without dynamic colour (Android < 12) or when the
          user disables "Dynamic colours" in the settings.
          ================================================================ -->
-    <color name="seed">#0274B2</color>
 
     <!-- Light scheme -->
     <color name="md_theme_light_primary">#00658E</color>
@@ -35,8 +34,6 @@
     <color name="md_theme_light_inverseSurface">#2E3133</color>
     <color name="md_theme_light_inverseOnSurface">#EFF1F3</color>
     <color name="md_theme_light_inversePrimary">#85CFFF</color>
-    <color name="md_theme_light_surfaceTint">#00658E</color>
-    <color name="md_theme_light_scrim">#000000</color>
     <color name="md_theme_light_surfaceDim">#D8DADD</color>
     <color name="md_theme_light_surfaceBright">#F7F9FC</color>
     <color name="md_theme_light_surfaceContainerLowest">#FFFFFF</color>
@@ -73,8 +70,6 @@
     <color name="md_theme_dark_inverseSurface">#E0E3E5</color>
     <color name="md_theme_dark_inverseOnSurface">#2E3133</color>
     <color name="md_theme_dark_inversePrimary">#00658E</color>
-    <color name="md_theme_dark_surfaceTint">#85CFFF</color>
-    <color name="md_theme_dark_scrim">#000000</color>
     <color name="md_theme_dark_surfaceDim">#101416</color>
     <color name="md_theme_dark_surfaceBright">#36393C</color>
     <color name="md_theme_dark_surfaceContainerLowest">#0B0F11</color>

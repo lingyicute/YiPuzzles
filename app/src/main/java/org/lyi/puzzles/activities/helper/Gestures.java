@@ -32,12 +32,10 @@ import android.view.View;
  */
 public class Gestures implements View.OnTouchListener {
 
-    private GestureDetector gestureDetector = null;
-    private Context cxt = null;
+    private final GestureDetector gestureDetector;
 
     public Gestures(Context context) {
         gestureDetector = new GestureDetector(context, new GestureListener());
-        cxt = context;
     }
 
     public boolean onTouch(View v, MotionEvent event) {

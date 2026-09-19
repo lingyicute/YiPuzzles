@@ -42,12 +42,10 @@ public class SplashActivity extends AppCompatActivity {
         SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
 
-        Intent mainIntent = new Intent(SplashActivity.this, TutorialActivity.class);
-
         FirstLaunchManager firstStartPref = new FirstLaunchManager(this);
 
+        Intent mainIntent;
         if (firstStartPref.isFirstTimeLaunch()) {
-            firstStartPref.initFirstTimeLaunch();
             mainIntent = new Intent(this, TutorialActivity.class);
         } else {
             mainIntent = new Intent(this, MainActivity.class);

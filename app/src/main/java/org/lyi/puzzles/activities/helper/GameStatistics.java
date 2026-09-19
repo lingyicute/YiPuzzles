@@ -30,11 +30,16 @@ import java.io.Serializable;
  * @version 20180910
  */
 public class GameStatistics implements Serializable {
+    /**
+     * Fixed id: the default value is computed from the class members, so every change to this
+     * class would otherwise make the statistics files written by earlier versions unreadable.
+     */
+    private static final long serialVersionUID = -3651969648725498397L;
+
     private long moves = 0;
     private long timePlayed = 0;
     private long highestNumber = 2;
-    private int n = 4;
-    private String filename = "statistics" + n + ".txt";
+    private String filename;
     private long record = 0;
     private int undo = 0;
     private int moves_l = 0;
@@ -43,7 +48,6 @@ public class GameStatistics implements Serializable {
     private int moves_d = 0;
 
     public GameStatistics(int n) {
-        this.n = n;
         filename = "statistics" + n + ".txt";
     }
 
@@ -63,11 +67,6 @@ public class GameStatistics implements Serializable {
 
     public void addTimePlayed(long timePlayed) {
         this.timePlayed += timePlayed;
-    }
-
-    public boolean resetTimePlayed() {
-        this.timePlayed = 0;
-        return true;
     }
 
     public long getMoves() {

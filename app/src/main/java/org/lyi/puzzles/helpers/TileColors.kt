@@ -100,10 +100,6 @@ object TileColors {
         PreferenceManager.getDefaultSharedPreferences(context)
             .getString(PREF_KEY, SCHEME_MATERIAL_YOU) ?: SCHEME_MATERIAL_YOU
 
-    /** `true` if the currently selected palette follows the app theme (Material You). */
-    @JvmStatic
-    fun isDynamic(context: Context): Boolean = currentScheme(context) == SCHEME_MATERIAL_YOU
-
     /** Colours of the tile showing [number] (0 = empty tile). */
     @JvmStatic
     fun forNumber(context: Context, number: Int): Tile {

@@ -19,7 +19,6 @@
 package org.lyi.puzzles.activities;
 
 import android.os.Bundle;
-import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 
@@ -67,9 +66,5 @@ public class AboutActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.textFieldVersionName)).setText(getString(R.string.version_number, BuildConfig.VERSION_NAME));
     }
 
-    //@Override
-    //protected int getNavigationDrawerID() {
-    //    return R.id.nav_about;
-    //}
 }
 

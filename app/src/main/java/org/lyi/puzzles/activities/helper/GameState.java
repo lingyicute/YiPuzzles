@@ -29,6 +29,12 @@ import java.io.Serializable;
  * @version 20180807
  */
 public class GameState implements Serializable {
+    /**
+     * Fixed id: the default value is computed from the class members, so every change to this
+     * class would otherwise make the save files written by earlier versions unreadable.
+     */
+    private static final long serialVersionUID = -8669012629409113385L;
+
     public int n = 4;
     public int[] numbers;
     public int[] last_numbers;
@@ -38,23 +44,6 @@ public class GameState implements Serializable {
 
     public GameState(int size) {
         numbers = new int[size * size];
-    }
-
-    public GameState(int[][] e) {
-        int length = 1;
-        for (int i = 0; i < e.length; i++) {
-            if (e[i].length > length)
-                length = e[i].length;
-        }
-        this.n = e.length;
-        numbers = new int[e.length * e.length];
-        int c = 0;
-        for (int i = 0; i < e.length; i++) {
-            for (int j = 0; j < e[i].length; j++) {
-                numbers[c++] = e[i][j];
-            }
-        }
-        last_numbers = numbers;
     }
 
     public GameState(Element[][] e, Element[][] e2) {
