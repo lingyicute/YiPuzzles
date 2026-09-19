@@ -223,15 +223,6 @@ public abstract class BaseActivity extends AppCompatActivity implements OnNaviga
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mNavigationView.setNavigationItemSelectedListener(this);
 
-        // Fix: keep the drawer header below the status bar. NavigationView only
-        // applies the top inset to its menu when there is no header; with a custom
-        // header (nav_header_main) the header would otherwise draw behind the
-        // transparent status bar. The inset is added on top of the header's own
-        // padding (24dp), and NavigationView forwards its insets to the header.
-        for (int i = 0; i < mNavigationView.getHeaderCount(); i++) {
-            EdgeToEdgeHelper.applyTopSystemBarPadding(mNavigationView.getHeaderView(i));
-        }
-
         selectNavigationItem(getNavigationDrawerID());
 
         View mainContent = findViewById(R.id.main_content);
