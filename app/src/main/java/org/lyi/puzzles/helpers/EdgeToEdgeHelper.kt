@@ -20,7 +20,7 @@ package org.lyi.puzzles.helpers
 
 import android.view.View
 import androidx.activity.ComponentActivity
-import androidx.activity.EdgeToEdge
+import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -31,7 +31,7 @@ import androidx.core.view.updatePadding
  * dark depending on the current theme.
  */
 fun ComponentActivity.enableEdgeToEdgeDisplay() {
-    EdgeToEdge.enable(this)
+    enableEdgeToEdge()
 }
 
 /**
