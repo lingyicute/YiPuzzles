@@ -75,7 +75,6 @@ import java.util.Calendar;
  * @version 20180910
  */
 
-@SuppressWarnings("StringConcatenationInLoop")
 public class GameActivity extends BaseActivityWithoutNavBar {
     public static int n = 4;
     public TextView textFieldPoints;
@@ -177,8 +176,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
             elements = last_elements;
             points = last_points;
             number_field.removeAllViews();
-            //number_field_background.removeAllViews();
-            points = last_points;
             textFieldPoints.setText("" + points);
             setDPositions(false);
             for (Element[] i : elements) {
@@ -236,7 +233,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
             }
         });
 
-        //number_field.setBackgroundColor((this.getResources().getColor(R.color.background_gamebord)));
         startingTime = Calendar.getInstance().getTimeInMillis();
     }
 
@@ -383,7 +379,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                 lp.topMargin = abstand + i * (number_size + abstand);
                 elements[i][j].setDPosition(lp.getMarginStart(), lp.topMargin);
                 elements[i][j].setLayoutParams(lp);
-                backgroundElements[i][j].setLayoutParams(lp);
                 backgroundElements[i][j].setLayoutParams(lp);
                 backgroundElements[i][j].setOnTouchListener(swipeListener);
                 elements[i][j].setOnTouchListener(swipeListener);
@@ -812,22 +807,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         }
     }
 
-    public String display(Element[][] e) {
-        String result = "\n";
-        for (int i = 0; i < e.length; i++) {
-            for (int j = 0; j < e[i].length; j++)
-                result = result + " " + elements[i][j].number; //+ " "+elements[i][j];
-            result = result + "\n";
-        }
-        result += "\n";
-        for (int i = 0; i < e.length; i++) {
-            for (int j = 0; j < e[i].length; j++)
-                result = result + " (" + elements[i][j].getX() + " , " + elements[i][j].getY() + ")" + " v:" + elements[i][j].getVisibility();//+" "+elements[i][j];
-            result = result + "\n";
-        }
-        return result;
-    }
-
     public void updateHighestNumber() {
         for (int i = 0; i < elements.length; i++) {
             for (int j = 0; j < elements[i].length; j++) {
@@ -873,13 +852,9 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
 
     public void setDPositions(boolean animation) {
-        long SCALINGSPEED = GameActivity.SCALINGSPEED;
-        long ADDINGSPEED = GameActivity.ADDINGSPEED;
         long MOVINGSPEED = GameActivity.MOVINGSPEED;
         boolean scale = true;
         if (!animation) {
-            SCALINGSPEED = 1;
-            ADDINGSPEED = 1;
             MOVINGSPEED = 1;
             scale = false;
         }
@@ -929,10 +904,10 @@ public class GameActivity extends BaseActivityWithoutNavBar {
     }
 
     class MovingListener extends AnimatorListenerAdapter {
-        Element e = null;
-        long SCALINGSPEED = 100;
-        float scalingFactor = 1.5f;
-        boolean scale = false;
+        Element e;
+        long SCALINGSPEED;
+        float scalingFactor;
+        boolean scale;
 
         public MovingListener(Element e, boolean scale) {
             super();
@@ -951,11 +926,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         }
 
         @Override
-        public void onAnimationPause(Animator animation) {
-            super.onAnimationPause(animation);
-        }
-
-        @Override
         public void onAnimationEnd(Animator animation) {
             super.onAnimationEnd(animation);
             if (e != null) {
@@ -968,26 +938,17 @@ public class GameActivity extends BaseActivityWithoutNavBar {
     }
 
     class ScalingListener extends AnimatorListenerAdapter {
-        Element e = null;
+        Element e;
 
         public ScalingListener(Element e) {
             super();
             this.e = e;
         }
 
-        public ScalingListener() {
-            super();
-        }
-
         @Override
         public void onAnimationCancel(Animator animation) {
             super.onAnimationCancel(animation);
             animation.setupEndValues();
-        }
-
-        @Override
-        public void onAnimationPause(Animator animation) {
-            super.onAnimationPause(animation);
         }
 
         @Override

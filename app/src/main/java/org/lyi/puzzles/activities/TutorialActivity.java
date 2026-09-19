@@ -66,8 +66,6 @@ public class TutorialActivity extends AppCompatActivity {
             R.layout.tutorial_slide4,
     };
 
-    private static final String TAG = TutorialActivity.class.getSimpleName();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         EdgeToEdgeHelper.enableEdgeToEdgeDisplay(this);

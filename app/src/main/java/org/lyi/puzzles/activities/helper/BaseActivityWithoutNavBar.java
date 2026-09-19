@@ -19,9 +19,6 @@
 package org.lyi.puzzles.activities.helper;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -46,19 +43,13 @@ import org.lyi.puzzles.helpers.EdgeToEdgeHelper;
 public abstract class BaseActivityWithoutNavBar extends AppCompatActivity {
 
 
-    static final int NAVDRAWER_LAUNCH_DELAY = 250;
-    static final int MAIN_CONTENT_FADEOUT_DURATION = 150;
     static final int MAIN_CONTENT_FADEIN_DURATION = 250;
-
-    protected Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Material 3: draw behind the transparent system bars
         EdgeToEdgeHelper.enableEdgeToEdgeDisplay(this);
         super.onCreate(savedInstanceState);
-
-        mHandler = new Handler(Looper.getMainLooper());
 
         overridePendingTransition(0, 0);
     }
@@ -86,11 +77,6 @@ public abstract class BaseActivityWithoutNavBar extends AppCompatActivity {
             mainContent.setAlpha(0);
             mainContent.animate().alpha(1).setDuration(MAIN_CONTENT_FADEIN_DURATION);
         }
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        return super.onKeyDown(keyCode, event);
     }
 
 }

@@ -1,7 +1,6 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'kotlin-kapt'
     id 'com.google.devtools.ksp'
 }
 
@@ -42,11 +41,6 @@ android {
         }
     }
 
-    dataBinding {
-        enabled = true
-    }
-    namespace 'org.lyi.puzzles'
-
     lint {
         lintConfig = file("lint.xml")
     }
@@ -54,23 +48,19 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.activity:activity:1.9.3'
     implementation 'androidx.core:core-splashscreen:1.0.1'
     implementation 'androidx.preference:preference:1.2.1'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
 
     // Backup
     implementation project(path: ':backup-api')
     def work_version = "2.9.1"
     implementation "androidx.work:work-runtime:$work_version"
     implementation "androidx.work:work-runtime-ktx:$work_version"
-    androidTestImplementation "androidx.work:work-testing:$work_version"
     implementation 'androidx.sqlite:sqlite-ktx:2.4.0'
 
     constraints {

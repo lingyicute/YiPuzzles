@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,7 +39,6 @@ import com.google.android.material.color.MaterialColors;
 
 import org.lyi.puzzles.R;
 import org.lyi.puzzles.activities.helper.BaseActivity;
-import org.lyi.puzzles.helpers.FirstLaunchManager;
 import org.lyi.puzzles.views.BoardPreviewView;
 
 import java.io.File;
@@ -61,7 +59,6 @@ public class MainActivity extends BaseActivity {
     private LinearLayout dotsLayout;
     private TextView[] dots;
     private MaterialButton btnPrev, btnNext;
-    private FirstLaunchManager firstLaunchManager;
     private int currentPage = 0;
     private SharedPreferences.Editor editor;
     private SharedPreferences preferences;
@@ -98,8 +95,6 @@ public class MainActivity extends BaseActivity {
 
 
         overridePendingTransition(0, 0);
-
-        firstLaunchManager = new FirstLaunchManager(this);
 
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         dotsLayout = (LinearLayout) findViewById(R.id.layoutDots);
