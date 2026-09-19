@@ -44,11 +44,19 @@ android {
     lint {
         lintConfig = file("lint.xml")
     }
+    testOptions {
+        unitTests {
+            // PreviewBoardSquareTest runs on Robolectric and needs the packaged resources
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.13.2'
+    testImplementation('org.robolectric:robolectric:4.13') { exclude group: 'org.bouncycastle' }
+    testImplementation 'org.bouncycastle:bcprov-jdk15on:1.70'
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.activity:activity:1.9.3'
