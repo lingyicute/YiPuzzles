@@ -1,5 +1,8 @@
 name: Release
-on: [push, pull_request,  workflow_dispatch]
+on: [push,  workflow_dispatch]
+
+permissions:   
+  contents: write
 
 jobs:
   build:
@@ -21,10 +24,26 @@ jobs:
       - uses: gradle/actions/setup-gradle@v3
 
       - name: Build apk
-        run: bash ./gradlew assembleRelease && tree -a app/build/outputs/apk/release/
+        run: bash ./gradlew assembleRelease
+    
+      - name: Delete old nightly release 
+        run: gh release delete nightly --yes --cleanup-tag || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish nightly release 
+        run: |
+          gh release create nightly \
+            app/build/outputs/apk/release/*.apk \
+            --title "Nightly Build" \
+            --notes "Auto build · Commit: ${GITHUB_SHA:0:7} · Branch: ${GITHUB_REF_NAME}" \
+            --prerelease \
+            --target "$GITHUB_SHA"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload apk
         uses: actions/upload-artifact@v4
         with:
           name: apk
-          path: app/build/outputs/apk/release/
+          path: app/build/outputs/apk/release/*.apk
