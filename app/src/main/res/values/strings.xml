@@ -74,7 +74,6 @@
     <string name="settings_dynamic_colors_summary">Use colours from your wallpaper (Android 12+)</string>
     <string name="settings_animation_summary">Animate moving and merging tiles</string>
     <string name="settings_display_summary">Keep the screen on while playing</string>
-    <string name="settings_color_summary_dynamic">Tiles follow the app colours</string>
     <string name="choose_board_size">Choose a board size</string>
     <string name="reset_stats_confirm_title">Reset statistics?</string>
     <string name="reset_stats_confirm_message">All statistics of every board size will be deleted. This cannot be undone.</string>

@@ -122,9 +122,6 @@ public class SettingsActivity extends BaseActivity implements SharedPreferences.
                     @Override
                     public CharSequence provideSummary(ListPreference preference) {
                         CharSequence entry = preference.getEntry();
-                        if (TileColors.SCHEME_MATERIAL_YOU.equals(preference.getValue())) {
-                            return entry + " · " + getString(R.string.settings_color_summary_dynamic);
-                        }
                         return entry;
                     }
                 });
