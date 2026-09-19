@@ -43,7 +43,7 @@
     <!--###ABOUT###-->
     <string name="about">About</string>
     <string name="version">Version: </string>
-    <string name="version_number">%s</string>
+    <string name="version_number"> %s</string>
     <string name="about_author">Author:</string>
     <string name="about_author_names">lingyicute</string>
     <string name="about_author_contributors">and contributors.</string>
