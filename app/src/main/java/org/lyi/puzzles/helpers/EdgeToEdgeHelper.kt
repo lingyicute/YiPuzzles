@@ -41,6 +41,15 @@ fun ComponentActivity.enableEdgeToEdgeDisplay() {
 fun applyBottomSystemBarPadding(view: View?) = applySystemBarPadding(view, top = false, bottom = true)
 
 /**
+ * Adds the top system bar inset (status bar / display cutout) as padding to [view] so
+ * that header content is never covered by the status bar.
+ *
+ * This is intended for the NavigationView header: NavigationView only pads its menu
+ * when there is *no* header, so a custom header layout must handle the top inset itself.
+ */
+fun applyTopSystemBarPadding(view: View?) = applySystemBarPadding(view, top = true, bottom = false)
+
+/**
  * Applies the system bar insets of the requested edges as padding to [view]. Unlike
  * `android:fitsSystemWindows` the insets are *not* consumed, so sibling views still receive them.
  */
