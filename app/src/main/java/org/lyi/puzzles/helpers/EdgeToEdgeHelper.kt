@@ -41,6 +41,15 @@ fun ComponentActivity.enableEdgeToEdgeDisplay() {
 fun applyBottomSystemBarPadding(view: View?) = applySystemBarPadding(view, top = false, bottom = true)
 
 /**
+ * Adds the top system bar inset (status bar / display cutout) as padding to [view] so
+ * that header content is never covered by the status bar.
+ *
+ * This is intended for the NavigationView header: NavigationView only pads its menu
+ * when there is *no* header, so a custom header layout must handle the top inset itself.
+ */
+fun applyTopSystemBarPadding(view: View?) = applySystemBarPadding(view, top = true, bottom = false)
+
+/**
  * Applies the system bar insets of the requested edges as padding to [view]. Unlike
  * `android:fitsSystemWindows` the insets are *not* consumed, so sibling views still receive them.
  */
@@ -59,4 +68,46 @@ fun applySystemBarPadding(view: View?, top: Boolean, bottom: Boolean) {
         insets
     }
     ViewCompat.requestApplyInsets(view)
+}
+
+/**
+ * Keeps NavigationView header view(s) below the status bar.
+ *
+ * A listener set directly on the header does NOT work here: DrawerLayout (with
+ * `fitsSystemWindows="true"`) consumes the system window insets in its own
+ * `OnApplyWindowInsetsListener` and only re-dispatches them during `onMeasure`,
+ * and NavigationView consumes them again internally — so the header never reliably
+ * receives real insets.
+ *
+ * Instead this listens on [root] (the activity content view, which always receives
+ * the real insets before any consumer) and forwards the top inset to [headers].
+ * As a safety net the system `status_bar_height` is applied immediately, so the
+ * header is correct even before the first inset dispatch (or if dispatch fails).
+ * The insets are *not* consumed, so DrawerLayout / NavigationView keep working as before.
+ */
+fun applyNavHeaderTopInset(root: View?, headers: List<View?>) {
+    val targets = headers.filterNotNull()
+    if (root == null || targets.isEmpty()) return
+    val initialTops = targets.map { it.paddingTop }
+
+    // Immediate fallback from framework resources (no dispatch chain involved).
+    val res = root.resources
+    val statusBarId = res.getIdentifier("status_bar_height", "dimen", "android")
+    val statusBarHeight = if (statusBarId > 0) res.getDimensionPixelSize(statusBarId) else 0
+    targets.forEachIndexed { index, header ->
+        header.updatePadding(top = initialTops[index] + statusBarHeight)
+    }
+
+    // Refine with live insets (cutout, rotation, foldables, ...).
+    ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
+        val bars = insets.getInsets(
+            WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+        )
+        val top = maxOf(bars.top, statusBarHeight)
+        targets.forEachIndexed { index, header ->
+            header.updatePadding(top = initialTops[index] + top)
+        }
+        insets
+    }
+    ViewCompat.requestApplyInsets(root)
 }
