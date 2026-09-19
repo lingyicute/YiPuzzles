@@ -47,3 +47,25 @@ jobs:
         with:
           name: apk
           path: app/build/outputs/apk/release/*.apk
+
+ 
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: 17
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - name: test
+        run: bash ./gradlew testDebugUnitTest
