@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
+import org.robolectric.RobolectricTestRunner;
 import androidx.viewpager.widget.ViewPager;
 
 import org.junit.Test;
@@ -26,7 +26,7 @@ import org.robolectric.annotation.Config;
  *
  * The user-visible requirement is that the grey card hugs the square board in every orientation.
  */
-@RunWith(AndroidJUnit4.class)
+@RunWith(RobolectricTestRunner.class)
 public class PreviewBoardSquareTest {
 
     private static class Holder {
