@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>YiPuzzles — 简洁，轻量的 2048 小游戏</title>
+<meta name="description" content="YiPuzzles：一款简洁、轻量、隐私至上的 2048 滑块拼图游戏。零权限、完全离线、无广告无追踪，基于 Material You 打造。Made with ❤️ by lingyicute.">
+<meta name="theme-color" id="metaTheme" content="#FEF7FF">
+<meta property="og:title" content="YiPuzzles — 简单却令人上瘾的 2048">
+<meta property="og:description" content="零权限、完全离线、无广告的 Material You 设计 2048 游戏。Made with ❤️ by lingyicute.">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ---------- 1. 设计令牌  ---------- */
+:root {
+  color-scheme: light;
+  --primary: #6750A4;
+  --on-primary: #FFFFFF;
+  --primary-container: #EADDFF;
+  --on-primary-container: #21005D;
+  --secondary: #625B71;
+  --on-secondary: #FFFFFF;
+  --secondary-container: #E8DEF8;
+  --on-secondary-container: #1D192B;
+  --tertiary: #7D5260;
+  --on-tertiary: #FFFFFF;
+  --tertiary-container: #FFD8E4;
+  --on-tertiary-container: #31111D;
+  --surface: #FEF7FF;
+  --surface-container-lowest: #FFFFFF;
+  --surface-container-low: #F7F2FA;
+  --surface-container: #F3EDF7;
+  --surface-container-high: #ECE6F0;
+  --surface-container-highest: #E6E0E9;
+  --on-surface: #1D1B20;
+  --on-surface-variant: #49454F;
+  --outline: #79747E;
+  --outline-variant: #CAC4D0;
+  --inverse-surface: #322F35;
+  --inverse-on-surface: #F5EFF7;
+  --shadow-1: 0 1px 2px rgba(0,0,0,.28), 0 1px 3px 1px rgba(0,0,0,.10);
+  --shadow-2: 0 1px 2px rgba(0,0,0,.28), 0 2px 6px 2px rgba(0,0,0,.10);
+  --shadow-3: 0 1px 3px rgba(0,0,0,.28), 0 4px 10px 3px rgba(0,0,0,.12);
+  --font: Roboto, "Roboto Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Noto Sans Mono CJK SC", monospace;
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+  --primary: #D0BCFF;
+  --on-primary: #381E72;
+  --primary-container: #4F378B;
+  --on-primary-container: #EADDFF;
+  --secondary: #CCC2DC;
+  --on-secondary: #332D41;
+  --secondary-container: #4A4458;
+  --on-secondary-container: #E8DEF8;
+  --tertiary: #EFB8C8;
+  --on-tertiary: #492532;
+  --tertiary-container: #633B48;
+  --on-tertiary-container: #FFD8E4;
+  --surface: #141218;
+  --surface-container-lowest: #0F0D13;
+  --surface-container-low: #1D1B20;
+  --surface-container: #211F26;
+  --surface-container-high: #2B2930;
+  --surface-container-highest: #36343B;
+  --on-surface: #E6E0E9;
+  --on-surface-variant: #CAC4D0;
+  --outline: #938F99;
+  --outline-variant: #49454F;
+  --inverse-surface: #E6E0E9;
+  --inverse-on-surface: #322F35;
+  --shadow-1: 0 1px 2px rgba(0,0,0,.55), 0 1px 3px 1px rgba(0,0,0,.30);
+  --shadow-2: 0 1px 2px rgba(0,0,0,.55), 0 2px 6px 2px rgba(0,0,0,.30);
+  --shadow-3: 0 1px 3px rgba(0,0,0,.55), 0 4px 10px 3px rgba(0,0,0,.35);
+}
+
+/* ---------- 2. 基础 ---------- */
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--surface);
+  color: var(--on-surface);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color .35s ease, color .35s ease;
+  overflow-x: hidden;
+}
+::selection { background: var(--primary-container); color: var(--on-primary-container); }
+a { color: var(--primary); text-decoration: none; }
+img, svg { display: block; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
+
+.container { width: min(1120px, 100% - 40px); margin-inline: auto; }
+@media (max-width: 600px) { .container { width: min(1120px, 100% - 32px); } }
+
+section { scroll-margin-top: 88px; }
+
+/* 涟漪效果 */
+[data-ripple] { position: relative; overflow: hidden; }
+.ripple {
+  position: absolute; border-radius: 50%; background: currentColor;
+  opacity: .16; transform: scale(0); pointer-events: none;
+  animation: ripple .55s ease-out forwards;
+}
+@keyframes ripple { to { transform: scale(1); opacity: 0; } }
+
+/* 滚动进场 */
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ---------- 3. 顶部应用栏 ---------- */
+.topbar {
+  position: sticky; top: 0; z-index: 60;
+  background: var(--surface);
+  transition: background-color .3s ease, box-shadow .3s ease;
+}
+.topbar.scrolled { background: var(--surface-container); box-shadow: var(--shadow-1); }
+.bar-inner { display: flex; align-items: center; gap: 8px; height: 64px; }
+.brand {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 20px; font-weight: 700; letter-spacing: .01em; color: var(--on-surface);
+  margin-right: 8px; flex-shrink: 0;
+}
+.brand .logo { width: 34px; height: 34px; }
+.nav-links { display: flex; align-items: center; gap: 2px; margin-inline: auto; }
+.nav-links a {
+  display: inline-flex; align-items: center; height: 40px; padding: 0 14px;
+  border-radius: 999px; font-size: 14px; font-weight: 500;
+  color: var(--on-surface-variant); transition: background-color .2s ease, color .2s ease;
+}
+.nav-links a:hover { background: var(--surface-container-highest); color: var(--on-surface); }
+.bar-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px; border-radius: 50%;
+  color: var(--on-surface-variant); transition: background-color .2s ease;
+  flex-shrink: 0;
+}
+.icon-btn:hover { background: var(--surface-container-highest); }
+.icon-btn svg { width: 22px; height: 22px; }
+
+.menu-toggle { display: none; }
+.menu-drop {
+  position: absolute; right: 12px; top: 62px; min-width: 190px;
+  background: var(--surface-container); border-radius: 14px;
+  box-shadow: var(--shadow-3); padding: 8px; display: none; z-index: 70;
+}
+.menu-drop.open { display: block; animation: menuIn .18s ease; }
+@keyframes menuIn { from { opacity: 0; transform: translateY(-6px); } }
+.menu-drop a {
+  display: block; padding: 11px 16px; border-radius: 10px;
+  font-size: 14.5px; font-weight: 500; color: var(--on-surface);
+}
+.menu-drop a:hover { background: var(--surface-container-highest); }
+
+/* ---------- 4. 按钮 / 徽章 ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  height: 46px; padding: 0 26px; border-radius: 999px;
+  font-size: 15px; font-weight: 600; letter-spacing: .02em;
+  transition: box-shadow .2s ease, filter .2s ease, background-color .25s ease, color .25s ease;
+  white-space: nowrap;
+}
+.btn svg { width: 20px; height: 20px; }
+.btn-filled { background: var(--primary); color: var(--on-primary); box-shadow: var(--shadow-1); }
+.btn-filled:hover { box-shadow: var(--shadow-2); filter: brightness(1.06); }
+.btn-tonal { background: var(--secondary-container); color: var(--on-secondary-container); }
+.btn-tonal:hover { filter: brightness(1.04); box-shadow: var(--shadow-1); }
+.btn-outlined { border: 1.5px solid var(--outline); color: var(--primary); }
+.btn-outlined:hover { background: var(--surface-container-low); }
+.btn-sm { height: 40px; padding: 0 18px; font-size: 14px; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 34px; padding: 0 14px; border-radius: 9px;
+  font-size: 13px; font-weight: 500; letter-spacing: .02em;
+  background: var(--surface-container-high); color: var(--on-surface-variant);
+  transition: background-color .3s ease, color .3s ease;
+}
+.chip svg { width: 16px; height: 16px; }
+.chip.accent { background: var(--primary-container); color: var(--on-primary-container); }
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700; letter-spacing: .14em;
+  color: var(--primary); text-transform: uppercase; margin-bottom: 14px;
+}
+.eyebrow::before { content: ""; width: 26px; height: 3px; border-radius: 2px; background: var(--primary); }
+.sec-title { font-size: clamp(26px, 4vw, 38px); font-weight: 750; letter-spacing: -.01em; line-height: 1.25; }
+.sec-desc { color: var(--on-surface-variant); font-size: 15.5px; max-width: 640px; margin-top: 12px; }
+.sec-head { margin-bottom: 36px; }
+.sec-head.center { text-align: center; }
+.sec-head.center .sec-desc { margin-inline: auto; }
+.sec-head.center .eyebrow::before { display: none; }
+
+/* ---------- 5. Hero ---------- */
+.hero {
+  position: relative; overflow: hidden;
+  padding: clamp(40px, 7vw, 88px) 0 clamp(48px, 7vw, 90px);
+}
+.hero::before {
+  content: ""; position: absolute; inset: -20% -10% auto -10%; height: 130%;
+  background:
+    radial-gradient(46% 46% at 78% 18%, var(--primary-container) 0%, transparent 70%),
+    radial-gradient(36% 36% at 8% 78%, var(--secondary-container) 0%, transparent 72%);
+  opacity: .55; pointer-events: none; transition: opacity .3s ease;
+}
+.hero-grid {
+  position: relative; display: grid; grid-template-columns: 1.06fr .94fr;
+  gap: clamp(28px, 5vw, 64px); align-items: center;
+}
+.hero-copy .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.hero h1 {
+  font-size: clamp(44px, 8vw, 76px); font-weight: 800; letter-spacing: -.025em; line-height: 1.04;
+}
+.hero h1 .grad {
+  background: linear-gradient(110deg, var(--primary), var(--tertiary));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero .tagline { font-size: clamp(19px, 2.6vw, 25px); font-weight: 600; margin-top: 14px; letter-spacing: -.005em; }
+.hero .lead { color: var(--on-surface-variant); font-size: clamp(15px, 1.6vw, 17px); margin-top: 14px; max-width: 54ch; }
+.hero .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+.hero .meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+
+/* 手机模型 */
+.hero-media { position: relative; display: flex; justify-content: center; }
+.phone {
+  position: relative; z-index: 2;
+  width: clamp(238px, 58vw, 296px); aspect-ratio: 9 / 18.6;
+  background: var(--inverse-surface); border-radius: 44px; padding: 10px;
+  box-shadow: var(--shadow-3), 0 24px 60px -18px rgba(0,0,0,.4);
+  container-type: inline-size; container-name: phone;
+}
+.phone-screen {
+  width: 100%; height: 100%; border-radius: clamp(27px, 11.8cqw, 35px); overflow: hidden;
+  background: #14181d; display: flex; flex-direction: column;
+  padding: clamp(6px, 2.7cqw, 8px) clamp(10px, 4.7cqw, 14px) clamp(12px, 5.4cqw, 16px);
+}
+.p-status { display: flex; justify-content: space-between; align-items: center; padding: clamp(4px, 2cqw, 6px) clamp(4px, 2cqw, 6px) clamp(9px, 4cqw, 12px); font-size: clamp(9.5px, 3.9cqw, 12px); font-weight: 600; color: #d3dae1; }
+.p-status .p-left { display: inline-flex; align-items: center; gap: clamp(5px, 2.4cqw, 7px); }
+.p-status .p-left svg { width: clamp(11px, 4.7cqw, 14px); height: clamp(11px, 4.7cqw, 14px); opacity: .85; }
+.p-appbar { display: flex; align-items: center; gap: clamp(8px, 4cqw, 12px); padding: 0 2px clamp(10px, 4.7cqw, 14px); }
+.p-appbar .p-back { width: clamp(20px, 9.5cqw, 28px); height: clamp(20px, 9.5cqw, 28px); color: #e8edf2; flex-shrink: 0; }
+.p-appbar .p-back svg { width: 100%; height: 100%; }
+.p-appbar b { display: block; font-size: clamp(15px, 6.4cqw, 19px); line-height: 1.15; color: #f2f5f8; letter-spacing: .01em; }
+.p-appbar .p-sub { display: block; font-size: clamp(9px, 3.7cqw, 11px); color: #93a0ab; font-weight: 600; }
+.p-scores { display: flex; align-items: stretch; gap: clamp(6px, 2.7cqw, 8px); padding: 0 0 clamp(9px, 4cqw, 12px); }
+.p-score { flex: 1; border-radius: clamp(12px, 5.4cqw, 16px); padding: clamp(7px, 3cqw, 9px) 4px clamp(8px, 3.4cqw, 10px); text-align: center; min-width: 0; overflow: hidden; }
+.p-score i { font-style: normal; display: block; font-size: clamp(8.5px, 3.4cqw, 10px); font-weight: 600; letter-spacing: .22em; text-indent: .22em; opacity: .9; white-space: nowrap; }
+.p-score b { display: block; font-size: clamp(14px, 6.1cqw, 18px); font-weight: 750; margin-top: 2px; }
+.p-score.s-score { background: #37454f; color: #cfd9e1; }
+.p-score.s-best { background: #4a3f66; color: #e6dcf5; }
+.p-cbtn { width: clamp(30px, 14.2cqw, 42px); height: clamp(30px, 14.2cqw, 42px); border-radius: 50%; flex-shrink: 0; align-self: center; display: flex; align-items: center; justify-content: center; }
+.p-cbtn svg { width: 46%; height: 46%; }
+.p-cbtn.undo { background: #37454f; color: #cfd9e1; }
+.p-cbtn.restart { background: #8ec8f4; color: #0d4e81; }
+.p-board {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(7px, 3cqw, 9px);
+  background: #1d242b; border-radius: clamp(16px, 7.4cqw, 22px); padding: clamp(9px, 4cqw, 12px);
+}
+.p-cell {
+  border-radius: clamp(10px, 4.7cqw, 14px); background: #2a3138;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 750; font-size: clamp(14px, 7.4cqw, 22px); aspect-ratio: 1;
+  color: #f4f8fb; min-width: 0;
+}
+.p-cell.pop { animation: pop .4s cubic-bezier(.3,1.6,.5,1); }
+@keyframes pop { 0% { transform: scale(.55); } 100% { transform: scale(1); } }
+.p-cell[data-v="2"]   { background: #015a9e; color: #f4f8fb; }
+.p-cell[data-v="4"]   { background: #0273c0; color: #f4f8fb; }
+.p-cell[data-v="8"]   { background: #0f8ce4; color: #f4f8fb; }
+.p-cell[data-v="16"]  { background: #26a5f2; color: #1f3442; }
+.p-cell[data-v="32"]  { background: #55bcf7; color: #24404f; }
+.p-cell[data-v="64"]  { background: #83cff9; color: #24404f; }
+.p-cell[data-v="128"] { background: #aedffb; color: #24404f; font-size: clamp(12px, 6.4cqw, 19px); }
+.p-cell[data-v="256"] { background: #d3effd; color: #2c4a5b; font-size: clamp(12px, 6.4cqw, 19px); }
+.p-cell[data-v="512"] { background: #eaf8ff; color: #2c4a5b; font-size: clamp(12px, 6.4cqw, 19px); }
+.p-cell[data-v="1024"]{ background: #f6fcff; color: #2c4a5b; font-size: clamp(10px, 5.4cqw, 16px); box-shadow: 0 0 0 2px #26a5f2 inset; }
+.p-cell[data-v="2048"]{ background: #ffffff; color: #0b62a8; font-size: clamp(10px, 5.4cqw, 16px); box-shadow: 0 0 14px 0 #26a5f2; }
+
+.float-tile {
+  position: absolute; z-index: 1; display: flex; align-items: center; justify-content: center;
+  border-radius: 18px; font-weight: 800; box-shadow: var(--shadow-2);
+  animation: floaty 5.5s ease-in-out infinite alternate;
+}
+.float-tile.a { width: 64px; height: 64px; top: 4%; left: 4%; font-size: 20px; transform: rotate(-9deg);
+  background: var(--primary-container); color: var(--on-primary-container); }
+.float-tile.b { width: 52px; height: 52px; bottom: 12%; right: 2%; font-size: 16px; transform: rotate(10deg);
+  background: var(--tertiary-container); color: var(--on-tertiary-container); animation-delay: -2.2s; }
+.float-tile.c { width: 40px; height: 40px; top: 26%; right: 0; font-size: 13px; transform: rotate(-14deg);
+  background: var(--secondary-container); color: var(--on-secondary-container); animation-delay: -4s; }
+@keyframes floaty { from { translate: 0 -7px; } to { translate: 0 9px; } }
+
+/* ---------- 6. 主题实验室 ---------- */
+.theme-lab { background: var(--surface-container-low); padding: clamp(52px, 7vw, 84px) 0; transition: background-color .35s ease; }
+.lab-card {
+  background: var(--surface-container-lowest); border-radius: 30px;
+  padding: clamp(26px, 4.5vw, 46px); box-shadow: var(--shadow-1);
+  transition: background-color .35s ease;
+}
+[data-theme="dark"] .lab-card { background: var(--surface-container); }
+.swatch-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 26px; }
+.swatch {
+  width: 46px; height: 46px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; box-shadow: var(--shadow-1);
+  transition: transform .2s cubic-bezier(.3,1.5,.5,1), outline-color .2s ease;
+  outline: 2.5px solid transparent; outline-offset: 3px;
+}
+.swatch:hover { transform: scale(1.12); }
+.swatch[aria-pressed="true"] { outline-color: var(--primary); transform: scale(1.06); }
+.swatch svg { width: 20px; height: 20px; opacity: 0; transition: opacity .2s ease; }
+.swatch[aria-pressed="true"] svg { opacity: 1; }
+.swatch.dice { background: var(--surface-container-highest); color: var(--on-surface-variant); }
+.swatch.dice svg { opacity: 1; }
+.lab-note { margin-top: 20px; font-size: 13.5px; color: var(--on-surface-variant); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.lab-note b { color: var(--on-surface); font-family: var(--mono); font-size: 13px; background: var(--surface-container-high); padding: 2px 8px; border-radius: 6px; }
+
+/* ---------- 7. 特性卡片 ---------- */
+.features { padding: clamp(56px, 8vw, 96px) 0; }
+.feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.feat-card {
+  background: var(--surface-container-low); border-radius: 26px;
+  padding: 26px 24px 24px; transition: background-color .35s ease, box-shadow .25s ease, transform .25s ease;
+}
+.feat-card:hover { background: var(--surface-container); box-shadow: var(--shadow-1); transform: translateY(-3px); }
+.feat-icon {
+  width: 46px; height: 46px; border-radius: 16px; margin-bottom: 16px;
+  background: var(--primary-container); color: var(--on-primary-container);
+  display: flex; align-items: center; justify-content: center;
+  transition: background-color .35s ease, color .35s ease;
+}
+.feat-icon svg { width: 24px; height: 24px; }
+.feat-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; letter-spacing: -.005em; }
+.feat-card ul { list-style: none; }
+.feat-card li {
+  position: relative; padding-left: 20px; font-size: 14px;
+  color: var(--on-surface-variant); margin-top: 7px;
+}
+.feat-card li::before {
+  content: ""; position: absolute; left: 2px; top: .56em;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--primary);
+}
+.feat-card li b { color: var(--on-surface); font-weight: 600; }
+
+/* ---------- 8. 棋盘尺寸 ---------- */
+.boards { background: var(--surface-container-low); padding: clamp(52px, 7vw, 84px) 0; transition: background-color .35s ease; }
+.board-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.board-card {
+  background: var(--surface-container-lowest); border-radius: 26px;
+  padding: 22px 18px 20px; text-align: center; box-shadow: var(--shadow-1);
+  transition: background-color .35s ease, transform .25s ease;
+}
+[data-theme="dark"] .board-card { background: var(--surface-container); }
+.board-card:hover { transform: translateY(-4px); }
+.mini-board {
+  display: grid; gap: 4px; aspect-ratio: 1; margin: 0 auto 14px;
+  width: min(100%, 148px); padding: 7px;
+  background: var(--surface-container); border-radius: 16px;
+  transition: background-color .35s ease;
+}
+.mini-board i { border-radius: 22%; background: var(--surface-container-highest); transition: background-color .35s ease; }
+.mini-board i.a { background: var(--primary-container); }
+.mini-board i.b { background: var(--secondary-container); }
+.mini-board i.c { background: var(--tertiary-container); }
+.mini-board i.d { background: var(--primary); }
+.board-card b { font-size: 16.5px; font-weight: 700; }
+.board-card span { display: block; font-size: 12.5px; color: var(--on-surface-variant); margin-top: 2px; }
+
+/* ---------- 9. 隐私 ---------- */
+.privacy { padding: clamp(56px, 8vw, 96px) 0; }
+.privacy-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(24px, 4vw, 48px); align-items: center; }
+.check-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 26px; }
+.check-item {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface-container-low); border-radius: 18px; padding: 14px 16px;
+  font-size: 14.5px; font-weight: 600; transition: background-color .35s ease;
+}
+.check-item .ck {
+  flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--primary-container); color: var(--on-primary-container);
+  display: flex; align-items: center; justify-content: center;
+}
+.check-item .ck svg { width: 15px; height: 15px; }
+.code-window {
+  background: var(--inverse-surface); color: var(--inverse-on-surface);
+  border-radius: 24px; overflow: hidden; box-shadow: var(--shadow-2);
+}
+.code-window .cw-bar {
+  display: flex; align-items: center; gap: 8px; padding: 14px 18px;
+  font-size: 12.5px; font-family: var(--mono); opacity: .85;
+}
+.code-window .cw-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--inverse-on-surface); opacity: .35; }
+.code-window pre {
+  padding: 4px 20px 22px; font-family: var(--mono); font-size: 13px;
+  line-height: 1.8; overflow-x: auto;
+}
+.code-window .cm { opacity: .55; }
+.code-window .hl { color: var(--tertiary-container); font-weight: 600; }
+.privacy-foot { margin-top: 22px; font-size: 13.5px; color: var(--on-surface-variant); }
+.privacy-foot b { color: var(--on-surface); }
+
+/* ---------- 10. 技术内幕 ---------- */
+.tech { background: var(--surface-container-low); padding: clamp(52px, 7vw, 84px) 0; transition: background-color .35s ease; }
+.tech-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.tech-card {
+  background: var(--surface-container-lowest); border-radius: 26px; padding: 28px 26px;
+  box-shadow: var(--shadow-1); transition: background-color .35s ease, transform .25s ease;
+}
+[data-theme="dark"] .tech-card { background: var(--surface-container); }
+.tech-card:hover { transform: translateY(-3px); }
+.tech-num { font-size: 42px; font-weight: 800; letter-spacing: -.03em; color: var(--primary); opacity: .38; line-height: 1; }
+.tech-card h3 { font-size: 18px; font-weight: 700; margin: 12px 0 8px; }
+.tech-card p { font-size: 14px; color: var(--on-surface-variant); }
+.tech-card p b { color: var(--on-surface); font-weight: 600; }
+
+/* ---------- 11. 下载 ---------- */
+.download { padding: clamp(56px, 8vw, 96px) 0; }
+.dl-panel {
+  background: var(--primary-container); color: var(--on-primary-container);
+  border-radius: 32px; padding: clamp(28px, 5vw, 52px);
+  display: grid; grid-template-columns: 1.2fr .8fr; gap: clamp(24px, 4vw, 48px);
+  transition: background-color .35s ease, color .35s ease;
+}
+.dl-panel h2 { font-size: clamp(24px, 3.4vw, 34px); font-weight: 780; letter-spacing: -.015em; line-height: 1.25; }
+.dl-panel .dl-sub { margin-top: 12px; opacity: .85; font-size: 15px; max-width: 46ch; }
+.dl-btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.dl-req { display: grid; gap: 12px; align-content: center; }
+.req-item {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--surface); border-radius: 20px; padding: 15px 18px;
+  transition: background-color .35s ease;
+}
+.req-item .rk { flex-shrink: 0; width: 40px; height: 40px; border-radius: 13px;
+  background: var(--primary-container); color: var(--on-primary-container);
+  display: flex; align-items: center; justify-content: center; }
+.req-item .rk svg { width: 21px; height: 21px; }
+.req-item b { display: block; font-size: 14.5px; }
+.req-item span { display: block; font-size: 12.5px; color: var(--on-surface-variant); }
+
+/* ---------- 12. 构建 ---------- */
+.build { padding: 0 0 clamp(56px, 8vw, 96px); }
+.build-steps { display: grid; gap: 14px; max-width: 760px; }
+.code-card {
+  background: var(--surface-container-low); border-radius: 22px; overflow: hidden;
+  transition: background-color .35s ease;
+}
+.code-head {
+  display: flex; align-items: center; gap: 10px; padding: 12px 12px 0 20px;
+}
+.step-badge {
+  width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+  background: var(--primary); color: var(--on-primary);
+  font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+}
+.code-head .code-title { font-size: 14px; font-weight: 650; }
+.code-head .icon-btn { margin-left: auto; width: 36px; height: 36px; }
+.code-head .icon-btn svg { width: 18px; height: 18px; }
+.code-card pre {
+  padding: 12px 20px 18px; font-family: var(--mono); font-size: 13.5px;
+  line-height: 1.85; overflow-x: auto; color: var(--on-surface);
+}
+.code-card pre .c { opacity: .55; }
+.build-note { margin-top: 18px; font-size: 13.5px; color: var(--on-surface-variant); max-width: 760px; }
+.build-note code {
+  font-family: var(--mono); font-size: 12.5px; background: var(--surface-container-high);
+  padding: 2px 7px; border-radius: 6px; color: var(--on-surface);
+}
+.prereq { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+
+/* ---------- 13. 贡献 ---------- */
+.contribute { background: var(--surface-container-low); padding: clamp(52px, 7vw, 84px) 0; transition: background-color .35s ease; }
+.contri-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.contri-card {
+  background: var(--surface-container-lowest); border-radius: 26px; padding: 26px 24px;
+  box-shadow: var(--shadow-1); transition: background-color .35s ease, transform .25s ease;
+}
+[data-theme="dark"] .contri-card { background: var(--surface-container); }
+.contri-card:hover { transform: translateY(-3px); }
+.contri-card .feat-icon { background: var(--tertiary-container); color: var(--on-tertiary-container); }
+.contri-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+.contri-card p { font-size: 14px; color: var(--on-surface-variant); }
+.contri-card a.more { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; font-size: 14px; font-weight: 600; }
+.contri-card a.more svg { width: 16px; height: 16px; }
+
+/* ---------- 14. 页脚 ---------- */
+footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
+.foot-inner { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; }
+.foot-brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; }
+.foot-brand .logo { width: 30px; height: 30px; }
+.foot-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 4px; }
+.foot-links a {
+  color: var(--on-surface-variant); font-size: 13.5px; font-weight: 500;
+  padding: 6px 12px; border-radius: 999px; transition: background-color .2s ease, color .2s ease;
+}
+.foot-links a:hover { background: var(--surface-container-high); color: var(--on-surface); }
+.foot-legal { font-size: 12.5px; color: var(--on-surface-variant); max-width: 560px; }
+
+/* ---------- 15. Snackbar / FAB ---------- */
+.snackbar {
+  position: fixed; left: 50%; bottom: 26px; z-index: 90;
+  transform: translate(-50%, 90px); opacity: 0;
+  background: var(--inverse-surface); color: var(--inverse-on-surface);
+  padding: 13px 22px; border-radius: 12px; font-size: 14px; font-weight: 500;
+  box-shadow: var(--shadow-3); pointer-events: none;
+  transition: transform .35s cubic-bezier(.2,.9,.3,1.2), opacity .3s ease;
+  max-width: calc(100vw - 40px); text-align: center;
+}
+.snackbar.show { transform: translate(-50%, 0); opacity: 1; }
+
+.fab {
+  position: fixed; right: 22px; bottom: 22px; z-index: 80;
+  width: 56px; height: 56px; border-radius: 18px;
+  background: var(--primary-container); color: var(--on-primary-container);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-3);
+  transform: translateY(110px); transition: transform .4s cubic-bezier(.2,.9,.3,1.1), background-color .35s ease;
+}
+.fab.show { transform: translateY(0); }
+.fab:hover { filter: brightness(1.05); }
+.fab svg { width: 24px; height: 24px; }
+
+/* ---------- 16. 响应式 ---------- */
+@media (max-width: 980px) {
+  .tech-grid, .contri-grid { grid-template-columns: 1fr 1fr; }
+  .privacy-grid, .dl-panel { grid-template-columns: 1fr; }
+  .board-strip { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 860px) {
+  .nav-links { display: none; }
+  .menu-toggle { display: inline-flex; }
+}
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 52px; }
+  .hero-media { order: 2; }
+  .hero-copy { text-align: center; }
+  .hero-copy .chip-row, .hero .cta-row, .hero .meta-row { justify-content: center; }
+  .hero .lead { margin-inline: auto; }
+}
+@media (max-width: 640px) {
+  .tech-grid, .contri-grid { grid-template-columns: 1fr; }
+  .check-list { grid-template-columns: 1fr; }
+  .btn { height: 48px; }
+  .hero .cta-row .btn { flex: 1 1 auto; min-width: 150px; }
+  .float-tile.c { display: none; }
+  .bar-actions .btn-tonal span.lbl { display: none; }
+  .bar-actions .btn-tonal { width: 42px; height: 42px; padding: 0; border-radius: 50%; }
+  footer { padding-bottom: 120px; }
+}
+@media (max-width: 380px) {
+  .board-strip { grid-template-columns: 1fr; }
+  .swatch { width: 40px; height: 40px; }
+}
+
+/* ---------- 17. 动效偏好 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+</style>
+<script>
+/* 首屏前应用主题，避免闪烁 */
+(function () {
+  try {
+    var t = localStorage.getItem("yi-theme");
+    if (!t) t = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", t);
+  } catch (e) { /* ignore */ }
+})();
+</script>
+</head>
+<body id="top">
+
+<!-- ======= 顶部应用栏 ======= -->
+<header class="topbar" id="topbar">
+  <div class="container bar-inner">
+    <a class="brand" href="#top" aria-label="YiPuzzles 首页">
+      <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
+        <rect x="2" y="2" width="44" height="44" rx="13" fill="var(--primary)"/>
+        <rect x="9" y="9" width="13" height="13" rx="4.5" fill="var(--on-primary)" opacity=".95"/>
+        <rect x="26" y="9" width="13" height="13" rx="4.5" fill="var(--on-primary)" opacity=".5"/>
+        <rect x="9" y="26" width="13" height="13" rx="4.5" fill="var(--on-primary)" opacity=".5"/>
+        <rect x="26" y="26" width="13" height="13" rx="4.5" fill="var(--on-primary)" opacity=".95"/>
+      </svg>
+      YiPuzzles
+    </a>
+    <nav class="nav-links" aria-label="页面导航">
+      <a href="#features">特性</a>
+      <a href="#theme">主题</a>
+      <a href="#privacy">隐私</a>
+      <a href="#download">下载</a>
+      <a href="#build">构建</a>
+    </nav>
+    <div class="bar-actions">
+      <button class="icon-btn" id="themeToggle" data-ripple aria-label="切换浅色 / 深色模式" title="切换浅色 / 深色模式">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="display:none"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M18.7 5.3 17 7M7 17l-1.7 1.7"/></svg>
+      </button>
+      <a class="btn btn-tonal btn-sm" data-ripple href="https://github.com/lingyicute/YiPuzzles" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        <span class="lbl">GitHub</span>
+      </a>
+      <button class="icon-btn menu-toggle" id="menuBtn" data-ripple aria-label="打开菜单" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 7h16v2H4zm0 4h16v2H4zm0 4h16v2H4z"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="menu-drop" id="menuDrop">
+    <a href="#features">✨ 特性</a>
+    <a href="#theme">🎨 动态主题</a>
+    <a href="#privacy">🔒 隐私</a>
+    <a href="#download">📥 下载</a>
+    <a href="#build">🔨 构建</a>
+    <a href="https://github.com/lingyicute/YiPuzzles" target="_blank" rel="noopener">🐙 GitHub 仓库</a>
+  </div>
+</header>
+
+<main>
+  <!-- ======= Hero ======= -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <div class="chip-row reveal">
+          <span class="chip accent">Material You</span>
+          <span class="chip">开源 · GPL-3.0</span>
+          <a class="chip" id="starChip" href="https://github.com/lingyicute/YiPuzzles" target="_blank" rel="noopener" data-ripple>
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            <span id="starCount">Star</span>
+          </a>
+        </div>
+        <h1 class="reveal" style="--d:.06s">Yi<span class="grad">Puzzles</span></h1>
+        <p class="tagline reveal" style="--d:.12s">是你熟悉的 2048，简单却令人上瘾。</p>
+        <p class="lead reveal" style="--d:.18s">
+          一款简洁、轻量、<b>隐私至上</b>的 2048 滑块拼图游戏：零权限、完全离线、无广告无追踪，
+          以 Material You 精心打造——配色甚至可以直接取自你的壁纸。
+        </p>
+        <div class="cta-row reveal" style="--d:.24s">
+          <a class="btn btn-filled" data-ripple href="https://github.com/lingyicute/YiPuzzles/releases" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            下载 APK
+          </a>
+          <a class="btn btn-tonal" data-ripple href="https://github.com/lingyicute/YiPuzzles" target="_blank" rel="noopener">
+            <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            查看源码
+          </a>
+        </div>
+        <div class="meta-row reveal" style="--d:.3s">
+          <span class="chip">🤖 Android 5.0+</span>
+          <span class="chip">🔒 零权限</span>
+          <span class="chip">🚫 无广告 · 无追踪</span>
+          <span class="chip">🧩 4×4 ~ 7×7</span>
+        </div>
+      </div>
+
+      <div class="hero-media reveal" style="--d:.2s" aria-hidden="true">
+        <div class="float-tile a">2048</div>
+        <div class="float-tile b">64</div>
+        <div class="float-tile c">2</div>
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="p-status">
+              <span class="p-left">00:30&nbsp;&nbsp;9/21
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.9 3 2.8 6.3 2.8 10.4c0 2.3 1.3 4.4 3.3 5.8L5.3 19l3-1.6c1.1.4 2.4.6 3.7.6 5.1 0 9.2-3.3 9.2-7.6S17.1 3 12 3z"/><circle cx="9.2" cy="10.2" r="1" fill="#14181d"/><circle cx="14.8" cy="10.2" r="1" fill="#14181d"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M4 12h16"/></svg>
+              </span>
+              <span class="p-right">100% 〇</span>
+            </div>
+            <div class="p-appbar">
+              <span class="p-back"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></span>
+              <div><b>2048</b><span class="p-sub">4x4</span></div>
+            </div>
+            <div class="p-scores">
+              <div class="p-score s-score"><i>分数</i><b id="pScore">180</b></div>
+              <div class="p-score s-best"><i>最高分</i><b id="pBest">180</b></div>
+              <span class="p-cbtn undo" title="撤销" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.5 8c-2.65 0-5.05 1-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg></span>
+              <span class="p-cbtn restart" title="重新开始" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35A7.96 7.96 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08a5.99 5.99 0 0 1-5.65 4c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></span>
+            </div>
+            <div class="p-board" id="pBoard"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= 主题实验室 ======= -->
+  <section class="theme-lab" id="theme">
+    <div class="container">
+      <div class="lab-card reveal">
+        <div class="sec-head" style="margin-bottom:0">
+          <span class="eyebrow">Dynamic Color · 现场演示</span>
+          <h2 class="sec-title">像 Material You 一样，<br>给整个页面换个颜色</h2>
+          <p class="sec-desc">
+            YiPuzzles 在 Android 12+ 上会从你的壁纸动态取色，让棋盘与系统浑然一体。
+            这个页面也内置了同样的动态调色板——点一颗种子色，整站立即重新着色，右上角还能切换深色模式。
+          </p>
+        </div>
+        <div class="swatch-row" id="swatchRow" role="group" aria-label="选择主题种子色"></div>
+        <p class="lab-note">
+          当前种子色 <b id="seedHex">#6750A4</b> · 选择会保存在本地 · 试试右上角的 🌙 / ☀️ 按钮
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= 特性 ======= -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Features</span>
+        <h2 class="sec-title">麻雀虽小，五脏俱全</h2>
+        <p class="sec-desc">商店里的 2048 要么塞满广告与账号体系，要么只有一个 4×4 棋盘。YiPuzzles 选择了另一条路。</p>
+      </div>
+      <div class="feat-grid">
+        <article class="feat-card reveal" style="--d:.02s">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M8 12h8m0 0-3-3m3 3-3 3"/></svg></div>
+          <h3>🧩 经典 2048 玩法</h3>
+          <ul>
+            <li>向任意方向滑动，数字块合并为下一个 <b>2 的幂</b></li>
+            <li>合成 <b>2048</b> 即可获胜，还可继续冲击更高分</li>
+            <li>支持<b>撤销一步</b>与即时<b>重新开始</b></li>
+            <li>进度<b>自动保存</b>，随时回到上次的棋盘</li>
+          </ul>
+        </article>
+        <article class="feat-card reveal" style="--d:.06s">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7.2" height="7.2" rx="2"/><rect x="13.3" y="3.5" width="7.2" height="7.2" rx="2"/><rect x="3.5" y="13.3" width="7.2" height="7.2" rx="2"/><rect x="13.3" y="13.3" width="7.2" height="7.2" rx="2"/></svg></div>
+          <h3>🎯 四种棋盘大小</h3>
+          <ul>
+            <li>经典 <b>4×4</b>，外加 <b>5×5、6×6、7×7</b></li>
+            <li>更大的棋盘，更长的对局，更烧脑的挑战</li>
+            <li>主页棋盘预览实时应用你当前的配色方案</li>
+          </ul>
+        </article>
+        <article class="feat-card reveal" style="--d:.1s">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20v-7M12 20V5M19 20v-10M3.5 20h17"/></svg></div>
+          <h3>📊 详细的统计数据</h3>
+          <ul>
+            <li>按棋盘大小分别记录，互不混淆</li>
+            <li><b>最大数字</b>、<b>最高分</b>、游戏时长</li>
+            <li>各方向滑动次数、撤销次数、单次滑动用时</li>
+          </ul>
+        </article>
+        <article class="feat-card reveal" style="--d:.14s">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><circle cx="8.6" cy="9.4" r="1.15" fill="currentColor" stroke="none"/><circle cx="15.4" cy="9.4" r="1.15" fill="currentColor" stroke="none"/><circle cx="12" cy="15.6" r="1.15" fill="currentColor" stroke="none"/></svg></div>
+          <h3>🎨 Material You 设计</h3>
+          <ul>
+            <li><b>动态取色</b>：从壁纸种子色生成和谐配色（Android 12+）</li>
+            <li>三套数字块配色：Material You / 2048 经典 / 深蓝</li>
+            <li>浅色 · 深色 · 跟随系统，边缘到边缘全屏显示</li>
+            <li>可选的移动与合并动画，反馈流畅舒适</li>
+          </ul>
+        </article>
+        <article class="feat-card reveal" style="--d:.18s">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5.2c0 4.8-3.4 7.9-7 9.3-3.6-1.4-7-4.5-7-9.3V6z"/><path d="m9 11.8 2.1 2.1L15.4 9.5"/></svg></div>
+          <h3>🔒 100% 隐私 · 离线 · 无广告</h3>
+          <ul>
+            <li><b>零权限</b>——应用根本无法触碰自身之外的任何东西</li>
+            <li>无广告、无跟踪、无统计、无账号、<b>无需联网</b></li>
+            <li>依据 <b>GPL-3.0</b> 许可证开源</li>
+          </ul>
+        </article>
+        <article class="feat-card reveal" style="--d:.22s">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M3.4 12h17.2M12 3.4c2.7 2.9 2.7 14.3 0 17.2-2.7-2.9-2.7-14.3 0-17.2z"/></svg></div>
+          <h3>🌍 多语言本地化</h3>
+          <ul>
+            <li>内置 <b>简体中文</b> 与 <b>English</b></li>
+            <li>随附新手教程与常见问题解答</li>
+            <li>欢迎社区贡献更多语言的翻译</li>
+          </ul>
+        </article>
+        <article class="feat-card reveal" style="--d:.26s">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7.5h9m5 0h2M4 16.5h3m5 0h8"/><circle cx="15.5" cy="7.5" r="2.2"/><circle cx="9.5" cy="16.5" r="2.2"/></svg></div>
+          <h3>⚙️ 贴心的玩家选项</h3>
+          <ul>
+            <li>游戏时<b>保持屏幕常亮</b></li>
+            <li>纯滑动操作——不会误触，<b>单手即可游玩</b></li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= 棋盘尺寸 ======= -->
+  <section class="boards" id="boards">
+    <div class="container">
+      <div class="sec-head center reveal">
+        <span class="eyebrow">Board Sizes</span>
+        <h2 class="sec-title">从 4×4 到 7×7，逐级升级</h2>
+        <p class="sec-desc">每一种棋盘大小都有独立的游戏进度与统计数据，配色随主题实时联动。</p>
+      </div>
+      <div class="board-strip">
+        <div class="board-card reveal" style="--d:.02s"><div class="mini-board" data-size="4"></div><b>4 × 4</b><span>经典 · 原汁原味</span></div>
+        <div class="board-card reveal" style="--d:.08s"><div class="mini-board" data-size="5"></div><b>5 × 5</b><span>进阶 · 渐入佳境</span></div>
+        <div class="board-card reveal" style="--d:.14s"><div class="mini-board" data-size="6"></div><b>6 × 6</b><span>挑战 · 运筹帷幄</span></div>
+        <div class="board-card reveal" style="--d:.2s"><div class="mini-board" data-size="7"></div><b>7 × 7</b><span>极限 · 大局观</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= 隐私 ======= -->
+  <section class="privacy" id="privacy">
+    <div class="container privacy-grid">
+      <div class="reveal">
+        <span class="eyebrow">Privacy First</span>
+        <h2 class="sec-title">100% 隐私，<br>说到做到</h2>
+        <p class="sec-desc">YiPuzzles 在清单文件中不申请任何权限。所有游戏数据（棋盘、分数、统计）都保存在本机——设置页里没有任何需要授予的东西，因为代码里就没有需要权限的东西。</p>
+        <div class="check-list">
+          <div class="check-item"><span class="ck"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>零权限声明</div>
+          <div class="check-item"><span class="ck"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>无广告</div>
+          <div class="check-item"><span class="ck"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>无跟踪器</div>
+          <div class="check-item"><span class="ck"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>无数据统计</div>
+          <div class="check-item"><span class="ck"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>无账号体系</div>
+          <div class="check-item"><span class="ck"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>完全离线运行</div>
+        </div>
+        <p class="privacy-foot">开源许可：<b>GPL-3.0</b> —— 你可以自由地使用、审查、修改和分发它的每一行代码。</p>
+      </div>
+      <div class="reveal" style="--d:.12s">
+        <div class="code-window" role="img" aria-label="AndroidManifest.xml 中没有任何权限声明">
+          <div class="cw-bar"><i></i><i></i><i></i>&nbsp;AndroidManifest.xml</div>
+          <pre>&lt;manifest
+    package="uk.euwen.yipuzzles"&gt;
+
+    <span class="cm">&lt;!-- 这里空空如也 --&gt;</span>
+    <span class="cm">&lt;!-- 没有 INTERNET 权限 --&gt;</span>
+    <span class="cm">&lt;!-- 没有任何权限声明 --&gt;</span>
+
+    &lt;application ...&gt;
+        <span class="hl">&lt;uses-permission&gt; × 0</span>
+    &lt;/application&gt;
+&lt;/manifest&gt;</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= 技术内幕 ======= -->
+  <section class="tech" id="tech">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Under the Hood</span>
+        <h2 class="sec-title">为什么是 YiPuzzles？技术内幕</h2>
+      </div>
+      <div class="tech-grid">
+        <article class="tech-card reveal" style="--d:.02s">
+          <div class="tech-num">01</div>
+          <h3>零权限架构</h3>
+          <p>清单文件不声明任何权限；棋盘、分数与统计全部存储在本机。游戏 100% 离线运行——<b>代码里没有需要审计的东西</b>，自然也无权可授。</p>
+        </article>
+        <article class="tech-card reveal" style="--d:.08s">
+          <div class="tech-num">02</div>
+          <h3>Material You 动态主题</h3>
+          <p>在 Android 12+ 上，整套配色从壁纸种子色派生，棋盘、数字块与主页预览与设备浑然一体。偏爱固定外观？随时切回 <b>2048 经典</b> 或 <b>深蓝</b> 方案。</p>
+        </article>
+        <article class="tech-card reveal" style="--d:.14s">
+          <div class="tech-num">03</div>
+          <h3>测试保障与持续集成</h3>
+          <p>游戏核心（棋盘状态、合并与计分）保持小而纯粹，由 <b>JUnit / Robolectric</b> 单元测试覆盖；<b>GitHub Actions</b> 每次推送自动构建并发布 <b>nightly</b>，始终有新鲜、可复现的下载。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= 下载 ======= -->
+  <section class="download" id="download">
+    <div class="container">
+      <div class="dl-panel reveal">
+        <div>
+          <h2>现在下载，<br>安装即玩 🚀</h2>
+          <p class="dl-sub">GitHub Releases 提供稳定版本，外加每次推送自动构建的 nightly 版本。无需授予任何权限——下载、安装、开始合并。</p>
+          <div class="dl-btns">
+            <a class="btn btn-filled" data-ripple href="https://github.com/lingyicute/YiPuzzles/releases" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              下载稳定版 APK
+            </a>
+            <a class="btn btn-tonal" data-ripple href="https://github.com/lingyicute/YiPuzzles/releases/tag/nightly" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg>
+              Nightly 每日构建
+            </a>
+          </div>
+        </div>
+        <div class="dl-req">
+          <div class="req-item">
+            <span class="rk"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 9.48 19.44 6.3a.4.4 0 0 0-.69-.4l-1.86 3.2a11.4 11.4 0 0 0-9.78 0L5.25 5.9a.4.4 0 0 0-.69.4l1.84 3.18A10.78 10.78 0 0 0 1 18h22a10.78 10.78 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 1.25-1.25A1.25 1.25 0 0 1 7 15.25zm10 0a1.25 1.25 0 1 1 1.25-1.25 1.25 1.25 0 0 1-1.25 1.25z"/></svg></span>
+            <div><b>Android 5.0 及以上</b><span>Lollipop（API 21）+，覆盖绝大多数设备</span></div>
+          </div>
+          <div class="req-item">
+            <span class="rk"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span>
+            <div><b>无需任何权限</b><span>安装过程中不会向你索取任何东西</span></div>
+          </div>
+          <div class="req-item">
+            <span class="rk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z" transform="translate(0 0)"/><path d="M4 4l16 16"/></svg></span>
+            <div><b>完全离线</b><span>飞行模式下也能畅通无阻地游玩</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= 构建 ======= -->
+  <section class="build" id="build">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Build from Source</span>
+        <h2 class="sec-title">从源码构建</h2>
+        <p class="sec-desc">想审查每一行代码，或动手改点什么？三条命令即可得到属于你自己的 APK。</p>
+      </div>
+      <div class="prereq reveal">
+        <span class="chip">☕ JDK 17+</span>
+        <span class="chip">🛠️ Android SDK（API 34）</span>
+        <span class="chip">🐘 Gradle Wrapper 已内置</span>
+      </div>
+      <div class="build-steps">
+        <div class="code-card reveal" style="--d:.02s">
+          <div class="code-head">
+            <span class="step-badge">1</span><span class="code-title">克隆仓库</span>
+            <button class="icon-btn copy-btn" data-ripple data-copy="cmd1" aria-label="复制克隆命令">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            </button>
+          </div>
+          <pre id="cmd1">git clone https://github.com/lingyicute/YiPuzzles.git
+cd YiPuzzles</pre>
+        </div>
+        <div class="code-card reveal" style="--d:.06s">
+          <div class="code-head">
+            <span class="step-badge">2</span><span class="code-title">构建 Debug APK（开发调试）</span>
+            <button class="icon-btn copy-btn" data-ripple data-copy="cmd2" aria-label="复制 Debug 构建命令">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            </button>
+          </div>
+          <pre id="cmd2">./gradlew assembleDebug</pre>
+        </div>
+        <div class="code-card reveal" style="--d:.1s">
+          <div class="code-head">
+            <span class="step-badge">3</span><span class="code-title">构建 Release APK（正式发布）</span>
+            <button class="icon-btn copy-btn" data-ripple data-copy="cmd3" aria-label="复制 Release 构建命令">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            </button>
+          </div>
+          <pre id="cmd3">./gradlew assembleRelease</pre>
+        </div>
+      </div>
+      <p class="build-note reveal">构建产物位于 <code>app/build/outputs/apk/</code>，文件名形如 <code>yipuzzles-&lt;variant&gt;-v&lt;version&gt;.apk</code>。提交代码前请确保 <code>./gradlew test</code> 全部通过。</p>
+    </div>
+  </section>
+
+  <!-- ======= 贡献 ======= -->
+  <section class="contribute" id="contribute">
+    <div class="container">
+      <div class="sec-head center reveal">
+        <span class="eyebrow">Contributing</span>
+        <h2 class="sec-title">欢迎每一种贡献</h2>
+        <p class="sec-desc">无论是报告一个 Bug、提交一行补丁，还是帮忙翻译一段文案，都弥足珍贵。</p>
+      </div>
+      <div class="contri-grid">
+        <article class="contri-card reveal" style="--d:.02s">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M9.2 9.2c.5-1.1 2-1.6 3.1-1.1 1.2.5 1.7 1.9 1.1 3-.5.9-1.5 1.2-1.8 2.2v.7"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></div>
+          <h3>🐛 反馈问题</h3>
+          <p>遇到 Bug 或有新功能想法？在 Issue Tracker 提交一条 issue，若能附上设备与系统版本就更好啦。</p>
+          <a class="more" href="https://github.com/lingyicute/YiPuzzles/issues" target="_blank" rel="noopener">前往 Issues <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7zM19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7z"/></svg></a>
+        </article>
+        <article class="contri-card reveal" style="--d:.08s">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6 3 12l5 6M16 6l5 6-5 6M13 4l-2.5 16"/></svg></div>
+          <h3>🔧 提交代码</h3>
+          <p>遵循现有代码风格发起 Pull Request，并确保 <b>./gradlew test</b> 在本地全部通过。</p>
+          <a class="more" href="https://github.com/lingyicute/YiPuzzles/pulls" target="_blank" rel="noopener">查看 Pull Requests <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7zM19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7z"/></svg></a>
+        </article>
+        <article class="contri-card reveal" style="--d:.14s">
+          <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 5h8M7 3v2c0 4.5-2.5 7.5-4 9M5 9c1 2.5 3.5 5 6 6"/><path d="M13.5 21 18 10.5 22.5 21M14.8 18h6.4"/></svg></div>
+          <h3>🌐 翻译本地化</h3>
+          <p>帮助 YiPuzzles 说更多语言：添加你的 <b>values-xx</b> 字符串资源即可，无需改动逻辑代码。</p>
+          <a class="more" href="https://github.com/lingyicute/YiPuzzles" target="_blank" rel="noopener">浏览仓库 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7zM19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7z"/></svg></a>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ======= 页脚 ======= -->
+<footer>
+  <div class="container foot-inner">
+    <div class="foot-brand">
+      <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
+        <rect x="2" y="2" width="44" height="44" rx="13" fill="var(--primary)"/>
+        <rect x="9" y="9" width="13" height="13" rx="4.5" fill="var(--on-primary)" opacity=".95"/>
+        <rect x="26" y="9" width="13" height="13" rx="4.5" fill="var(--on-primary)" opacity=".5"/>
+        <rect x="9" y="26" width="13" height="13" rx="4.5" fill="var(--on-primary)" opacity=".5"/>
+        <rect x="26" y="26" width="13" height="13" rx="4.5" fill="var(--on-primary)" opacity=".95"/>
+      </svg>
+      YiPuzzles
+    </div>
+    <div class="foot-links">
+      <a href="https://github.com/lingyicute/YiPuzzles" target="_blank" rel="noopener">仓库</a>
+      <a href="https://github.com/lingyicute/YiPuzzles/releases" target="_blank" rel="noopener">Releases</a>
+      <a href="https://github.com/lingyicute/YiPuzzles/issues" target="_blank" rel="noopener">Issues</a>
+      <a href="https://github.com/lingyicute/YiPuzzles/blob/main/LICENSE" target="_blank" rel="noopener">GPL-3.0 许可证</a>
+      <a href="https://github.com/lingyicute" target="_blank" rel="noopener">@lingyicute</a>
+    </div>
+    <p class="foot-legal">
+      Made with ❤️ by lingyicute. Copyright © 2025–2026 · Licensed as GPL-3.0<br>
+      This website proudly features Material You design, just like the game.
+    </p>
+  </div>
+</footer>
+
+<!-- Snackbar 与 FAB -->
+<div class="snackbar" id="snackbar" role="status" aria-live="polite"></div>
+<button class="fab" id="fab" data-ripple aria-label="前往下载" title="前往下载">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+</button>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============ 1. 颜色工具：HSL <-> HEX ============ */
+  function hexToHsl(hex) {
+    hex = hex.replace('#', '');
+    var r = parseInt(hex.slice(0, 2), 16) / 255,
+        g = parseInt(hex.slice(2, 4), 16) / 255,
+        b = parseInt(hex.slice(4, 6), 16) / 255;
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var h = 0, s = 0, l = (max + min) / 2;
+    if (max !== min) {
+      var d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+      else if (max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h *= 60;
+    }
+    return { h: h, s: s * 100, l: l * 100 };
+  }
+  function hslToHex(h, s, l) {
+    h = ((h % 360) + 360) % 360;
+    s /= 100; l /= 100;
+    var k = function (n) { return (n + h / 30) % 12; };
+    var a = s * Math.min(l, 1 - l);
+    var f = function (n) {
+      return l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    };
+    var toHex = function (x) {
+      var v = Math.round(x * 255).toString(16);
+      return v.length < 2 ? '0' + v : v;
+    };
+    return '#' + toHex(f(0)) + toHex(f(8)) + toHex(f(4));
+  }
+  function clamp(v, lo, hi) { return Math.min(Math.max(v, lo), hi); }
+
+  /* ============ 2. Material You 色调方案生成 ============ */
+  function buildScheme(seed, dark) {
+    var c = hexToHsl(seed);
+    var h = c.h;
+    var ps = clamp(c.s, 14, 78);              // 主色饱和度
+    var neu = Math.min(ps * 0.18, 12);        // 表面中性饱和度
+    function T(hh, ss, ll) { return hslToHex(hh, clamp(ss, 0, 100), clamp(ll, 0, 100)); }
+    if (!dark) {
+      return {
+        '--primary': T(h, ps, 40),
+        '--on-primary': T(h, ps, 100),
+        '--primary-container': T(h, ps, 90),
+        '--on-primary-container': T(h, ps, 12),
+        '--secondary': T(h, ps * 0.42, 40),
+        '--on-secondary': T(h, ps * 0.42, 100),
+        '--secondary-container': T(h, ps * 0.42, 90),
+        '--on-secondary-container': T(h, ps * 0.42, 12),
+        '--tertiary': T(h + 60, ps * 0.55, 42),
+        '--on-tertiary': T(h + 60, ps * 0.55, 100),
+        '--tertiary-container': T(h + 60, ps * 0.55, 90),
+        '--on-tertiary-container': T(h + 60, ps * 0.55, 12),
+        '--surface': T(h, neu, 98),
+        '--surface-container-lowest': T(h, neu, 100),
+        '--surface-container-low': T(h, neu, 96),
+        '--surface-container': T(h, neu, 94),
+        '--surface-container-high': T(h, neu, 92),
+        '--surface-container-highest': T(h, neu, 90),
+        '--on-surface': T(h, neu, 12),
+        '--on-surface-variant': T(h, neu, 32),
+        '--outline': T(h, neu, 52),
+        '--outline-variant': T(h, neu, 80),
+        '--inverse-surface': T(h, neu, 20),
+        '--inverse-on-surface': T(h, neu, 95)
+      };
+    }
+    return {
+      '--primary': T(h, Math.min(ps, 60), 80),
+      '--on-primary': T(h, ps, 18),
+      '--primary-container': T(h, ps * 0.9, 30),
+      '--on-primary-container': T(h, ps, 90),
+      '--secondary': T(h, ps * 0.36, 78),
+      '--on-secondary': T(h, ps * 0.36, 16),
+      '--secondary-container': T(h, ps * 0.36, 28),
+      '--on-secondary-container': T(h, ps * 0.36, 90),
+      '--tertiary': T(h + 60, ps * 0.5, 78),
+      '--on-tertiary': T(h + 60, ps * 0.5, 16),
+      '--tertiary-container': T(h + 60, ps * 0.5, 26),
+      '--on-tertiary-container': T(h + 60, ps * 0.5, 90),
+      '--surface': T(h, neu * 0.8, 7),
+      '--surface-container-lowest': T(h, neu * 0.8, 4),
+      '--surface-container-low': T(h, neu * 0.8, 10),
+      '--surface-container': T(h, neu * 0.8, 13),
+      '--surface-container-high': T(h, neu * 0.8, 16),
+      '--surface-container-highest': T(h, neu * 0.8, 19),
+      '--on-surface': T(h, neu * 0.8, 92),
+      '--on-surface-variant': T(h, neu * 0.8, 72),
+      '--outline': T(h, neu * 0.8, 55),
+      '--outline-variant': T(h, neu * 0.8, 30),
+      '--inverse-surface': T(h, neu * 0.8, 90),
+      '--inverse-on-surface': T(h, neu * 0.8, 15)
+    };
+  }
+
+  /* ============ 3. 状态与应用 ============ */
+  var SEEDS = [
+    { name: 'Material 紫', hex: '#6750A4' },
+    { name: '深海蓝', hex: '#0B57D0' },
+    { name: '青瓷绿', hex: '#006A60' },
+    { name: '落日橙', hex: '#B75C00' },
+    { name: '山茶粉', hex: '#C93A63' },
+    { name: '橄榄绿', hex: '#5C6620' }
+  ];
+  var state = { seed: SEEDS[0].hex, theme: 'light' };
+  try {
+    var savedSeed = localStorage.getItem('yi-seed');
+    if (savedSeed && /^#[0-9a-fA-F]{6}$/.test(savedSeed)) state.seed = savedSeed;
+    var savedTheme = localStorage.getItem('yi-theme');
+    if (savedTheme === 'dark' || savedTheme === 'light') state.theme = savedTheme;
+    else state.theme = document.documentElement.getAttribute('data-theme') || 'light';
+  } catch (e) { /* ignore */ }
+
+  var root = document.documentElement;
+  var metaTheme = document.getElementById('metaTheme');
+
+  function applyTheme() {
+    var dark = state.theme === 'dark';
+    root.setAttribute('data-theme', state.theme);
+    var scheme = buildScheme(state.seed, dark);
+    for (var k in scheme) root.style.setProperty(k, scheme[k]);
+    if (metaTheme) metaTheme.setAttribute('content', scheme['--surface']);
+    var label = document.getElementById('seedHex');
+    if (label) label.textContent = state.seed.toUpperCase();
+    /* 切换图标 */
+    var moon = document.querySelector('#themeToggle .icon-moon');
+    var sun = document.querySelector('#themeToggle .icon-sun');
+    if (moon && sun) {
+      moon.style.display = dark ? 'none' : 'block';
+      sun.style.display = dark ? 'block' : 'none';
+    }
+    /* 色板选中态 */
+    var sws = document.querySelectorAll('.swatch[data-seed]');
+    Array.prototype.forEach.call(sws, function (el) {
+      el.setAttribute('aria-pressed', el.dataset.seed.toLowerCase() === state.seed.toLowerCase() ? 'true' : 'false');
+    });
+    try {
+      localStorage.setItem('yi-seed', state.seed);
+      localStorage.setItem('yi-theme', state.theme);
+    } catch (e) { /* ignore */ }
+  }
+
+  /* ============ 4. 种子色色板 ============ */
+  var swatchRow = document.getElementById('swatchRow');
+  if (swatchRow) {
+    SEEDS.forEach(function (s) {
+      var b = document.createElement('button');
+      b.className = 'swatch';
+      b.dataset.ripple = '';
+      b.dataset.seed = s.hex;
+      b.style.background = s.hex;
+      b.setAttribute('aria-label', '主题色：' + s.name);
+      b.setAttribute('title', s.name + ' ' + s.hex);
+      b.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+      b.addEventListener('click', function () {
+        state.seed = s.hex;
+        applyTheme();
+        snack('主题已切换：' + s.name);
+      });
+      swatchRow.appendChild(b);
+    });
+    var dice = document.createElement('button');
+    dice.className = 'swatch dice';
+    dice.dataset.ripple = '';
+    dice.setAttribute('aria-label', '随机主题色');
+    dice.setAttribute('title', '随机颜色');
+    dice.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="8.6" cy="8.6" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.4" cy="8.6" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="8.6" cy="15.4" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.4" cy="15.4" r="1.2" fill="currentColor" stroke="none"/></svg>';
+    dice.addEventListener('click', function () {
+      var hex = hslToHex(Math.random() * 360, 45 + Math.random() * 30, 34 + Math.random() * 14);
+      state.seed = hex;
+      applyTheme();
+      snack('随机主题色：' + hex.toUpperCase());
+    });
+    swatchRow.appendChild(dice);
+  }
+
+  /* ============ 5. 深浅色切换 ============ */
+  var themeToggle = document.getElementById('themeToggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', function () {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      applyTheme();
+      snack(state.theme === 'dark' ? '已切换到深色模式 🌙' : '已切换到浅色模式 ☀️');
+    });
+  }
+
+  /* ============ 6. 窄屏菜单 ============ */
+  var menuBtn = document.getElementById('menuBtn');
+  var menuDrop = document.getElementById('menuDrop');
+  function closeMenu() {
+    if (!menuDrop) return;
+    menuDrop.classList.remove('open');
+    if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+  }
+  if (menuBtn && menuDrop) {
+    menuBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = menuDrop.classList.toggle('open');
+      menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', function (e) {
+      if (!menuDrop.contains(e.target) && e.target !== menuBtn) closeMenu();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeMenu();
+    });
+    menuDrop.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') closeMenu();
+    });
+  }
+
+  /* ============ 7. 顶栏阴影 / FAB ============ */
+  var topbar = document.getElementById('topbar');
+  var fab = document.getElementById('fab');
+  window.addEventListener('scroll', function () {
+    var y = window.scrollY || document.documentElement.scrollTop;
+    if (topbar) topbar.classList.toggle('scrolled', y > 12);
+    if (fab) fab.classList.toggle('show', y > 460);
+  }, { passive: true });
+  if (fab) {
+    fab.addEventListener('click', function () {
+      var t = document.getElementById('download');
+      if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  /* ============ 8. 滚动进场动画 ============ */
+  var revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+    Array.prototype.forEach.call(revealEls, function (el) { io.observe(el); });
+  } else {
+    Array.prototype.forEach.call(revealEls, function (el) { el.classList.add('in'); });
+  }
+
+  /* ============ 9. 涟漪 ============ */
+  document.addEventListener('pointerdown', function (e) {
+    var t = e.target.closest ? e.target.closest('[data-ripple]') : null;
+    if (!t) return;
+    var rect = t.getBoundingClientRect();
+    var d = Math.max(rect.width, rect.height) * 2.1;
+    var r = document.createElement('span');
+    r.className = 'ripple';
+    r.style.width = r.style.height = d + 'px';
+    r.style.left = (e.clientX - rect.left - d / 2) + 'px';
+    r.style.top = (e.clientY - rect.top - d / 2) + 'px';
+    t.appendChild(r);
+    r.addEventListener('animationend', function () { r.remove(); });
+  });
+
+  /* ============ 10. Snackbar 与复制 ============ */
+  var snackbar = document.getElementById('snackbar');
+  var snackTimer = null;
+  function snack(msg) {
+    if (!snackbar) return;
+    snackbar.textContent = msg;
+    snackbar.classList.add('show');
+    clearTimeout(snackTimer);
+    snackTimer = setTimeout(function () { snackbar.classList.remove('show'); }, 2400);
+  }
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(function () { return true; }, function () { return fallbackCopy(text); });
+    }
+    return Promise.resolve(fallbackCopy(text));
+  }
+  function fallbackCopy(text) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      return true;
+    } catch (e) { return false; }
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.copy-btn'), function (btn) {
+    btn.addEventListener('click', function () {
+      var target = document.getElementById(btn.dataset.copy);
+      if (!target) return;
+      copyText(target.textContent).then(function () { snack('已复制到剪贴板 📋'); });
+    });
+  });
+
+  /* ============ 11. GitHub 星标（可选，失败静默） ============ */
+  try {
+    fetch('https://api.github.com/repos/lingyicute/YiPuzzles')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (d && typeof d.stargazers_count === 'number') {
+          var el = document.getElementById('starCount');
+          if (el) el.textContent = d.stargazers_count + ' Stars';
+        }
+      })
+      .catch(function () { /* 离线环境静默降级 */ });
+  } catch (e) { /* ignore */ }
+
+  /* ============ 12. Hero 手机棋盘动画 ============ */
+  var pBoard = document.getElementById('pBoard');
+  var pScoreEl = document.getElementById('pScore');
+  var cells = [];
+  /* 与 App 截图一致的棋盘布局 */
+  var layout = [0, 4, 0, 0, 2, 4, 0, 0, 4, 8, 2, 0, 2, 32, 16, 2];
+  var score = 180, best = 180;
+  if (pBoard) {
+    for (var i = 0; i < 16; i++) {
+      var cell = document.createElement('div');
+      cell.className = 'p-cell';
+      if (layout[i]) { cell.dataset.v = layout[i]; cell.textContent = layout[i]; }
+      pBoard.appendChild(cell);
+      cells.push(cell);
+    }
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduced) {
+      setInterval(function () {
+        if (document.hidden) return;
+        var occupied = [];
+        var empty = [];
+        cells.forEach(function (c, idx) { (c.dataset.v ? occupied : empty).push(idx); });
+        /* 合并一块 */
+        if (occupied.length) {
+          var pick = occupied[Math.floor(Math.random() * occupied.length)];
+          var v = parseInt(cells[pick].dataset.v, 10) * 2;
+          if (v > 2048) v = Math.random() < 0.5 ? 2 : 4;
+          cells[pick].dataset.v = v;
+          cells[pick].textContent = v;
+          cells[pick].classList.remove('pop');
+          void cells[pick].offsetWidth;
+          cells[pick].classList.add('pop');
+          score += v;
+          if (score > best) best = score;
+          if (pScoreEl) pScoreEl.textContent = score.toLocaleString('en-US');
+          var pBestEl = document.getElementById('pBest');
+          if (pBestEl) pBestEl.textContent = best.toLocaleString('en-US');
+        }
+        /* 偶尔生成一块新的 2 */
+        if (empty.length && Math.random() < 0.65) {
+          var e2 = empty[Math.floor(Math.random() * empty.length)];
+          cells[e2].dataset.v = 2;
+          cells[e2].textContent = '2';
+          cells[e2].classList.remove('pop');
+          void cells[e2].offsetWidth;
+          cells[e2].classList.add('pop');
+        }
+      }, 1800);
+    }
+  }
+
+  /* ============ 13. 迷你棋盘生成 ============ */
+  var tiers = ['a', 'b', 'c', 'd'];
+  Array.prototype.forEach.call(document.querySelectorAll('.mini-board'), function (board) {
+    var n = parseInt(board.dataset.size, '10') || 4;
+    board.style.gridTemplateColumns = 'repeat(' + n + ', 1fr)';
+    for (var i = 0; i < n * n; i++) {
+      var cellEl = document.createElement('i');
+      var r = Math.random();
+      if (r < 0.42) cellEl.className = tiers[Math.floor(Math.random() * tiers.length)];
+      board.appendChild(cellEl);
+    }
+  });
+
+  /* 初始应用 */
+  applyTheme();
+})();
+</script>
+</body>
+</html>
