@@ -921,7 +921,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         public void onAnimationEnd(Animator animation) {
             super.onAnimationEnd(animation);
             if (e != null) {
-                e.animate().scaleX(1.0f).scaleY(1.0f).setDuration(SCALINGSPEED).setStartDelay(0).setInterpolator(new LinearInterpolator()).setListener(new AnimatorListenerAdapter()).start();
+                e.animate().scaleX(1.0f).scaleY(1.0f).setDuration(SCALINGSPEED).setStartDelay(0).setInterpolator(new LinearInterpolator()).setListener(new AnimatorListenerAdapter() {}).start();
             }
 
         }
