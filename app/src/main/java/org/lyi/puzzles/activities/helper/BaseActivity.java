@@ -84,6 +84,10 @@ public abstract class BaseActivity extends AppCompatActivity implements OnNaviga
         // Material 3: draw behind the transparent system bars
         EdgeToEdgeHelper.enableEdgeToEdgeDisplay(this);
         super.onCreate(savedInstanceState);
+        // The effective night mode is settled now (AppCompat ran in
+        // super.onCreate): make sure the Material You dynamic colour overlay
+        // matches it before the content is inflated (see helper for details).
+        EdgeToEdgeHelper.applyDynamicColorsSettled(this);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mHandler = new Handler(Looper.getMainLooper());

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Onboarding (Material 3) -->
+<!-- Onboarding (Material 3).
+     Explicit uniform screen background; see activity_game.xml for the rationale. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,6 +8,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="?android:colorBackground"
     tools:context=".activities.TutorialActivity">
 
     <androidx.viewpager.widget.ViewPager
