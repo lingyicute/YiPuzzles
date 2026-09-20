@@ -1,1 +1,7 @@
+plugins {
+    // Auto-provision the JDK 17 toolchain required for compilation
+    // (Gradle itself now runs on JDK 21)
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
 include ':app'
