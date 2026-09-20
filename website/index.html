@@ -117,21 +117,21 @@ section { scroll-margin-top: 88px; }
   transition: background-color .3s ease, box-shadow .3s ease;
 }
 .topbar.scrolled { background: var(--surface-container); box-shadow: var(--shadow-1); }
-.bar-inner { display: flex; align-items: center; gap: 8px; height: 64px; }
+.bar-inner { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; height: 64px; }
 .brand {
   display: inline-flex; align-items: center; gap: 10px;
   font-size: 20px; font-weight: 700; letter-spacing: .01em; color: var(--on-surface);
-  margin-right: 8px; flex-shrink: 0;
+  justify-self: start;
 }
 .brand .logo { width: 34px; height: 34px; }
-.nav-links { display: flex; align-items: center; gap: 2px; margin-inline: auto; }
+.nav-links { display: flex; align-items: center; gap: 2px; }
 .nav-links a {
   display: inline-flex; align-items: center; height: 40px; padding: 0 14px;
   border-radius: 999px; font-size: 14px; font-weight: 500;
   color: var(--on-surface-variant); transition: background-color .2s ease, color .2s ease;
 }
 .nav-links a:hover { background: var(--surface-container-highest); color: var(--on-surface); }
-.bar-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.bar-actions { display: flex; align-items: center; gap: 6px; justify-self: end; }
 
 .icon-btn {
   display: inline-flex; align-items: center; justify-content: center;
@@ -403,20 +403,6 @@ section { scroll-margin-top: 88px; }
 .privacy-foot { margin-top: 22px; font-size: 13.5px; color: var(--on-surface-variant); }
 .privacy-foot b { color: var(--on-surface); }
 
-/* ---------- 10. 技术内幕 ---------- */
-.tech { background: var(--surface-container-low); padding: clamp(52px, 7vw, 84px) 0; transition: background-color .35s ease; }
-.tech-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.tech-card {
-  background: var(--surface-container-lowest); border-radius: 26px; padding: 28px 26px;
-  box-shadow: var(--shadow-1); transition: background-color .35s ease, transform .25s ease;
-}
-[data-theme="dark"] .tech-card { background: var(--surface-container); }
-.tech-card:hover { transform: translateY(-3px); }
-.tech-num { font-size: 42px; font-weight: 800; letter-spacing: -.03em; color: var(--primary); opacity: .38; line-height: 1; }
-.tech-card h3 { font-size: 18px; font-weight: 700; margin: 12px 0 8px; }
-.tech-card p { font-size: 14px; color: var(--on-surface-variant); }
-.tech-card p b { color: var(--on-surface); font-weight: 600; }
-
 /* ---------- 11. 下载 ---------- */
 .download { padding: clamp(56px, 8vw, 96px) 0; }
 .dl-panel {
@@ -525,7 +511,7 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
 
 /* ---------- 16. 响应式 ---------- */
 @media (max-width: 980px) {
-  .tech-grid, .contri-grid { grid-template-columns: 1fr 1fr; }
+  .contri-grid { grid-template-columns: 1fr 1fr; }
   .privacy-grid, .dl-panel { grid-template-columns: 1fr; }
   .board-strip { grid-template-columns: repeat(2, 1fr); }
 }
@@ -541,7 +527,7 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
   .hero .lead { margin-inline: auto; }
 }
 @media (max-width: 640px) {
-  .tech-grid, .contri-grid { grid-template-columns: 1fr; }
+  .contri-grid { grid-template-columns: 1fr; }
   .check-list { grid-template-columns: 1fr; }
   .btn { height: 48px; }
   .hero .cta-row .btn { flex: 1 1 auto; min-width: 150px; }
@@ -841,33 +827,6 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
     &lt;/application&gt;
 &lt;/manifest&gt;</pre>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======= 技术内幕 ======= -->
-  <section class="tech" id="tech">
-    <div class="container">
-      <div class="sec-head reveal">
-        <span class="eyebrow">Under the Hood</span>
-        <h2 class="sec-title">为什么是 YiPuzzles？技术内幕</h2>
-      </div>
-      <div class="tech-grid">
-        <article class="tech-card reveal" style="--d:.02s">
-          <div class="tech-num">01</div>
-          <h3>零权限架构</h3>
-          <p>清单文件不声明任何权限；棋盘、分数与统计全部存储在本机。游戏 100% 离线运行——<b>代码里没有需要审计的东西</b>，自然也无权可授。</p>
-        </article>
-        <article class="tech-card reveal" style="--d:.08s">
-          <div class="tech-num">02</div>
-          <h3>Material You 动态主题</h3>
-          <p>在 Android 12+ 上，整套配色从壁纸种子色派生，棋盘、数字块与主页预览与设备浑然一体。偏爱固定外观？随时切回 <b>2048 经典</b> 或 <b>深蓝</b> 方案。</p>
-        </article>
-        <article class="tech-card reveal" style="--d:.14s">
-          <div class="tech-num">03</div>
-          <h3>测试保障与持续集成</h3>
-          <p>游戏核心（棋盘状态、合并与计分）保持小而纯粹，由 <b>JUnit / Robolectric</b> 单元测试覆盖；<b>GitHub Actions</b> 每次推送自动构建并发布 <b>nightly</b>，始终有新鲜、可复现的下载。</p>
-        </article>
       </div>
     </div>
   </section>
