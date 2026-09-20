@@ -19,51 +19,87 @@
 package org.lyi.puzzles.activities;
 
 import android.os.Bundle;
-import android.widget.ExpandableListView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.lyi.puzzles.R;
-import org.lyi.puzzles.activities.adapter.HelpExpandableListAdapter;
+import org.lyi.puzzles.activities.adapter.HelpQuestionAdapter;
+import org.lyi.puzzles.activities.adapter.HelpQuestionAdapter.HelpItem;
 import org.lyi.puzzles.activities.helper.BaseActivity;
-import org.lyi.puzzles.helpers.EdgeToEdgeHelper;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 
+/**
+ * Help screen (FAQ).
+ * <p>
+ * Material 3 implementation: a {@link RecyclerView} list of expandable filled
+ * cards (one per question) replaces the legacy {@code ExpandableListView}.
+ * The list carries the shared {@code main_content} id, so {@link BaseActivity}
+ * applies the standard content fade-in and the bottom system bar padding
+ * (edge-to-edge) exactly like on every other screen.
+ */
 public class HelpActivity extends BaseActivity {
+
+    private static final String STATE_EXPANDED_ITEMS = "help_expanded_items";
+
+    private HelpQuestionAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_help);
 
-        LinkedHashMap<String, List<String>> expandableListDetail = buildData();
+        boolean[] restoredState = savedInstanceState != null
+                ? savedInstanceState.getBooleanArray(STATE_EXPANDED_ITEMS)
+                : null;
 
-        ExpandableListView generalExpandableListView = findViewById(R.id.generalExpandableListView);
-        HelpExpandableListAdapter adapter = new HelpExpandableListAdapter(this, new ArrayList<>(expandableListDetail.keySet()), expandableListDetail);
-        generalExpandableListView.setAdapter(adapter);
-        // keep the list clear of the navigation bar (edge-to-edge)
-        EdgeToEdgeHelper.applyBottomSystemBarPadding(generalExpandableListView);
+        adapter = new HelpQuestionAdapter(this, buildHelpItems(restoredState));
+
+        RecyclerView helpList = findViewById(R.id.main_content);
+        helpList.setLayoutManager(new LinearLayoutManager(this));
+        helpList.setAdapter(adapter);
 
         overridePendingTransition(0, 0);
     }
 
-    private LinkedHashMap<String, List<String>> buildData() {
-        LinkedHashMap<String, List<String>> expandableListDetail = new LinkedHashMap<String, List<String>>();
-
-        expandableListDetail.put(getString(R.string.help_permission), Collections.singletonList(getString(R.string.help_permission_answer)));
-        expandableListDetail.put(getString(R.string.help_play), Collections.singletonList(getString(R.string.help_play_answer)));
-        expandableListDetail.put(getString(R.string.help_play_how), Collections.singletonList(getString(R.string.help_play_how_answer)));
-        expandableListDetail.put(getString(R.string.help_play_add), Collections.singletonList(getString(R.string.help_play_add_answer)));
-        expandableListDetail.put(getString(R.string.help_tip), Collections.singletonList(getString(R.string.help_tip_answer)));
-        expandableListDetail.put(getString(R.string.help_undo), Collections.singletonList(getString(R.string.help_undo_answer)));
-        expandableListDetail.put(getString(R.string.help_color), Collections.singletonList(getString(R.string.help_color_answer)));
-
-
-        return expandableListDetail;
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (adapter != null) {
+            outState.putBooleanArray(STATE_EXPANDED_ITEMS, adapter.getExpandedState());
+        }
     }
 
+    /**
+     * The FAQ entries in display order. Entries that were expanded before a
+     * configuration change (rotation, dark mode switch, ...) are restored.
+     */
+    private List<HelpItem> buildHelpItems(@Nullable boolean[] expandedState) {
+        int[][] entries = {
+                {R.string.help_permission, R.string.help_permission_answer},
+                {R.string.help_play, R.string.help_play_answer},
+                {R.string.help_play_how, R.string.help_play_how_answer},
+                {R.string.help_play_add, R.string.help_play_add_answer},
+                {R.string.help_tip, R.string.help_tip_answer},
+                {R.string.help_undo, R.string.help_undo_answer},
+                {R.string.help_color, R.string.help_color_answer},
+        };
+
+        List<HelpItem> items = new ArrayList<>(entries.length);
+        for (int i = 0; i < entries.length; i++) {
+            boolean expanded = expandedState != null
+                    && i < expandedState.length
+                    && expandedState[i];
+            items.add(new HelpItem(getString(entries[i][0]), getString(entries[i][1]), expanded));
+        }
+        return items;
+    }
+
+    @Override
     protected int getNavigationDrawerID() {
         return R.id.nav_help;
     }
