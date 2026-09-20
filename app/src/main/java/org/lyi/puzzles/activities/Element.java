@@ -102,10 +102,6 @@ public class Element extends androidx.appcompat.widget.AppCompatButton {
         }
     }
 
-    public String toString() {
-        return "number: " + number;
-    }
-
     public int getNumber() {
         return number;
     }

@@ -130,7 +130,6 @@ public class MainActivity extends BaseActivity {
                 if (current >= 0) {
                     // move to next screen
                     viewPager.setCurrentItem(current);
-                } else {
                 }
             }
         });
@@ -144,7 +143,6 @@ public class MainActivity extends BaseActivity {
                 if (current < layouts.length) {
                     // move to next screen
                     viewPager.setCurrentItem(current);
-                } else {
                 }
             }
         });

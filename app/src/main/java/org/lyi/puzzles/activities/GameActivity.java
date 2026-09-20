@@ -366,7 +366,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
             for (int j = 0; j < elements[i].length; j++) {
                 //background elements
                 backgroundElements[i][j] = new Element(this);
-                //backgroundElements[i][j].setVisibility(View.INVISIBLE);
 
                 elements[i][j] = new Element(this);
                 elements[i][j].setNumber(gameState.getNumber(i, j));
