@@ -111,6 +111,22 @@ section { scroll-margin-top: 88px; }
 .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
 .reveal.in { opacity: 1; transform: none; }
 
+/* ---------- 2.5 加载遮罩层 ---------- */
+#loader {
+  position: fixed; inset: 0; z-index: 200;
+  background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .45s ease, visibility .45s ease;
+}
+#loader.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+#loader .spinner {
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 4px solid var(--surface-container-highest);
+  border-top-color: var(--primary);
+  animation: loader-spin .8s linear infinite;
+}
+@keyframes loader-spin { to { transform: rotate(360deg); } }
+
 /* ---------- 3. 顶部应用栏 ---------- */
 .topbar {
   position: sticky; top: 0; z-index: 60;
@@ -522,7 +538,9 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
   .board-strip { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 860px) {
+  .bar-inner { grid-template-columns: 1fr auto; }
   .nav-links { display: none; }
+  .bar-actions { grid-column: 2; }
   .menu-toggle { display: inline-flex; }
 }
 @media (max-width: 900px) {
@@ -575,6 +593,43 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
 </script>
 </head>
 <body id="top">
+
+<!-- ======= 加载遮罩层：等待字体加载完毕后隐藏 ======= -->
+<div id="loader" role="status" aria-label="正在加载">
+  <div class="spinner" aria-hidden="true"></div>
+</div>
+<script>
+/* 字体加载完毕后隐藏遮罩层（含兜底超时，避免字体失败时无限遮挡） */
+(function () {
+  var done = false;
+  function hideLoader() {
+    if (done) return;
+    done = true;
+    var loader = document.getElementById('loader');
+    if (!loader) return;
+    loader.classList.add('hide');
+    setTimeout(function () { loader.remove(); }, 600);
+  }
+  // 兜底：最多遮挡 4 秒
+  setTimeout(hideLoader, 4000);
+  // 页面完全加载后兜底
+  window.addEventListener('load', function () { setTimeout(hideLoader, 100); });
+  try {
+    if (document.fonts && document.fonts.load) {
+      // 主动触发 Nebulove 加载并等待
+      Promise.all([
+        document.fonts.load('400 16px Nebulove'),
+        document.fonts.load('700 16px Nebulove'),
+        document.fonts.load('800 16px Nebulove')
+      ]).then(hideLoader).catch(hideLoader);
+      // 额外保险：所有初始字体就绪
+      document.fonts.ready.then(function () { setTimeout(hideLoader, 50); });
+    } else {
+      document.addEventListener('DOMContentLoaded', function () { setTimeout(hideLoader, 100); });
+    }
+  } catch (e) { setTimeout(hideLoader, 100); }
+})();
+</script>
 
 <!-- ======= 顶部应用栏 ======= -->
 <header class="topbar" id="topbar">
