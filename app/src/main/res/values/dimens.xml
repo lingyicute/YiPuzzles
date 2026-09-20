@@ -1,4 +1,3 @@
 <resources>
-    <dimen name="dots_height">30dp</dimen>
     <dimen name="desc_padding">40dp</dimen>
 </resources>
