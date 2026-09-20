@@ -18,22 +18,15 @@ package org.lyi.puzzles
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
-import androidx.work.Configuration
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.color.DynamicColorsOptions
-import org.lyi.puzzles.backup.BackupCreator
-import org.lyi.puzzles.backup.BackupRestorer
-import org.secuso.privacyfriendlybackup.api.pfa.BackupManager
 
-class PF2048 : Application(), Configuration.Provider {
+class PF2048 : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        BackupManager.backupCreator = BackupCreator()
-        BackupManager.backupRestorer = BackupRestorer()
 
         applyNightMode(this)
 
@@ -47,9 +40,6 @@ class PF2048 : Application(), Configuration.Provider {
                 .build()
         )
     }
-
-    override val workManagerConfiguration: Configuration =
-        Configuration.Builder().setMinimumLoggingLevel(Log.INFO).build()
 
     companion object {
         const val PREF_THEME = "currentTheme"
