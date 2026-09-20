@@ -21,7 +21,6 @@ package org.lyi.puzzles.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -155,7 +154,6 @@ public class MainActivity extends BaseActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, GameActivity.class);
                 intent.putExtra("n", temp);
-                intent.putExtra("points", 0);
                 intent.putExtra("new", true);
                 intent.putExtra("filename", "state" + temp + ".txt");
                 intent.putExtra("undo", false);
@@ -176,14 +174,9 @@ public class MainActivity extends BaseActivity {
     }
 
     private void createBackStack(Intent intent) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            TaskStackBuilder builder = TaskStackBuilder.create(this);
-            builder.addNextIntentWithParentStack(intent);
-            builder.startActivities();
-        } else {
-            startActivity(intent);
-            finish();
-        }
+        TaskStackBuilder builder = TaskStackBuilder.create(this);
+        builder.addNextIntentWithParentStack(intent);
+        builder.startActivities();
     }
 
     private void addBottomDots(int currentPage) {

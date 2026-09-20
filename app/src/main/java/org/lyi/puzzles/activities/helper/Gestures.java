@@ -67,8 +67,6 @@ public class Gestures implements View.OnTouchListener {
                         } else {
                             result = onSwipeLeft();
                         }
-                    } else {
-                        result = nichts();
                     }
                 } else {
                     if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
@@ -77,8 +75,6 @@ public class Gestures implements View.OnTouchListener {
                         } else {
                             result = onSwipeTop();
                         }
-                    } else {
-                        result = nichts();
                     }
                 }
             } catch (Exception exception) {
@@ -93,10 +89,6 @@ public class Gestures implements View.OnTouchListener {
     }
 
     public boolean onSwipeLeft() {
-        return false;
-    }
-
-    public boolean nichts() {
         return false;
     }
 

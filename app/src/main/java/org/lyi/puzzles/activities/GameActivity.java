@@ -30,7 +30,6 @@ import androidx.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -124,14 +123,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
     private Activity myActivity;
 
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.findItem(R.id.action_settings);
-        item.setVisible(false);
-        super.onPrepareOptionsMenu(menu);
-        return true;
-    }
 
     @Override
     public void onPause() {
@@ -285,11 +276,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
         initialize();
         setListener();
-        if (newGame) {
-            moved = true;
-            addNumber();
-        }
-        newGame = false;
 
     }
 
@@ -306,7 +292,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
             last_points = gameState.last_points;
         } else {
             gameState = new GameState(n);
-            newGame = true;
         }
         elements = new Element[n][n];
         last_elements = new Element[n][n];
@@ -475,8 +460,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                     Element z = elements[j][i];
                     elements[j][i] = elements[s.posX][s.posY];
                     elements[s.posX][s.posY] = z;
-                    if (s.number != 0)
-                        s.posX++;
                     j = s.posX;
                     s.number = elements[j][i].number;
 
@@ -558,8 +541,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                     elements[s.posX][s.posY] = z;
 
 
-                    if (s.number != 0)
-                        s.posY--;
                     j = s.posY;
                     s.number = elements[i][j].number;
                 } else if (s.number != 0) {
@@ -640,8 +621,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                     elements[i][j] = elements[s.posX][s.posY];
                     elements[s.posX][s.posY] = z;
 
-                    if (s.number != 0)
-                        s.posY++;
                     j = s.posY;
                     s.number = elements[i][j].number;
                 } else if (s.number != 0) {
@@ -721,8 +700,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                     elements[j][i] = elements[s.posX][s.posY];
                     elements[s.posX][s.posY] = z;
 
-                    if (s.number != 0)
-                        s.posX--;
                     j = s.posX;
                     s.number = elements[j][i].number;
                 } else if (s.number != 0) {
@@ -791,10 +768,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                 return handleSwipeBottom();
             }
 
-            public boolean nichts() {
-                //es wurde keine wischrichtung erkannt, hier den Code einfügen
-                return false;
-            }
         };
         touch_field.setOnTouchListener(swipeListener);
         number_field.setOnTouchListener(swipeListener);
@@ -851,18 +824,12 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
 
     public void setDPositions(boolean animation) {
-        long MOVINGSPEED = GameActivity.MOVINGSPEED;
-        boolean scale = true;
-        if (!animation) {
-            MOVINGSPEED = 1;
-            scale = false;
-        }
         for (Element[] i : elements) {
             for (Element j : i) {
                 if (j.dPosX != j.getX()) {
                     if (j.animateMoving && animation) {
                         if (j.number != j.dNumber)
-                            j.animate().x(j.dPosX).setDuration(MOVINGSPEED).setStartDelay(0).setInterpolator(new LinearInterpolator()).setListener(new MovingListener(j, scale)).start();
+                            j.animate().x(j.dPosX).setDuration(MOVINGSPEED).setStartDelay(0).setInterpolator(new LinearInterpolator()).setListener(new MovingListener(j, true)).start();
                         else
                             j.animate().x(j.dPosX).setDuration(MOVINGSPEED).setStartDelay(0).setInterpolator(new LinearInterpolator()).setListener(new MovingListener(j, false)).start();
 
@@ -881,7 +848,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                 if (j.dPosY != j.getY()) {
                     if (j.animateMoving && animation) {
                         if (j.number != j.dNumber)
-                            j.animate().y(j.dPosY).setDuration(MOVINGSPEED).setStartDelay(0).setInterpolator(new LinearInterpolator()).setListener(new MovingListener(j, scale)).start();
+                            j.animate().y(j.dPosY).setDuration(MOVINGSPEED).setStartDelay(0).setInterpolator(new LinearInterpolator()).setListener(new MovingListener(j, true)).start();
                         else
                             j.animate().y(j.dPosY).setDuration(MOVINGSPEED).setStartDelay(0).setInterpolator(new LinearInterpolator()).setListener(new MovingListener(j, false)).start();
 
@@ -954,12 +921,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         public void onAnimationEnd(Animator animation) {
             super.onAnimationEnd(animation);
             if (e != null) {
-                e.animate().scaleX(1.0f).scaleY(1.0f).setDuration(SCALINGSPEED).setStartDelay(0).setInterpolator(new LinearInterpolator()).setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-                        super.onAnimationCancel(animation);
-                    }
-                }).start();
+                e.animate().scaleX(1.0f).scaleY(1.0f).setDuration(SCALINGSPEED).setStartDelay(0).setInterpolator(new LinearInterpolator()).setListener(new AnimatorListenerAdapter()).start();
             }
 
         }
@@ -1047,24 +1009,13 @@ public class GameActivity extends BaseActivityWithoutNavBar {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-
-        if (id == R.id.action_settings) {
-            return true;
-        } else if (id == android.R.id.home) {
+        if (id == android.R.id.home) {
             save();
         }
 

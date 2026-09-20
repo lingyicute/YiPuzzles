@@ -72,7 +72,6 @@ object TileColors {
     )
 
     private val STATIC_ATTRS = linkedMapOf(
-        0 to (R.attr.buttonEmpty to R.attr.buttonEmptyText),
         2 to (R.attr.button2 to R.attr.button2Text),
         4 to (R.attr.button4 to R.attr.button4Text),
         8 to (R.attr.button8 to R.attr.button8Text),
@@ -187,15 +186,15 @@ object TileColors {
 
     private fun staticPalette(context: Context, @StyleRes overlay: Int): Map<Int, Tile> {
         val result = LinkedHashMap<Int, Tile>()
+        // Empty tiles always follow the surface so the board looks right in dark mode as well
+        val empty = themeColor(context, com.google.android.material.R.attr.colorSurfaceContainerHighest)
+        result[0] = Tile(empty, empty)
         for ((number, attrs) in STATIC_ATTRS) {
             result[number] = Tile(
                 overlayColor(context, overlay, attrs.first),
                 overlayColor(context, overlay, attrs.second)
             )
         }
-        // Empty tiles always follow the surface so the board looks right in dark mode as well
-        val empty = themeColor(context, com.google.android.material.R.attr.colorSurfaceContainerHighest)
-        result[0] = Tile(empty, empty)
         return result
     }
 

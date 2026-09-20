@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="buttonEmpty" format="color"/>
-    <attr name="buttonEmptyText" format="color"/>
-
     <attr name="button2" format="color"/>
     <attr name="button2Text" format="color"/>
     <attr name="button4" format="color"/>
