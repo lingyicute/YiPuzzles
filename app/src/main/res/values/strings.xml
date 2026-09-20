@@ -56,7 +56,8 @@
     <string name="settings_color_light">Light</string>
     <string name="settings_color_dark">Dark</string>
     <string name="settings_color_scheme_material_you">Material You</string>
-    <string name="settings_color_scheme_classic">Classic Blue</string>
+    <string name="settings_color_scheme_classic">Deep Blue</string>
+    <string name="settings_color_scheme_original">Original 2048 Color</string>
     <string name="settings_category_appearance">Appearance</string>
     <string name="settings_category_game">Game</string>
     <string name="settings_theme">Theme</string>
@@ -72,7 +73,6 @@
     <string name="undo">Undo</string>
     <string name="restart">Restart</string>
     <string name="previous">Previous</string>
-    <string name="settings_color_scheme_original">Original</string>
 
     <!-- ### CHOOSE DIALOG ### -->
     <string name="new_Game_Button">Start New Game</string>
