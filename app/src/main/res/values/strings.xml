@@ -50,6 +50,10 @@
     <string name="version_number"> %s</string>
     <string name="about_author">Author：</string>
     <string name="about_author_names">lingyicute</string>
+    <string name="about_homepage">Home</string>
+    <string name="about_github">GitHub</string>
+    <string name="url_homepage" translatable="false">https://92li.uk</string>
+    <string name="url_github" translatable="false">https://github.com/lingyicute</string>
 
     <!-- ###SETTINGS### -->
     <string name="settings_name">Settings</string>

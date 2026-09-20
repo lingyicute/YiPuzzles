@@ -18,6 +18,9 @@
 
 package org.lyi.puzzles.activities;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -57,6 +60,31 @@ public class AboutActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
 
         ((TextView) findViewById(R.id.textFieldVersionName)).setText(getString(R.string.version_number, BuildConfig.VERSION_NAME));
+
+        setupLinkButton(R.id.buttonHomepage, R.string.about_homepage, getString(R.string.url_homepage));
+        setupLinkButton(R.id.buttonGithub, R.string.about_github, getString(R.string.url_github));
+    }
+
+    /**
+     * Wires one of the author card link buttons to an external URL. A tooltip is
+     * set as well so the icon-only portrait buttons still convey their meaning.
+     */
+    private void setupLinkButton(int buttonId, int tooltipTextRes, final String url) {
+        View button = findViewById(buttonId);
+        if (button == null) {
+            return;
+        }
+        androidx.appcompat.widget.TooltipCompat.setTooltipText(button, getString(tooltipTextRes));
+        button.setOnClickListener(v -> openUrl(url));
+    }
+
+    /** Opens the given URL in an external browser, ignoring the click if none is available. */
+    private void openUrl(String url) {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        } catch (ActivityNotFoundException ignored) {
+            // No app can handle the link; nothing sensible to do here.
+        }
     }
 
 }

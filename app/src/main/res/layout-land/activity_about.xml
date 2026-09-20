@@ -118,22 +118,22 @@
 
                     </LinearLayout>
 
-                    <!-- Portrait: icon-only link buttons -->
+                    <!-- Landscape: icon + text link buttons -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/buttonHomepage"
-                        style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                        style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:contentDescription="@string/about_homepage"
+                        android:text="@string/about_homepage"
                         app:icon="@drawable/ic_menu_home" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/buttonGithub"
-                        style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                        style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:contentDescription="@string/about_github"
+                        android:text="@string/about_github"
                         app:icon="@drawable/ic_github" />
 
                 </LinearLayout>

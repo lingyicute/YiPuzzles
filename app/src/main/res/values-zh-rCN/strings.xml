@@ -51,6 +51,8 @@
     <string name="version_number"> %s</string>
     <string name="about_author">作者：</string>
     <string name="about_author_names">lingyicute</string>
+    <string name="about_homepage">主页</string>
+    <string name="about_github">GitHub</string>
 
     <!-- ###SETTINGS### -->
     <string name="settings_name">设置</string>
