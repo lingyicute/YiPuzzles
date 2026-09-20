@@ -93,7 +93,6 @@
          ================================================================ -->
 
     <!-- Classic blue palette (former default) -->
-    <color name="button_empty">#E6E6E6</color>
     <color name="button2">#B7C6F1</color>
     <color name="button4">#8aa5ce</color>
     <color name="button8">#5D84AB</color>
@@ -111,7 +110,6 @@
     <color name="button32768">#6482FF</color>
 
     <!-- Original 2048 palette -->
-    <color name="button_empty_2">#CDC1B4</color>
     <color name="button2_2">#EEE4DA</color>
     <color name="button4_2">#ECE0C3</color>
     <color name="button8_2">#FEB588</color>

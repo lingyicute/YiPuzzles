@@ -132,7 +132,6 @@ public class Element extends androidx.appcompat.widget.AppCompatButton {
         temp.dPosX = dPosX;
         temp.dPosY = dPosY;
         temp.animateMoving = animateMoving;
-        temp.color = color;
         temp.setColor(color);
         temp.setVisibility(getVisibility());
         temp.setLayoutParams(getLayoutParams());
