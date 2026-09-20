@@ -92,9 +92,9 @@
     <string name="skip">Skip</string>
     <string name="Tutorial_Titel">Welcome!</string>
     <string name="Tutorial_Instruction">In the following slides you will learn how to play the Game 2048.</string>
-    <string name="Tutorial_Titel_Move">Learn how to move the numbers!</string>
+    <string name="Tutorial_Titel_Move">Learn how to move the numbers</string>
     <string name="Tutorial_Move">To move all the numbers in the possible position in one direction, you have to swipe your finger in the same way.</string>
-    <string name="Tutorial_Titel_Add">How to Combine the Numbers!</string>
+    <string name="Tutorial_Titel_Add">How to Combine the Numbers</string>
     <string name="Tutorial_Add">To get the next higher power of 2 you have to combine numbers with the same value. The goal is to reach 2048 and higher.</string>
 
     <!-- ###STATISTICS### -->
