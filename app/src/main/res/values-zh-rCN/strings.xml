@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">2048</string>
+    <string name="app_name_long">YiPuzzles</string>
+
+    <!-- ###DRAWER###-->
+    <string name="action_help">帮助</string>
+    <string name="action_about">关于</string>
+    <string name="action_settings">设置</string>
+    <string name="action_main">主页</string>
+    <string name="action_tutorial">教程</string>
+    <string name="action_stat">统计</string>
+
+
+    <string name="navigation_drawer_open">打开导航</string>
+    <string name="navigation_drawer_close">关闭导航</string>
+
+
+    <!-- ###GAME###-->
+    <string name="title_activity_game">2048</string>
+
+    <!--###HELP###-->
+    <string name="help">帮助</string>
+
+    <string name="help_color">如何更改游戏的配色方案？</string>
+    <string name="help_color_answer">转到“设置”就可以更改游戏的配色方案啦。</string>
+    <string name="help_play">这个游戏的目标是什么？</string>
+    <string name="help_play_answer">游戏目标是合成 2048 块。合并数值相同的方块，可以得到更大的 2 的幂。你可以在“教程”中查看更详细的说明。</string>
+    <string name="help_play_how">如何移动数字？</string>
+    <string name="help_play_how_answer">用手指朝着希望数字移动的方向滑动屏幕就可以了。</string>
+    <string name="help_play_add">如何得到更大的数字？</string>
+    <string name="help_play_add_answer">两个相同的数字方块相撞时，会合并为下一个更大的 2 的幂。</string>
+    <string name="help_undo">可以撤销操作吗？</string>
+    <string name="help_undo_answer">每次可以撤销一步。点击逆时针方向的箭头按钮即可。</string>
+    <string name="help_tip">如何赢得游戏？</string>
+    <string name="help_tip_answer">赢得游戏的策略有很多。你可以在网络上找到许多相关视频。</string>
+    <string name="help_permission">应用需要哪些权限？</string>
+    <string name="help_permission_answer">此应用不需要任何权限。</string>
+
+    <!-- ### WELCOME DIALOG ### -->
+    <string name="okay">好的</string>
+
+
+    <!--###ABOUT###-->
+    <string name="about">关于</string>
+    <string name="version">版本：</string>
+    <string name="version_number"> %s</string>
+    <string name="about_author">作者：</string>
+    <string name="about_author_names">lingyicute</string>
+
+    <!-- ###SETTINGS### -->
+    <string name="settings_name">设置</string>
+    <string name="settings_animation">启用动画</string>
+    <string name="settings_display">保持屏幕常亮</string>
+    <string name="settings_color">选择配色方案</string>
+    <string name="settings_color_system">跟随系统</string>
+    <string name="settings_color_light">浅色</string>
+    <string name="settings_color_dark">深色</string>
+    <string name="settings_color_scheme_material_you">Material You</string>
+    <string name="settings_color_scheme_classic">经典蓝</string>
+    <string name="settings_category_appearance">外观</string>
+    <string name="settings_category_game">游戏</string>
+    <string name="settings_theme">主题</string>
+    <string name="settings_dynamic_colors">动态颜色</string>
+    <string name="settings_dynamic_colors_summary">壁纸取色（Android 12 及更高版本）</string>
+    <string name="settings_animation_summary">为方块的移动和合并添加动画</string>
+    <string name="settings_display_summary">玩游戏时保持屏幕开启</string>
+    <string name="choose_board_size">选择棋盘大小</string>
+    <string name="reset_stats_confirm_title">重置统计数据？</string>
+    <string name="reset_stats_confirm_message">所有棋盘大小的统计数据都将被删除。此操作无法撤销。</string>
+    <string name="reset">重置</string>
+    <string name="cancel">取消</string>
+    <string name="undo">撤销</string>
+    <string name="restart">重新开始</string>
+    <string name="previous">上一个</string>
+    <string name="settings_color_scheme_original">原始</string>
+
+    <!-- ### CHOOSE DIALOG ### -->
+    <string name="new_Game_Button">开始新游戏</string>
+    <string name="continue_Game_Button">继续游戏</string>
+    <string name="Record_Button">最高分</string>
+    <string name="Points_Button">分数</string>
+    <string name="Winning_Message">太棒啦，你赢了！还要继续玩下去吗？</string>
+    <string name="Yes_Message">是</string>
+    <string name="No_Message">否</string>
+    <string name="Titel_V_Message">胜利</string>
+    <string name="Titel_L_Message">本次得分：%1$d</string>
+    <string name="Lost_Message">已没有回旋的余地了。本次得分为：%1$d。要再来一局吗？</string>
+
+
+    <!-- ###TUTORIAL### -->
+    <string name="next">下一步</string>
+    <string name="skip">跳过</string>
+    <string name="Tutorial_Titel">哈喽！</string>
+    <string name="Tutorial_Instruction">接下来的页面将简单介绍 2048 的玩法。</string>
+    <string name="Tutorial_Titel_Move">学习如何移动数字</string>
+    <string name="Tutorial_Move">请用手指向一个方向滑动，这样所有数字就都会向同一方向移动。</string>
+    <string name="Tutorial_Titel_Add">如何合并数字？</string>
+    <string name="Tutorial_Add">将数值相同的方块合并，即可得到下一个更大的 2 的幂。目标是合成 2048。</string>
+
+    <!-- ###STATISTICS### -->
+    <string name="Stat_High_Number">最大数字</string>
+    <string name="Stat_High_Point">最高分</string>
+    <string name="Stat_Amount_Undo">撤销次数</string>
+    <string name="Stat_Amount_Swipe">滑动总次数</string>
+    <string name="Stat_Swipes_Left">左</string>
+    <string name="Stat_Swipes_Right">右</string>
+    <string name="Stat_Swipes_Down">下</string>
+    <string name="Stat_Swipes_Up">上</string>
+    <string name="Stat_Time">游戏时间</string>
+    <string name="Stat_Time_Swipes">每次滑动用时</string>
+    <string name="reset_stats">重置统计数据</string>
+
+    <!-- ###AIR ACTIONS### -->
+    <string name="swipe_up">上滑</string>
+    <string name="swipe_down">下滑</string>
+    <string name="swipe_left">左滑</string>
+    <string name="swipe_right">右滑</string>
+
+</resources>
