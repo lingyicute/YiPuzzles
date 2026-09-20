@@ -195,7 +195,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle(R.string.app_name);
+            actionBar.setTitle(R.string.title_activity_game);
             int size = getIntent().getIntExtra("n", 4);
             actionBar.setSubtitle(size + "x" + size);
         }
