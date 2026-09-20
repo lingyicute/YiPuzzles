@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Material 3 top app bar shared by all screens -->
+<!-- Material 3 top app bar shared by all screens.
+     The MD3 default would paint this bar with ?attr/colorSurface. With the
+     wallpaper based dynamic colours that differs from the window background
+     (?android:colorBackground) and the "title bar" becomes a visible band
+     above the rest of the screen. Paint it with the background colour
+     instead so the screen stays one uniform colour; the bar still lifts
+     to ?attr/colorSurfaceContainer when content scrolls under it. -->
 <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:fitsSystemWindows="true"
+    android:background="?android:colorBackground"
     app:liftOnScroll="true">
 
     <com.google.android.material.appbar.MaterialToolbar

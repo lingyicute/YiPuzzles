@@ -18,12 +18,15 @@
 
 package org.lyi.puzzles.helpers
 
+import android.os.Build
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import com.google.android.material.color.DynamicColors
+import org.lyi.puzzles.PF2048
 
 /**
  * Enables Material 3 edge-to-edge drawing: the content is laid out behind the transparent
@@ -32,6 +35,29 @@ import androidx.core.view.updatePadding
  */
 fun ComponentActivity.enableEdgeToEdgeDisplay() {
     enableEdgeToEdge()
+}
+
+/**
+ * Re-applies the Material You dynamic colour overlay at a point in the activity
+ * lifecycle where the effective night mode is already settled, i.e. right after
+ * [ComponentActivity.onCreate] (which lets AppCompat apply the app's
+ * dark / light / system preference).
+ *
+ * [DynamicColors.applyToActivitiesIfAvailable] (registered in [PF2048.onCreate])
+ * applies the overlay in `onActivityPreCreated`, which runs *before*
+ * `super.onCreate()`. If the configuration is still settling at that moment
+ * (system auto dark mode switch, process restored from a stale state, ...),
+ * the light/dark overlay variant can be inconsistent with the theme the
+ * content is actually inflated with, so different colour roles resolve to
+ * light *and* dark values on the same screen. Re-applying (with force=true
+ * inside the library) after `super.onCreate()` guarantees that the overlay
+ * and the theme agree before the first layout pass; when nothing changed it
+ * is a cheap no-op.
+ */
+fun ComponentActivity.applyDynamicColorsSettled() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && PF2048.isDynamicColorEnabled(this)) {
+        DynamicColors.applyToActivityIfAvailable(this)
+    }
 }
 
 /**
