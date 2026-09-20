@@ -32,13 +32,6 @@ import org.lyi.puzzles.helpers.EdgeToEdgeHelper;
 
 import com.google.android.material.appbar.MaterialToolbar;
 
-/**
- * This activity shows the important information about the app.
- * Information like the developers, the version and the superior project for which this app was implemented, are presented in this activity.
- *
- * @author Julian Wadephul and Saskia Jacob
- * @version 20180910
- */
 public class AboutActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {

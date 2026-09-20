@@ -47,11 +47,6 @@ public class GameState implements Serializable {
     }
 
     public GameState(Element[][] e, Element[][] e2) {
-        int length = 1;
-        for (int i = 0; i < e.length; i++) {
-            if (e[i].length > length)
-                length = e[i].length;
-        }
         this.n = e.length;
         numbers = new int[e.length * e.length];
         int c = 0;
@@ -60,11 +55,6 @@ public class GameState implements Serializable {
 
                 numbers[c++] = e[i][j].number;
             }
-        }
-        length = 1;
-        for (int i = 0; i < e2.length; i++) {
-            if (e2[i].length > length)
-                length = e2[i].length;
         }
         last_numbers = new int[e2.length * e2.length];
         c = 0;
@@ -98,16 +88,4 @@ public class GameState implements Serializable {
         return 0;
     }
 
-
-    @Override
-    public String toString() {
-        String result = "numbers: ";
-        for (int i : numbers) {
-            result += i + " ";
-        }
-        result += ", n: " + n;
-        result += ", points: " + points;
-        result += ", undo: " + undo;
-        return result;
-    }
 }

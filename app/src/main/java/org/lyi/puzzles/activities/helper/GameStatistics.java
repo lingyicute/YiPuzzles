@@ -113,14 +113,6 @@ public class GameStatistics implements Serializable {
         return undo;
     }
 
-    @Override
-    public String toString() {
-        return "moves " + moves +
-                " timePlayed " + timePlayed / 1000.0f +
-                " highest Number " + highestNumber +
-                " record" + record;
-    }
-
     public int getMoves_d() {
         return moves_d;
     }

@@ -28,8 +28,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
@@ -102,7 +100,6 @@ public class StatsActivity extends BaseActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-        //tabLayout.setTabTextColors(Color.WHITE,Color.YELLOW);
     }
 
     @Override
@@ -115,9 +112,7 @@ public class StatsActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_stats, menu);
-        //getMenuInflater().inflate(R.menu.menu_stats, menu);
         return true;
-        //return false;
     }
 
     @Override
