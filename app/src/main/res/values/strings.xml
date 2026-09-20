@@ -36,6 +36,10 @@
     <string name="help_permission">Which permissions requires the app?</string>
     <string name="help_permission_answer">This app does not require any permission.</string>
 
+    <!-- Expansion state of a help entry, announced by screen readers -->
+    <string name="help_state_expanded">Expanded</string>
+    <string name="help_state_collapsed">Collapsed</string>
+
     <!-- ### WELCOME DIALOG ### -->
     <string name="okay">Okay</string>
 

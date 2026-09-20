@@ -20,21 +20,21 @@
 
         <include layout="@layout/toolbar" />
 
-        <ExpandableListView
-            android:id="@+id/generalExpandableListView"
+        <!-- Material 3 FAQ list: one expandable filled card per question
+             (see item_help_question.xml). The main_content id lets BaseActivity
+             apply the standard content fade-in and the bottom system bar
+             padding (edge-to-edge), like on all other screens. -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/main_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:childDivider="@android:color/transparent"
             android:clipToPadding="false"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="0dp"
-            android:groupIndicator="@null"
             android:paddingStart="16dp"
             android:paddingTop="8dp"
             android:paddingEnd="16dp"
             android:paddingBottom="16dp"
-            android:scrollbars="none"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:listitem="@layout/item_help_question" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

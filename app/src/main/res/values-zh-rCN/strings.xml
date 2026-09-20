@@ -37,6 +37,10 @@
     <string name="help_permission">应用需要哪些权限？</string>
     <string name="help_permission_answer">此应用不需要任何权限。</string>
 
+    <!-- 帮助条目的展开状态，由屏幕阅读器朗读 -->
+    <string name="help_state_expanded">已展开</string>
+    <string name="help_state_collapsed">已收起</string>
+
     <!-- ### WELCOME DIALOG ### -->
     <string name="okay">好的</string>
 
