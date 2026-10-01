@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>YiPuzzles — 简洁，轻量的 2048 小游戏</title>
-<meta name="description" content="YiPuzzles：一款简洁、轻量、隐私至上的 2048 滑块拼图游戏。零权限、完全离线、无广告无追踪，基于 Material You 打造。Made with ❤️ by lingyicute.">
+<meta name="description" content="YiPuzzles：一款简洁、轻量、隐私至上的 2048 滑块拼图游戏。零权限、完全离线、无广告无追踪，基于 Material You 打造；也提供免安装的网页版 play.2048.92li.uk。Made with ❤️ by lingyicute.">
 <meta name="theme-color" id="metaTheme" content="#FEF7FF">
 <meta property="og:title" content="YiPuzzles — 简单却令人上瘾的 2048">
-<meta property="og:description" content="零权限、完全离线、无广告的 Material You 设计 2048 游戏。Made with ❤️ by lingyicute.">
+<meta property="og:description" content="零权限、完全离线、无广告的 Material You 设计 2048 游戏，网页版免安装即开即玩。Made with ❤️ by lingyicute.">
 <link rel="icon" href="https://92li.uk/static/img/favicon.png" type="image/png" sizes="64x64">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -449,7 +449,32 @@ section { scroll-margin-top: 88px; }
 .req-item b { display: block; font-size: 14.5px; }
 .req-item span { display: block; font-size: 12.5px; color: var(--on-surface-variant); }
 
-/* ---------- 12. 构建 ---------- */
+/* ---------- 12. 网页版 ---------- */
+.web { padding: 0 0 clamp(56px, 8vw, 96px); }
+.web-panel {
+  background: var(--tertiary-container); color: var(--on-tertiary-container);
+  border-radius: 32px; padding: clamp(28px, 5vw, 52px);
+  display: grid; grid-template-columns: 1.2fr .8fr; gap: clamp(24px, 4vw, 48px);
+  transition: background-color .35s ease, color .35s ease;
+}
+.web-panel .eyebrow { color: inherit; }
+.web-panel .eyebrow::before { background: currentColor; }
+.web-panel h2 { font-size: clamp(24px, 3.4vw, 34px); font-weight: 780; letter-spacing: -.015em; line-height: 1.25; }
+.web-panel .web-sub { margin-top: 12px; opacity: .85; font-size: 15px; max-width: 46ch; }
+.web-btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.web-url {
+  margin-top: 16px; font-family: var(--mono); font-size: 13px; letter-spacing: .01em;
+  opacity: .75; word-break: break-all;
+}
+.web-feats { display: grid; gap: 12px; align-content: center; }
+.web-feats .req-item .rk { background: var(--tertiary); color: var(--on-tertiary); }
+.web-note { margin-top: 18px; font-size: 13.5px; color: var(--on-surface-variant); max-width: 760px; }
+.web-note code {
+  font-family: var(--mono); font-size: 12.5px; background: var(--surface-container-high);
+  padding: 2px 7px; border-radius: 6px; color: var(--on-surface);
+}
+
+/* ---------- 13. 构建 ---------- */
 .build { padding: 0 0 clamp(56px, 8vw, 96px); }
 .build-steps { display: grid; gap: 14px; max-width: 760px; }
 .code-card {
@@ -479,7 +504,7 @@ section { scroll-margin-top: 88px; }
 }
 .prereq { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
 
-/* ---------- 13. 贡献 ---------- */
+/* ---------- 14. 贡献 ---------- */
 .contribute { background: var(--surface-container-low); padding: clamp(52px, 7vw, 84px) 0; transition: background-color .35s ease; }
 .contri-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .contri-card {
@@ -494,7 +519,7 @@ section { scroll-margin-top: 88px; }
 .contri-card a.more { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; font-size: 14px; font-weight: 600; }
 .contri-card a.more svg { width: 16px; height: 16px; }
 
-/* ---------- 14. 页脚 ---------- */
+/* ---------- 15. 页脚 ---------- */
 footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
 .foot-inner { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; }
 .foot-brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; }
@@ -507,7 +532,7 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
 .foot-links a:hover { background: var(--surface-container-high); color: var(--on-surface); }
 .foot-legal { font-size: 12.5px; color: var(--on-surface-variant); max-width: 560px; }
 
-/* ---------- 15. Snackbar / FAB ---------- */
+/* ---------- 16. Snackbar / FAB ---------- */
 .snackbar {
   position: fixed; left: 50%; bottom: 26px; z-index: 90;
   transform: translate(-50%, 90px); opacity: 0;
@@ -531,10 +556,10 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
 .fab:hover { filter: brightness(1.05); }
 .fab svg { width: 24px; height: 24px; }
 
-/* ---------- 16. 响应式 ---------- */
+/* ---------- 17. 响应式 ---------- */
 @media (max-width: 980px) {
   .contri-grid { grid-template-columns: 1fr 1fr; }
-  .privacy-grid, .dl-panel { grid-template-columns: 1fr; }
+  .privacy-grid, .dl-panel, .web-panel { grid-template-columns: 1fr; }
   .board-strip { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 860px) {
@@ -556,8 +581,6 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
   .btn { height: 48px; }
   .hero .cta-row .btn { flex: 1 1 auto; min-width: 150px; }
   .float-tile.c { display: none; }
-  .bar-actions .btn-tonal span.lbl { display: none; }
-  .bar-actions .btn-tonal { width: 42px; height: 42px; padding: 0; border-radius: 50%; }
   footer { padding-bottom: 120px; }
 }
 @media (max-width: 380px) {
@@ -565,7 +588,7 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
   .swatch { width: 40px; height: 40px; }
 }
 
-/* ---------- 17. 动效偏好 ---------- */
+/* ---------- 18. 动效偏好 ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -649,6 +672,7 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
       <a href="#theme">主题</a>
       <a href="#privacy">隐私</a>
       <a href="#download">下载</a>
+      <a href="#web">网页版</a>
       <a href="#build">构建</a>
     </nav>
     <div class="bar-actions">
@@ -656,9 +680,8 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
         <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="display:none"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M18.7 5.3 17 7M7 17l-1.7 1.7"/></svg>
       </button>
-      <a class="btn btn-tonal btn-sm" data-ripple href="https://github.com/lingyicute/YiPuzzles" target="_blank" rel="noopener">
+      <a class="icon-btn" data-ripple href="https://github.com/lingyicute/YiPuzzles" target="_blank" rel="noopener" aria-label="GitHub 仓库" title="GitHub 仓库">
         <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-        <span class="lbl">GitHub</span>
       </a>
       <button class="icon-btn menu-toggle" id="menuBtn" data-ripple aria-label="打开菜单" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 7h16v2H4zm0 4h16v2H4zm0 4h16v2H4z"/></svg>
@@ -670,6 +693,7 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
     <a href="#theme">🎨 动态主题</a>
     <a href="#privacy">🔒 隐私</a>
     <a href="#download">📥 下载</a>
+    <a href="#web">🌐 网页版</a>
     <a href="#build">🔨 构建</a>
   </div>
 </header>
@@ -691,16 +715,16 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
         <p class="tagline reveal" style="--d:.12s">是你熟悉的, 简单却令人上瘾的 2048。</p>
         <p class="lead reveal" style="--d:.18s">
           一款简洁、轻量、<b>隐私至上</b>的 2048 滑块拼图游戏：零权限、完全离线、无广告无追踪，
-          以 Material You 风格精心打造。
+          以 Material You 风格精心打造。现在还有 <b>网页版</b>，打开浏览器就能玩。
         </p>
         <div class="cta-row reveal" style="--d:.24s">
           <a class="btn btn-filled" data-ripple href="https://github.com/lingyicute/YiPuzzles/releases" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
             下载 APK
           </a>
-          <a class="btn btn-tonal" data-ripple href="https://github.com/lingyicute/YiPuzzles" target="_blank" rel="noopener">
-            <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-            查看源码
+          <a class="btn btn-tonal" data-ripple href="https://play.2048.92li.uk" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.8"/><path d="M3.2 12h17.6M12 3.2c2.4 2.6 2.4 15 0 17.6M12 3.2c-2.4 2.6-2.4 15 0 17.6"/></svg>
+            试试网页版
           </a>
         </div>
         <div class="meta-row reveal" style="--d:.3s">
@@ -708,6 +732,7 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
           <span class="chip">🔒 零权限</span>
           <span class="chip">🚫 无广告 · 无追踪</span>
           <span class="chip">🧩 4×4 ~ 7×7</span>
+          <span class="chip">🌐 网页版 · 免安装</span>
         </div>
       </div>
 
@@ -927,6 +952,51 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
     </div>
   </section>
 
+  <!-- ======= 网页版 ======= -->
+  <section class="web" id="web">
+    <div class="container">
+      <div class="web-panel reveal">
+        <div>
+          <span class="eyebrow">YiPuzzles Web</span>
+          <h2>不想安装？<br>打开浏览器就能玩 🌐</h2>
+          <p class="web-sub">
+            YiPuzzles 也有网页版。访问 <b>play.2048.92li.uk</b> 即可立刻开局：不用下载、不用安装，
+            手机、平板与电脑的浏览器都能玩。同样无广告、无追踪，对局进度只保存在你自己的浏览器里。
+          </p>
+          <div class="web-btns">
+            <a class="btn btn-filled" data-ripple href="https://play.2048.92li.uk" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.8"/><path d="M3.2 12h17.6M12 3.2c2.4 2.6 2.4 15 0 17.6M12 3.2c-2.4 2.6-2.4 15 0 17.6"/></svg>
+              试试网页版
+            </a>
+          </div>
+          <p class="web-url">play.2048.92li.uk</p>
+        </div>
+        <div class="web-feats">
+          <div class="req-item">
+            <span class="rk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="M4 9h16M7 7h.01M9.5 7h.01"/></svg></span>
+            <div><b>免安装 · 打开即玩</b><span>没有应用商店，也没有等待安装的进度条</span></div>
+          </div>
+          <div class="req-item">
+            <span class="rk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l3 3v15H5z"/><path d="M8.5 3v6h7V3M8.5 21v-6h7v6"/></svg></span>
+            <div><b>自动存档</b><span>分数、最高分与对局进度按棋盘大小保存在本机浏览器</span></div>
+          </div>
+          <div class="req-item">
+            <span class="rk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2.6"/><path d="M6.4 10h.01M9.7 10h.01M13 10h.01M16.3 10h.01M8.2 13.8h7.6"/></svg></span>
+            <div><b>键盘 + 触屏</b><span>方向键 / WASD 移动，Z 撤销，R 重新开始；手机上直接滑动屏幕</span></div>
+          </div>
+          <div class="req-item">
+            <span class="rk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 0 0 18h1.6a2.4 2.4 0 0 0 0-4.8h-.9a2 2 0 0 1 0-4h2.8A5.5 5.5 0 0 0 21 6.7C21 4.5 17 3 12 3z"/><path d="M7.6 11.4h.01M10.4 7.6h.01M14.6 7.6h.01"/></svg></span>
+            <div><b>与 App 同款外观</b><span>Material You 动态配色、深浅色模式、4×4 ~ 7×7 与经典 2048 配色</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="web-note reveal">
+        网页版同样开源，源码就在仓库的 <code>h5-demo/</code> 目录里；发现 Bug 或想加点新玩法，
+        欢迎到 <a href="https://github.com/lingyicute/YiPuzzles/issues" target="_blank" rel="noopener">Issues</a> 说一声。
+      </p>
+    </div>
+  </section>
+
   <!-- ======= 构建 ======= -->
   <section class="build" id="build">
     <div class="container">
@@ -1020,6 +1090,7 @@ cd YiPuzzles</pre>
       YiPuzzles
     </div>
     <div class="foot-links">
+      <a href="https://play.2048.92li.uk" target="_blank" rel="noopener">网页版</a>
       <a href="https://github.com/lingyicute/YiPuzzles" target="_blank" rel="noopener">仓库</a>
       <a href="https://github.com/lingyicute/YiPuzzles/releases" target="_blank" rel="noopener">Releases</a>
       <a href="https://github.com/lingyicute/YiPuzzles/issues" target="_blank" rel="noopener">Issues</a>
