@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#121014">
+<title>YiPuzzles Web · 2048</title>
+<meta name="description" content="YiPuzzles Web · 纯净的网页 2048 小游戏">
+<style>
+  :root {
+    color-scheme: dark light;
+    --bg:#121014; --s-low:#1a181d; --s-high:#242229; --s-highest:#2e2c33;
+    --on-s:#e8e3ee; --on-var:#c9c4d0;
+    --pri:#c5bbe6; --on-pri:#2a1f4a; --pri-c:#433a68; --on-pri-c:#e6deff;
+    --sec-c:#454357; --on-sec-c:#e3dff2; --ter-c:#4f3a4d; --on-ter-c:#ffd7f2;
+    --outline:#6f6a78; --board:#1e1c22; --cell:#28262d;
+    --font: "Nebulove","Google Sans","Product Sans","Nunito","Segoe UI","PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    --ease: cubic-bezier(.2,0,0,1);
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; min-height:100%; }
+  body {
+    font-family:var(--font); background:var(--bg); color:var(--on-s);
+    transition:background .35s var(--ease), color .35s var(--ease);
+    min-height:100vh; min-height:100dvh; overflow-x:hidden;
+    background-image:
+      radial-gradient(60vw 50vh at 85% 10%, color-mix(in srgb, var(--pri) 14%, transparent), transparent 70%),
+      radial-gradient(50vw 50vh at 0% 80%, color-mix(in srgb, var(--pri) 9%, transparent), transparent 70%);
+    background-attachment: fixed;
+  }
+  button { font-family:inherit; color:inherit; border:0; background:none; cursor:pointer; padding:0; }
+  svg { display:block; fill:currentColor; }
+
+  /* ---------- App bar ---------- */
+  .appbar {
+    position:sticky; top:0; z-index:20; display:flex; align-items:center; justify-content:space-between;
+    padding:12px clamp(16px,4vw,40px); padding-top:max(12px, env(safe-area-inset-top));
+    background:color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  }
+  .brand { display:flex; align-items:center; gap:12px; font-weight:700; font-size:20px; letter-spacing:.2px; }
+  .brand small { font-weight:600; font-size:12px; margin-left:6px; padding:2px 8px; border-radius:999px; background:var(--pri-c); color:var(--on-pri-c); vertical-align:middle; }
+  .logo { width:40px; height:40px; border-radius:13px; background:var(--pri); color:var(--on-pri); display:grid; place-items:center; }
+  .actions { display:flex; gap:4px; align-items:center; flex:none; }
+  .brand { min-width:0; }
+  .brand > div:last-child { white-space:nowrap; }
+  .logo { flex:none; }
+  @media (max-width:420px) {
+    .appbar { padding-left:12px; padding-right:12px; }
+    .brand { gap:8px; font-size:18px; }
+    .logo { width:34px; height:34px; border-radius:11px; }
+    .logo svg { width:22px; height:22px; }
+    .brand small { display:none; }
+    .icon-btn { width:40px; height:40px; }
+    .actions { gap:0; }
+  }
+  .icon-btn { position:relative; width:44px; height:44px; border-radius:50%; display:grid; place-items:center; color:var(--on-var); transition:background .2s, transform .15s var(--ease); }
+  .icon-btn:hover { background:color-mix(in srgb, var(--on-s) 9%, transparent); }
+  .icon-btn:active { transform:scale(.9); background:color-mix(in srgb, var(--on-s) 16%, transparent); }
+  .icon-btn.tonal { background:var(--sec-c); color:var(--on-sec-c); }
+  .icon-btn svg { width:24px; height:24px; }
+  .icon-btn .sun,.icon-btn .moon { position:absolute; transition:transform .45s var(--ease), opacity .3s; }
+  [data-theme="dark"] .sun { transform:rotate(0); opacity:1; }
+  [data-theme="dark"] .moon { transform:rotate(-90deg) scale(.4); opacity:0; }
+  [data-theme="light"] .sun { transform:rotate(90deg) scale(.4); opacity:0; }
+  [data-theme="light"] .moon { transform:rotate(0); opacity:1; }
+
+  /* ---------- Layout ---------- */
+  .layout { max-width:1120px; margin:0 auto; padding:8px clamp(16px,4vw,40px) 40px; display:grid; gap:28px; grid-template-columns:minmax(0,1fr); }
+  .game { order:1; width:100%; max-width:540px; margin:0 auto; }
+  .intro { order:2; text-align:center; }
+  @media (min-width:960px) {
+    .layout { grid-template-columns:minmax(0,1fr) 540px; align-items:center; gap:64px; min-height:calc(100dvh - 110px); }
+    .intro { order:1; text-align:left; } .game { order:2; margin:0; }
+    .intro .badges,.intro .features { justify-content:flex-start; }
+  }
+
+  /* ---------- Intro ---------- */
+  .badges,.features { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .badge { padding:10px 18px; border-radius:14px; font-size:14px; background:var(--s-high); color:var(--on-var); }
+  .badge.pri { background:var(--pri-c); color:var(--on-pri-c); }
+  .intro h1 { font-size:clamp(44px,8vw,76px); line-height:1.05; margin:28px 0 14px; font-weight:800; letter-spacing:-1px;
+    background:linear-gradient(90deg, var(--on-s) 20%, var(--pri)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .intro .tagline { font-size:clamp(18px,2.6vw,24px); font-weight:700; margin:0 0 14px; }
+  .intro .desc { color:var(--on-var); line-height:1.9; margin:0 0 26px; font-size:15px; max-width:520px; }
+  @media (max-width:959px){ .intro .desc{ margin-left:auto; margin-right:auto; } }
+  .features .badge { display:flex; align-items:center; gap:8px; font-size:13.5px; padding:9px 14px; border-radius:12px; }
+  .cta { display:flex; gap:12px; margin:0 0 26px; flex-wrap:wrap; justify-content:inherit; }
+  @media (max-width:959px){ .cta{justify-content:center;} }
+  .btn { height:52px; padding:0 28px; border-radius:999px; font-weight:700; font-size:16px; display:inline-flex; align-items:center; gap:10px; transition:transform .15s var(--ease), box-shadow .2s, filter .2s; }
+  .btn:active { transform:scale(.96); }
+  .btn.filled { background:var(--pri); color:var(--on-pri); box-shadow:0 2px 8px color-mix(in srgb, var(--pri) 35%, transparent); }
+  .btn.filled:hover { filter:brightness(1.07); box-shadow:0 4px 16px color-mix(in srgb, var(--pri) 45%, transparent); }
+  .btn.tonal { background:var(--sec-c); color:var(--on-sec-c); }
+  .btn.tonal:hover { filter:brightness(1.12); }
+  .btn.text { color:var(--pri); padding:0 16px; height:44px; }
+  .btn.text:hover { background:color-mix(in srgb, var(--pri) 10%, transparent); }
+  .btn svg { width:22px; height:22px; }
+
+  /* ---------- Game header / HUD ---------- */
+  .titlebar { display:flex; align-items:baseline; gap:12px; margin:6px 4px 14px; }
+  .titlebar h2 { margin:0; font-size:32px; font-weight:800; }
+  .titlebar span { color:var(--on-var); font-size:14px; font-weight:600; }
+  .hud { display:flex; gap:10px; align-items:center; margin-bottom:14px; }
+  .score-card { flex:1; min-width:0; position:relative; border-radius:22px; padding:12px 8px 10px; text-align:center; background:var(--sec-c); color:var(--on-sec-c); transition:background .35s; }
+  .score-card.best { background:var(--pri-c); color:var(--on-pri-c); }
+  .score-card .label { font-size:12px; font-weight:700; letter-spacing:2px; opacity:.8; }
+  .score-card .value { font-size:clamp(22px,6vw,28px); font-weight:800; margin-top:2px; font-variant-numeric:tabular-nums; }
+  /* 机械翻滚数字（分位滚动） */
+  .score-card .value { display:flex; justify-content:center; line-height:1.2; }
+  .rd { display:block; height:1.2em; width:1ch; overflow:hidden; }
+  .rs { display:flex; flex-direction:column; will-change:transform; transition:transform .6s cubic-bezier(.25,.9,.3,1); }
+  .rs i { display:block; height:1.2em; line-height:1.2em; font-style:normal; text-align:center; }
+  .round-btn { width:52px; height:52px; border-radius:50%; flex:none; display:grid; place-items:center; background:var(--s-highest); color:var(--on-s); transition:transform .15s var(--ease), opacity .2s, filter .2s; }
+  .round-btn.pri { background:var(--pri); color:var(--on-pri); }
+  .round-btn:hover { filter:brightness(1.12); }
+  .round-btn:active { transform:scale(.88); }
+  .round-btn:disabled { opacity:.38; cursor:not-allowed; filter:none; transform:none; }
+  .round-btn svg { width:26px; height:26px; }
+  .round-btn.spin svg { animation:spin .5s var(--ease); }
+  @keyframes spin { to{ transform:rotate(360deg);} }
+  @media (max-width:400px){ .round-btn{width:46px;height:46px} .score-card{border-radius:18px} }
+
+  /* ---------- Board ---------- */
+  #board {
+    --n:4; --gap:calc(48px / var(--n)); --tr:calc(64px / var(--n));
+    position:relative; width:min(100%,540px); aspect-ratio:1; margin:0 auto;
+    background:var(--board); border-radius:calc(var(--tr) + 12px); touch-action:none; user-select:none; -webkit-user-select:none;
+    transition:background .35s;
+  }
+  #cells { position:absolute; inset:var(--gap); display:grid; grid-template-columns:repeat(var(--n),1fr); grid-template-rows:repeat(var(--n),1fr); gap:var(--gap); }
+  #cells i { background:var(--cell); border-radius:var(--tr); transition:background .35s; }
+  #tiles { position:absolute; inset:var(--gap); container-type:inline-size; }
+  .tile {
+    position:absolute; left:0; top:0; z-index:1;
+    width:calc((100% - (var(--n) - 1) * var(--gap)) / var(--n));
+    height:calc((100% - (var(--n) - 1) * var(--gap)) / var(--n));
+    transform:translate(calc(var(--x) * (100% + var(--gap))), calc(var(--y) * (100% + var(--gap))));
+    transition:transform 110ms ease-in-out;
+  }
+  .tile .inner {
+    width:100%; height:100%; display:grid; place-items:center; border-radius:var(--tr);
+    font-weight:800; font-size:calc(100cqw / var(--n) * .42); font-variant-numeric:tabular-nums; line-height:1;
+    transition:background .35s, color .35s;
+  }
+  .tile .inner.d3 { font-size:calc(100cqw / var(--n) * .34); }
+  .tile .inner.d4 { font-size:calc(100cqw / var(--n) * .27); }
+  .tile .inner.d5 { font-size:calc(100cqw / var(--n) * .22); }
+  .tile .inner.glow { box-shadow:0 0 22px 2px color-mix(in srgb, currentColor 0%, var(--glow, transparent)); }
+  .tile .inner.new { animation:appear .2s ease .1s backwards; }
+  .tile .inner.pop { animation:pop .2s ease; }
+  @keyframes appear { from{ transform:scale(.2); opacity:0 } to{ transform:scale(1); opacity:1 } }
+  @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
+
+  #overlay { position:absolute; inset:0; z-index:5; border-radius:inherit; display:grid; place-items:center; text-align:center; padding:20px;
+    background:color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px);
+    opacity:0; pointer-events:none; transition:opacity .35s; }
+  #overlay.show { opacity:1; pointer-events:auto; }
+  #overlay .card { transform:scale(.9); transition:transform .4s var(--ease); }
+  #overlay.show .card { transform:scale(1); }
+  #overlay h3 { margin:0 0 6px; font-size:clamp(28px,7vw,40px); font-weight:800; }
+  #overlay p { margin:0 0 18px; color:var(--on-var); }
+  #overlay .row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  #overlay .btn { height:46px; padding:0 22px; font-size:15px; }
+
+  /* ---------- Size chips ---------- */
+  .size-row { display:flex; gap:8px; justify-content:center; margin:18px 0 6px; flex-wrap:wrap; }
+  .chip { height:38px; padding:0 18px; border-radius:12px; border:1px solid var(--outline); font-weight:700; font-size:14px; color:var(--on-var); transition:all .2s var(--ease); display:inline-flex; align-items:center; gap:6px; }
+  .chip:hover { background:color-mix(in srgb, var(--on-s) 8%, transparent); }
+  .chip[aria-checked="true"] { background:var(--sec-c); color:var(--on-sec-c); border-color:transparent; }
+  .chip[aria-checked="true"]::before { content:""; width:14px; height:14px; background:currentColor; -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") center/contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") center/contain no-repeat; }
+  .hint { text-align:center; color:var(--on-var); font-size:13px; opacity:.8; margin:12px 0 0; line-height:1.7; }
+
+  /* ---------- Dialogs ---------- */
+  dialog { border:0; padding:0; margin:auto; width:min(440px, calc(100vw - 32px)); max-height:calc(100dvh - 48px); border-radius:28px; background:var(--s-high); color:var(--on-s); box-shadow:0 12px 48px rgba(0,0,0,.4); overflow:auto; }
+  dialog[open] { animation:dialogIn .35s var(--ease); }
+  dialog::backdrop { background:rgba(0,0,0,.45); backdrop-filter:blur(3px); }
+  @keyframes dialogIn { from{ opacity:0; transform:translateY(24px) scale(.96)} to{opacity:1; transform:none} }
+  .dlg { padding:24px; }
+  .dlg h3 { margin:0 0 18px; font-size:24px; font-weight:700; display:flex; justify-content:space-between; align-items:center; }
+  .dlg h4 { margin:20px 0 10px; font-size:14px; color:var(--pri); font-weight:700; letter-spacing:.5px; }
+  .dlg p,.dlg li { color:var(--on-var); line-height:1.8; font-size:14.5px; }
+  .dlg ul { padding-left:20px; margin:0; }
+  .dlg .foot { display:flex; justify-content:flex-end; gap:8px; margin-top:22px; }
+  .seg { display:flex; border:1px solid var(--outline); border-radius:999px; overflow:hidden; }
+  .seg button { flex:1; height:42px; font-weight:600; font-size:14px; color:var(--on-var); display:flex; align-items:center; justify-content:center; gap:6px; transition:background .2s; }
+  .seg button + button { border-left:1px solid var(--outline); }
+  .seg button[aria-pressed="true"] { background:var(--sec-c); color:var(--on-sec-c); }
+  .swatches { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; transition:opacity .25s; }
+  .swatches.dim { opacity:.35; pointer-events:none; }
+  .swatch { display:flex; flex-direction:column; align-items:center; gap:6px; font-size:12px; color:var(--on-var); }
+  .swatch .dot { width:52px; height:52px; border-radius:50%; position:relative; display:grid; place-items:center; transition:transform .2s var(--ease), box-shadow .2s; color:#fff; }
+  .swatch:hover .dot { transform:scale(1.08); }
+  .swatch .dot svg { width:24px; height:24px; opacity:0; transform:scale(.4); transition:all .25s var(--ease); }
+  .swatch[aria-checked="true"] .dot { box-shadow:0 0 0 3px var(--s-high), 0 0 0 5px var(--pri); }
+  .swatch[aria-checked="true"] .dot svg { opacity:1; transform:none; }
+  .switch-row { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 0; cursor:pointer; }
+  .switch-row b { display:block; font-size:16px; font-weight:600; }
+  .switch-row span.sub { font-size:13px; color:var(--on-var); }
+  .switch { position:relative; width:52px; height:32px; border-radius:16px; flex:none; background:var(--s-highest); border:2px solid var(--outline); transition:all .25s var(--ease); }
+  .switch::after { content:""; position:absolute; left:6px; top:50%; width:16px; height:16px; border-radius:50%; background:var(--outline); transform:translateY(-50%); transition:all .25s var(--ease); }
+  .switch[aria-checked="true"] { background:var(--pri); border-color:var(--pri); }
+  .switch[aria-checked="true"]::after { left:24px; width:24px; height:24px; margin-left:-4px; background:var(--on-pri); }
+  kbd { background:var(--s-highest); padding:1px 8px; border-radius:6px; font-family:inherit; font-size:13px; border:1px solid var(--outline); }
+
+  footer { text-align:center; color:var(--on-var); font-size:13px; opacity:.7; padding:0 16px 32px; line-height:1.8; }
+
+  @media (prefers-reduced-motion:reduce){ *{ animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+</style>
+<style>
+@font-face {
+    font-family: 'Nebulove';
+    src: url('https://nebulove.92li.uk/Nebulove.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <svg width="26" height="26" viewBox="0 0 26 26"><rect x="2" y="2" width="9.5" height="9.5" rx="3.2"/><rect x="14.5" y="2" width="9.5" height="9.5" rx="3.2" opacity=".6"/><rect x="2" y="14.5" width="9.5" height="9.5" rx="3.2" opacity=".6"/><rect x="14.5" y="14.5" width="9.5" height="9.5" rx="3.2"/></svg>
+    </div>
+    <div>YiPuzzles<small>Web</small></div>
+  </div>
+  <div class="actions">
+    <button class="icon-btn" id="themeBtn" aria-label="切换深色/浅色模式" title="切换深色 / 浅色">
+      <svg class="sun" viewBox="0 0 24 24"><path d="M12 7a5 5 0 100 10 5 5 0 000-10zM2 13h2a1 1 0 000-2H2a1 1 0 000 2zm18 0h2a1 1 0 000-2h-2a1 1 0 000 2zM11 2v2a1 1 0 002 0V2a1 1 0 00-2 0zm0 18v2a1 1 0 002 0v-2a1 1 0 00-2 0zM5.99 4.58a1 1 0 00-1.41 1.41l1.06 1.06a1 1 0 001.41-1.41L5.99 4.58zm12.37 12.37a1 1 0 00-1.41 1.41l1.06 1.06a1 1 0 001.41-1.41l-1.06-1.06zm1.06-10.96a1 1 0 00-1.41-1.41l-1.06 1.06a1 1 0 001.41 1.41l1.06-1.06zM7.05 18.36a1 1 0 00-1.41-1.41l-1.06 1.06a1 1 0 001.41 1.41l1.06-1.06z"/></svg>
+      <svg class="moon" viewBox="0 0 24 24"><path d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+    </button>
+    <button class="icon-btn" id="paletteBtn" aria-label="外观与配色" title="外观与配色">
+      <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 000 18 1.5 1.5 0 001.11-2.51 1.5 1.5 0 011.12-2.49H16a5 5 0 005-5c0-4.42-4.03-8-9-8zm-5.5 9a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3-4a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm5 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3 4a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg>
+    </button>
+    <button class="icon-btn" id="menuBtn" aria-label="菜单" title="玩法与关于">
+      <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- Game -->
+  <main class="game">
+    <div class="titlebar"><h2>2048</h2><span id="sizeLabel">4×4</span></div>
+    <div class="hud">
+      <div class="score-card" id="scoreCard"><div class="label">分数</div><div class="value" id="score">0</div></div>
+      <div class="score-card best"><div class="label">最高分</div><div class="value" id="best">0</div></div>
+      <button class="round-btn" id="undoBtn" aria-label="撤销" title="撤销 (Z)" disabled>
+        <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+      </button>
+      <button class="round-btn pri" id="restartBtn" aria-label="重新开始" title="重新开始 (R)">
+        <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+      </button>
+    </div>
+
+    <div id="board" aria-label="2048 游戏棋盘">
+      <div id="cells"></div>
+      <div id="tiles"></div>
+      <div id="overlay"></div>
+    </div>
+
+    <div class="size-row" id="sizeRow" role="radiogroup" aria-label="棋盘大小"></div>
+    <p class="hint">滑动屏幕或使用 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> / <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移动方块<br>相同数字相撞即合并，目标：拼出 2048</p>
+  </main>
+
+  <!-- Intro -->
+  <section class="intro">
+    <div class="badges">
+      <span class="badge pri">Material You</span>
+      <span class="badge">自动存档</span>
+      <span class="badge">清爽纯净</span>
+    </div>
+    <h1>YiPuzzles</h1>
+    <p class="tagline">是你熟悉的，简单却令人上瘾的 2048。</p>
+    <p class="desc">YiPuzzles 是一款简洁、轻量、隐私至上的 2048 滑块拼图游戏。这里是它的网页版本：无需安装、无广告，无追踪，以 Material You 风格精心打造。</p>
+    <div class="cta">
+      <button class="btn filled" id="ctaNew">
+        <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        新游戏
+      </button>
+      <button class="btn tonal" id="ctaTheme">
+        <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 000 18 1.5 1.5 0 001.11-2.51 1.5 1.5 0 011.12-2.49H16a5 5 0 005-5c0-4.42-4.03-8-9-8zm-5.5 9a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3-4a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm5 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3 4a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg>
+        个性化配色
+      </button>
+    </div>
+    <div class="features">
+      <span class="badge">🎨 8 种动态配色</span>
+      <span class="badge">🌗 深色 / 浅色</span>
+      <span class="badge">🚫 无广告 · 无追踪</span>
+      <span class="badge">🧩 4×4 ~ 7×7</span>
+      <span class="badge">🕹️ 经典 2048 配色</span>
+    </div>
+  </section>
+</div>
+
+<footer>YiPuzzles Web · Made with ❤️ by lingyicute</footer>
+
+<!-- Appearance dialog -->
+<dialog id="themeDlg">
+  <div class="dlg">
+    <h3>外观与配色 <button class="icon-btn" data-close aria-label="关闭"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></h3>
+    <h4>显示模式</h4>
+    <div class="seg" id="modeSeg">
+      <button data-mode="light">浅色</button>
+      <button data-mode="dark">深色</button>
+      <button data-mode="auto">跟随系统</button>
+    </div>
+    <h4>配色方案</h4>
+    <div class="swatches" id="swatches"></div>
+    <h4>游戏配色</h4>
+    <div class="switch-row" id="classicRow" role="presentation">
+      <div><b>原版 2048 配色</b><span class="sub">使用经典的米色棋盘与橙黄方块（开启后将替代上方配色）</span></div>
+      <div class="switch" id="classicSwitch" role="switch" aria-checked="false" tabindex="0"></div>
+    </div>
+    <div class="foot"><button class="btn text" data-close>完成</button></div>
+  </div>
+</dialog>
+
+<!-- Menu dialog -->
+<dialog id="menuDlg">
+  <div class="dlg">
+    <h3>关于 YiPuzzles Web <button class="icon-btn" data-close aria-label="关闭"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></h3>
+    <p>YiPuzzles Web 是 Android 版 YiPuzzles 2048 的网页版，沿用 Material You 设计语言，无广告、无追踪、完全离线可玩。</p>
+    <h4>玩法</h4>
+    <ul>
+      <li>滑动或按方向键，所有方块向同一方向移动。</li>
+      <li>两个相同数字的方块碰撞后合并为它们的和。</li>
+      <li>拼出 2048 即获胜，之后仍可继续挑战更高分。</li>
+      <li>棋盘填满且无法合并时游戏结束，可随时撤销。</li>
+    </ul>
+    <h4>快捷键</h4>
+    <ul>
+      <li><kbd>↑↓←→</kbd> / <kbd>WASD</kbd> 移动</li>
+      <li><kbd>Z</kbd> 撤销　<kbd>R</kbd> 重新开始</li>
+    </ul>
+    <h4>数据</h4>
+    <p style="margin:0">分数、最高分与对局进度按棋盘大小分别自动保存在本机浏览器中。</p>
+    <div class="foot">
+      <button class="btn text" id="clearBtn" style="color:#ff8a80">清除全部记录</button>
+      <button class="btn text" data-close>关闭</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s);
+  const root = document.documentElement;
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+    clear() { try { Object.keys(localStorage).filter(k => k.startsWith('yp.')).forEach(k => localStorage.removeItem(k)); } catch (e) {} }
+  };
+
+  /* ================= Theme ================= */
+  const SCHEMES = [
+    { id: 'purple', name: '薰衣草紫', h: 255 },
+    { id: 'blue',   name: '天空蓝',   h: 212 },
+    { id: 'teal',   name: '湖青',   h: 174 },
+    { id: 'green',  name: '梨绿',   h: 135 },
+    { id: 'yellow', name: '琥珀黄',   h: 44 },
+    { id: 'orange', name: '日落橙',   h: 20 },
+    { id: 'pink',   name: '樱花粉',   h: 330 },
+    { id: 'red',    name: '玫瑰红',   h: 356 }
+  ];
+  const DARK_T  = [[0,8,22],[0,12,28],[0,18,34],[0,24,78],[60,24,30],[60,32,38],[60,42,74],[0,46,62],[0,56,70],[60,56,64],[0,72,80],[30,82,86]];
+  const LIGHT_T = [[0,30,97],[0,40,90],[0,48,72],[0,40,40],[60,40,82],[60,46,66],[60,46,40],[0,50,32],[0,56,26],[60,56,30],[0,72,24],[30,82,16]];
+  const CLASSIC_T = [['#eee4da','#776e65'],['#ede0c8','#776e65'],['#f2b179','#f9f6f2'],['#f59563','#f9f6f2'],['#f67c5f','#f9f6f2'],['#f65e3b','#f9f6f2'],['#edcf72','#f9f6f2'],['#edcc61','#f9f6f2'],['#edc850','#f9f6f2'],['#edc53f','#f9f6f2'],['#edc22e','#f9f6f2'],['#3c3a32','#f9f6f2']];
+  const hsl = (h, s, l) => `hsl(${((h % 360) + 360) % 360},${s}%,${l}%)`;
+
+  let settings = Object.assign({ mode: 'auto', scheme: 'purple', classic: false, size: 4 }, store.get('yp.settings', {}));
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  const isDark = () => settings.mode === 'dark' || (settings.mode === 'auto' && mq.matches);
+
+  function applyTheme() {
+    const dark = isDark();
+    const sch = SCHEMES.find(s => s.id === settings.scheme) || SCHEMES[0];
+    const h = settings.classic ? 36 : sch.h;
+    const v = {};
+    if (dark) {
+      Object.assign(v, {
+        '--bg': hsl(h,12,8), '--s-low': hsl(h,10,12), '--s-high': hsl(h,9,17), '--s-highest': hsl(h,8,22),
+        '--on-s': hsl(h,15,91), '--on-var': hsl(h,12,76),
+        '--pri': hsl(h,48,80), '--on-pri': hsl(h,50,20), '--pri-c': hsl(h,34,28), '--on-pri-c': hsl(h,70,91),
+        '--sec-c': hsl(h,14,29), '--on-sec-c': hsl(h,25,90), '--ter-c': hsl(h+60,22,28), '--on-ter-c': hsl(h+60,50,90),
+        '--outline': hsl(h,8,42), '--board': hsl(h,9,14), '--cell': hsl(h,9,19)
+      });
+    } else {
+      Object.assign(v, {
+        '--bg': hsl(h,30,98), '--s-low': hsl(h,22,95), '--s-high': hsl(h,20,93), '--s-highest': hsl(h,18,89),
+        '--on-s': hsl(h,20,10), '--on-var': hsl(h,12,30),
+        '--pri': hsl(h,40,40), '--on-pri': '#fff', '--pri-c': hsl(h,75,90), '--on-pri-c': hsl(h,70,16),
+        '--sec-c': hsl(h,35,88), '--on-sec-c': hsl(h,30,15), '--ter-c': hsl(h+60,45,88), '--on-ter-c': hsl(h+60,60,14),
+        '--outline': hsl(h,10,52), '--board': hsl(h,22,85), '--cell': hsl(h,22,79)
+      });
+    }
+    if (settings.classic) { v['--board'] = '#bbada0'; v['--cell'] = 'rgba(238,228,218,.35)'; }
+    const tiles = dark ? DARK_T : LIGHT_T;
+    for (let i = 0; i < 12; i++) {
+      let bg, fg;
+      if (settings.classic) { bg = CLASSIC_T[i][0]; fg = CLASSIC_T[i][1]; }
+      else {
+        const [ho, s, l] = tiles[i];
+        bg = hsl(h + ho, s, l);
+        fg = l >= 58 ? hsl(h + ho, 40, 12) : hsl(h + ho, 20, 96);
+      }
+      v['--tb' + (i + 1)] = bg; v['--tf' + (i + 1)] = fg;
+    }
+    for (const k in v) root.style.setProperty(k, v[k]);
+    root.dataset.theme = dark ? 'dark' : 'light';
+    root.dataset.classic = settings.classic ? 'true' : 'false';
+    root.style.colorScheme = dark ? 'dark' : 'light';
+    $('meta[name="theme-color"]').setAttribute('content', v['--bg']);
+    syncThemeUI();
+  }
+  function saveSettings() { store.set('yp.settings', settings); }
+  mq.addEventListener && mq.addEventListener('change', () => { if (settings.mode === 'auto') applyTheme(); });
+
+  /* ---- Theme UI ---- */
+  const swatchesEl = $('#swatches');
+  SCHEMES.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'swatch'; b.setAttribute('role', 'radio'); b.dataset.id = s.id;
+    b.innerHTML = `<span class="dot" style="background:conic-gradient(from 135deg, ${hsl(s.h,48,62)} 0 50%, ${hsl(s.h+60,40,55)} 50% 75%, ${hsl(s.h,30,40)} 75% 100%)"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>${s.name}`;
+    b.addEventListener('click', () => { settings.scheme = s.id; saveSettings(); applyTheme(); });
+    swatchesEl.appendChild(b);
+  });
+  function syncThemeUI() {
+    document.querySelectorAll('#modeSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === settings.mode)));
+    swatchesEl.querySelectorAll('.swatch').forEach(b => b.setAttribute('aria-checked', String(b.dataset.id === settings.scheme)));
+    swatchesEl.classList.toggle('dim', settings.classic);
+    $('#classicSwitch').setAttribute('aria-checked', String(settings.classic));
+  }
+  document.querySelectorAll('#modeSeg button').forEach(b => b.addEventListener('click', () => { settings.mode = b.dataset.mode; saveSettings(); applyTheme(); }));
+  function toggleClassic() { settings.classic = !settings.classic; saveSettings(); applyTheme(); }
+  $('#classicRow').addEventListener('click', toggleClassic);
+  $('#classicSwitch').addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); toggleClassic(); } });
+  $('#themeBtn').addEventListener('click', () => { settings.mode = isDark() ? 'light' : 'dark'; saveSettings(); applyTheme(); });
+
+  /* ---- Dialogs ---- */
+  const themeDlg = $('#themeDlg'), menuDlg = $('#menuDlg');
+  const openDlg = d => d.showModal();
+  $('#paletteBtn').addEventListener('click', () => openDlg(themeDlg));
+  $('#ctaTheme').addEventListener('click', () => openDlg(themeDlg));
+  $('#menuBtn').addEventListener('click', () => openDlg(menuDlg));
+  document.querySelectorAll('dialog').forEach(d => {
+    d.addEventListener('click', e => { if (e.target === d || e.target.closest('[data-close]')) d.close(); });
+  });
+  $('#clearBtn').addEventListener('click', () => {
+    if (confirm('确定要清除所有分数与对局记录吗？（外观设置将保留）')) {
+      const keep = settings; store.clear(); store.set('yp.settings', keep);
+      menuDlg.close(); newGame(true);
+    }
+  });
+
+  /* ================= Game ================= */
+  const boardEl = $('#board'), tilesEl = $('#tiles'), cellsEl = $('#cells'), overlayEl = $('#overlay');
+  const scoreEl = $('#score'), bestEl = $('#best'), undoBtn = $('#undoBtn');
+  const SIZES = [4, 5, 6, 7];
+  const VEC = [[0, -1], [1, 0], [0, 1], [-1, 0]]; // up right down left
+  let N = 4, grid = [], score = 0, best = 0, won = false, over = false, undoStack = [], nextId = 1, overlayType = null;
+
+  const inb = (x, y) => x >= 0 && y >= 0 && x < N && y < N;
+
+  function buildBoard() {
+    boardEl.style.setProperty('--n', N);
+    cellsEl.innerHTML = '<i></i>'.repeat(N * N);
+    tilesEl.innerHTML = '';
+    $('#sizeLabel').textContent = `${N}×${N}`;
+  }
+  function renderSizeRow() {
+    const row = $('#sizeRow'); row.innerHTML = '';
+    SIZES.forEach(s => {
+      const b = document.createElement('button');
+      b.className = 'chip'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(s === N));
+      b.textContent = `${s}×${s}`;
+      b.addEventListener('click', () => { if (s !== N) { saveState(); settings.size = s; saveSettings(); init(s); } });
+      row.appendChild(b);
+    });
+  }
+
+  function renderTile(t, pop) {
+    const inner = t.el.firstChild, k = Math.min(Math.log2(t.val), 12) | 0;
+    inner.textContent = t.val;
+    inner.style.background = `var(--tb${k})`;
+    inner.style.color = `var(--tf${k})`;
+    const len = String(t.val).length;
+    inner.className = 'inner' + (len >= 3 ? ' d' + Math.min(len, 5) : '') + (inner.classList.contains('new') ? ' new' : '');
+    if (k >= 11) inner.style.boxShadow = `0 0 24px 4px color-mix(in srgb, var(--tb${k}) 55%, transparent)`; else inner.style.boxShadow = '';
+    if (pop) { inner.classList.remove('new'); void inner.offsetWidth; inner.classList.add('pop'); }
+  }
+  function place(t) { t.el.style.setProperty('--x', t.x); t.el.style.setProperty('--y', t.y); }
+  function makeTile(val, x, y, isNew) {
+    const el = document.createElement('div'); el.className = 'tile';
+    const inner = document.createElement('div'); inner.className = 'inner' + (isNew ? ' new' : '');
+    el.appendChild(inner);
+    const t = { id: nextId++, val, x, y, el, merged: false };
+    place(t); renderTile(t); tilesEl.appendChild(el);
+    return t;
+  }
+  function loadMatrix(m) {
+    tilesEl.innerHTML = '';
+    grid = m.map((r, y) => r.map((v, x) => v ? makeTile(v, x, y, false) : null));
+  }
+  const snapshot = () => ({ g: grid.map(r => r.map(t => t ? t.val : 0)), score });
+  function emptyGrid() { return Array.from({ length: N }, () => Array(N).fill(null)); }
+
+  function spawn() {
+    const empties = [];
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (!grid[y][x]) empties.push([x, y]);
+    if (!empties.length) return;
+    const [x, y] = empties[Math.floor(Math.random() * empties.length)];
+    grid[y][x] = makeTile(Math.random() < 0.9 ? 2 : 4, x, y, true);
+  }
+  function canMove() {
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const t = grid[y][x];
+      if (!t) return true;
+      if (x + 1 < N && grid[y][x + 1] && grid[y][x + 1].val === t.val) return true;
+      if (y + 1 < N && grid[y + 1][x] && grid[y + 1][x].val === t.val) return true;
+    }
+    return false;
+  }
+
+  /* ---- 机械翻滚计数器：每一位独立向前滚动 ---- */
+  const DH = 1.2;
+  function snapCol(c, n) { c.st.style.transition = 'none'; c.st.style.transform = `translateY(${-n * DH}em)`; }
+  function makeCol() {
+    const el = document.createElement('span'); el.className = 'rd'; el.setAttribute('aria-hidden', 'true');
+    const st = document.createElement('span'); st.className = 'rs';
+    let h = ''; for (let i = 0; i < 20; i++) h += `<i>${i % 10}</i>`;
+    st.innerHTML = h; el.appendChild(st);
+    return { el, st, cur: 0, dirty: false, timer: 0 };
+  }
+  function setCol(c, d, animate) {
+    clearTimeout(c.timer);
+    if (c.dirty) { snapCol(c, c.cur); c.dirty = false; }
+    if (!animate) { c.cur = d; snapCol(c, d); return; }
+    const delta = (d - c.cur + 10) % 10;
+    if (!delta) return;
+    void c.st.offsetWidth;
+    c.st.style.transition = '';
+    c.st.style.transform = `translateY(${-(c.cur + delta) * DH}em)`;
+    c.cur = d; c.dirty = true;
+    c.timer = setTimeout(() => { snapCol(c, d); c.dirty = false; }, 650);
+  }
+  function setRoll(el, val, animate) {
+    const s = String(val);
+    if (el.dataset.v === s) return;
+    el.dataset.v = s; el.setAttribute('role', 'img'); el.setAttribute('aria-label', s);
+    const cols = el._cols || (el._cols = []);
+    if (!cols.length) el.textContent = '';
+    while (cols.length > s.length) cols.shift().el.remove();
+    while (cols.length < s.length) { const c = makeCol(); cols.unshift(c); el.insertBefore(c.el, el.firstChild); snapCol(c, 0); }
+    for (let i = 0; i < s.length; i++) setCol(cols[i], +s[i], animate);
+  }
+  let hudAnimate = true;
+  function updateHud() {
+    if (score > best) { best = score; store.set('yp.best.' + N, best); }
+    setRoll(scoreEl, score, hudAnimate);
+    setRoll(bestEl, best, hudAnimate);
+    undoBtn.disabled = undoStack.length === 0;
+  }
+  function saveState() {
+    store.set('yp.state.' + N, { g: snapshot().g, score, won, over, undo: undoStack.slice(-20) });
+  }
+
+  function move(d) {
+    if (over || overlayType) return false;
+    const [dx, dy] = VEC[d];
+    const xs = [...Array(N).keys()], ys = [...Array(N).keys()];
+    if (dx === 1) xs.reverse();
+    if (dy === 1) ys.reverse();
+    const snap = snapshot();
+    let moved = false, gain = 0, reached = false;
+    grid.forEach(r => r.forEach(t => t && (t.merged = false)));
+    for (const y of ys) for (const x of xs) {
+      const t = grid[y][x]; if (!t) continue;
+      let cx = x, cy = y;
+      while (inb(cx + dx, cy + dy) && !grid[cy + dy][cx + dx]) { cx += dx; cy += dy; }
+      const nx = cx + dx, ny = cy + dy;
+      const o = inb(nx, ny) ? grid[ny][nx] : null;
+      grid[y][x] = null;
+      if (o && o.val === t.val && !o.merged) {
+        o.val *= 2; o.merged = true; gain += o.val;
+        t.x = nx; t.y = ny; place(t); moved = true;
+        if (o.val === 2048 && !won) reached = true;
+        setTimeout(() => { t.el.remove(); renderTile(o, true); }, 115);
+      } else {
+        grid[cy][cx] = t;
+        if (cx !== x || cy !== y) { moved = true; t.x = cx; t.y = cy; place(t); }
+      }
+    }
+    if (!moved) return false;
+    undoStack.push(snap); if (undoStack.length > 30) undoStack.shift();
+    score += gain;
+    spawn();
+    updateHud(gain);
+    if (reached) { won = true; setTimeout(() => showOverlay('win'), 320); }
+    else if (!canMove()) { over = true; setTimeout(() => showOverlay('over'), 420); }
+    saveState();
+    return true;
+  }
+
+  function undo() {
+    if (!undoStack.length) return;
+    const s = undoStack.pop();
+    hideOverlay(); over = false;
+    loadMatrix(s.g); score = s.score;
+    updateHud(0); saveState();
+  }
+
+  function showOverlay(type) {
+    overlayType = type;
+    if (type === 'win') {
+      overlayEl.innerHTML = `<div class="card"><h3>🎉 你赢了！</h3><p>成功拼出 2048，当前得分 ${score}</p><div class="row"><button class="btn filled" data-act="continue">继续挑战</button><button class="btn tonal" data-act="new">新游戏</button></div></div>`;
+    } else {
+      overlayEl.innerHTML = `<div class="card"><h3>游戏结束</h3><p>最终得分 ${score}${score >= best && score > 0 ? ' · 新纪录！' : ''}</p><div class="row"><button class="btn filled" data-act="new">再来一局</button>${undoStack.length ? '<button class="btn tonal" data-act="undo">撤销一步</button>' : ''}</div></div>`;
+    }
+    requestAnimationFrame(() => overlayEl.classList.add('show'));
+  }
+  function hideOverlay() { overlayType = null; overlayEl.classList.remove('show'); }
+  overlayEl.addEventListener('click', e => {
+    const a = e.target.closest('[data-act]'); if (!a) return;
+    const act = a.dataset.act;
+    if (act === 'continue') { hideOverlay(); saveState(); }
+    else if (act === 'new') newGame();
+    else if (act === 'undo') undo();
+  });
+
+  function newGame(resetBest) {
+    hideOverlay();
+    grid = emptyGrid(); tilesEl.innerHTML = '';
+    score = 0; won = false; over = false; undoStack = [];
+    if (resetBest) best = 0;
+    spawn(); spawn();
+    updateHud(0); saveState();
+  }
+
+  function init(size) {
+    N = size; settings.size = size;
+    hudAnimate = false;
+    buildBoard(); renderSizeRow();
+    best = store.get('yp.best.' + N, 0);
+    hideOverlay();
+    const st = store.get('yp.state.' + N, null);
+    const valid = st && Array.isArray(st.g) && st.g.length === N && st.g.every(r => Array.isArray(r) && r.length === N);
+    if (valid) {
+      grid = emptyGrid(); loadMatrix(st.g);
+      score = st.score || 0; won = !!st.won; over = !!st.over;
+      undoStack = (st.undo || []).filter(s => s.g && s.g.length === N);
+      updateHud(0);
+      if (over) { overlayEl.style.transition = 'none'; showOverlay('over'); setTimeout(() => overlayEl.style.transition = '', 50); }
+    } else newGame();
+    hudAnimate = true;
+  }
+
+  /* ---- Controls ---- */
+  $('#restartBtn').addEventListener('click', e => {
+    const b = e.currentTarget; b.classList.remove('spin'); void b.offsetWidth; b.classList.add('spin');
+    newGame();
+  });
+  $('#ctaNew').addEventListener('click', () => { newGame(); boardEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+  undoBtn.addEventListener('click', undo);
+
+  const KEYS = { ArrowUp: 0, ArrowRight: 1, ArrowDown: 2, ArrowLeft: 3, w: 0, d: 1, s: 2, a: 3, W: 0, D: 1, S: 2, A: 3 };
+  document.addEventListener('keydown', e => {
+    if (document.querySelector('dialog[open]') || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key in KEYS) { e.preventDefault(); move(KEYS[e.key]); }
+    else if (e.key === 'z' || e.key === 'Z' || e.key === 'Backspace') { e.preventDefault(); undo(); }
+    else if (e.key === 'r' || e.key === 'R') { newGame(); }
+  });
+
+  // Swipe (touch + mouse drag) on board
+  let sx = 0, sy = 0, tracking = false;
+  boardEl.addEventListener('pointerdown', e => { if (e.target.closest('#overlay.show')) return; tracking = true; sx = e.clientX; sy = e.clientY; });
+  window.addEventListener('pointerup', e => {
+    if (!tracking) return; tracking = false;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+    move(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
+  });
+  window.addEventListener('pointercancel', () => { tracking = false; });
+  boardEl.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+
+  /* ---- Boot ---- */
+  applyTheme();
+  init(SIZES.includes(settings.size) ? settings.size : 4);
+})();
+</script>
+</body>
+</html>
