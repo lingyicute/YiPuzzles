@@ -2,8 +2,9 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#121014">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26'%3E%3Crect width='26' height='26' rx='6' fill='%23c5bbe6'/%3E%3Cg fill='%232a1f4a'%3E%3Crect x='4' y='4' width='8' height='8' rx='2.6'/%3E%3Crect x='14' y='4' width='8' height='8' rx='2.6' opacity='.6'/%3E%3Crect x='4' y='14' width='8' height='8' rx='2.6' opacity='.6'/%3E%3Crect x='14' y='14' width='8' height='8' rx='2.6'/%3E%3C/g%3E%3C/svg%3E">
 <title>YiPuzzles Web · 2048</title>
 <meta name="description" content="YiPuzzles Web · 纯净的网页 2048 小游戏">
 <style>
@@ -28,7 +29,7 @@
       radial-gradient(50vw 50vh at 0% 80%, color-mix(in srgb, var(--pri) 9%, transparent), transparent 70%);
     background-attachment: fixed;
   }
-  button { font-family:inherit; color:inherit; border:0; background:none; cursor:pointer; padding:0; }
+  button { font-family:inherit; color:inherit; border:0; background:none; cursor:pointer; padding:0; touch-action:manipulation; }
   svg { display:block; fill:currentColor; }
 
   /* ---------- App bar ---------- */
@@ -181,6 +182,8 @@
   .dlg p,.dlg li { color:var(--on-var); line-height:1.8; font-size:14.5px; }
   .dlg ul { padding-left:20px; margin:0; }
   .dlg .foot { display:flex; justify-content:flex-end; gap:8px; margin-top:22px; }
+  .dlg .tight { margin:0; }
+  .dlg .danger { color:#ff8a80; }
   .seg { display:flex; border:1px solid var(--outline); border-radius:999px; overflow:hidden; }
   .seg button { flex:1; height:42px; font-weight:600; font-size:14px; color:var(--on-var); display:flex; align-items:center; justify-content:center; gap:6px; transition:background .2s; }
   .seg button + button { border-left:1px solid var(--outline); }
@@ -226,14 +229,14 @@
     <div>YiPuzzles<small>Web</small></div>
   </div>
   <div class="actions">
-    <button class="icon-btn" id="themeBtn" aria-label="切换深色/浅色模式" title="切换深色 / 浅色">
+    <button class="icon-btn" id="themeBtn" aria-label="切换深色/浅色模式" title="切换深色 / 浅色" type="button">
       <svg class="sun" viewBox="0 0 24 24"><path d="M12 7a5 5 0 100 10 5 5 0 000-10zM2 13h2a1 1 0 000-2H2a1 1 0 000 2zm18 0h2a1 1 0 000-2h-2a1 1 0 000 2zM11 2v2a1 1 0 002 0V2a1 1 0 00-2 0zm0 18v2a1 1 0 002 0v-2a1 1 0 00-2 0zM5.99 4.58a1 1 0 00-1.41 1.41l1.06 1.06a1 1 0 001.41-1.41L5.99 4.58zm12.37 12.37a1 1 0 00-1.41 1.41l1.06 1.06a1 1 0 001.41-1.41l-1.06-1.06zm1.06-10.96a1 1 0 00-1.41-1.41l-1.06 1.06a1 1 0 001.41 1.41l1.06-1.06zM7.05 18.36a1 1 0 00-1.41-1.41l-1.06 1.06a1 1 0 001.41 1.41l1.06-1.06z"/></svg>
       <svg class="moon" viewBox="0 0 24 24"><path d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
     </button>
-    <button class="icon-btn" id="paletteBtn" aria-label="外观与配色" title="外观与配色">
+    <button class="icon-btn" id="paletteBtn" aria-label="外观与配色" title="外观与配色" type="button">
       <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 000 18 1.5 1.5 0 001.11-2.51 1.5 1.5 0 011.12-2.49H16a5 5 0 005-5c0-4.42-4.03-8-9-8zm-5.5 9a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3-4a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm5 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3 4a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg>
     </button>
-    <button class="icon-btn" id="menuBtn" aria-label="菜单" title="玩法与关于">
+    <button class="icon-btn" id="menuBtn" aria-label="菜单" title="玩法与关于" type="button">
       <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
     </button>
   </div>
@@ -246,15 +249,15 @@
     <div class="hud">
       <div class="score-card" id="scoreCard"><div class="label">分数</div><div class="value" id="score">0</div></div>
       <div class="score-card best"><div class="label">最高分</div><div class="value" id="best">0</div></div>
-      <button class="round-btn" id="undoBtn" aria-label="撤销" title="撤销 (Z)" disabled>
+      <button class="round-btn" id="undoBtn" aria-label="撤销" title="撤销 (Z)" disabled type="button">
         <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
       </button>
-      <button class="round-btn pri" id="restartBtn" aria-label="重新开始" title="重新开始 (R)">
+      <button class="round-btn pri" id="restartBtn" aria-label="重新开始" title="重新开始 (R)" type="button">
         <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
       </button>
     </div>
 
-    <div id="board" aria-label="2048 游戏棋盘">
+    <div id="board" role="group" aria-label="2048 游戏棋盘">
       <div id="cells"></div>
       <div id="tiles"></div>
       <div id="overlay"></div>
@@ -275,11 +278,11 @@
     <p class="tagline">是你熟悉的，简单却令人上瘾的 2048。</p>
     <p class="desc">YiPuzzles 是一款简洁、轻量、隐私至上的 2048 滑块拼图游戏。这里是它的网页版本：无需安装、无广告，无追踪，以 Material You 风格精心打造。</p>
     <div class="cta">
-      <button class="btn filled" id="ctaNew">
+      <button class="btn filled" id="ctaNew" type="button">
         <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
         新游戏
       </button>
-      <button class="btn tonal" id="ctaTheme">
+      <button class="btn tonal" id="ctaTheme" type="button">
         <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 000 18 1.5 1.5 0 001.11-2.51 1.5 1.5 0 011.12-2.49H16a5 5 0 005-5c0-4.42-4.03-8-9-8zm-5.5 9a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3-4a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm5 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3 4a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg>
         个性化配色
       </button>
@@ -299,12 +302,12 @@
 <!-- Appearance dialog -->
 <dialog id="themeDlg">
   <div class="dlg">
-    <h3>外观与配色 <button class="icon-btn" data-close aria-label="关闭"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></h3>
+    <h3>外观与配色 <button class="icon-btn" data-close aria-label="关闭" type="button"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></h3>
     <h4>显示模式</h4>
     <div class="seg" id="modeSeg">
-      <button data-mode="light">浅色</button>
-      <button data-mode="dark">深色</button>
-      <button data-mode="auto">跟随系统</button>
+      <button data-mode="light" type="button">浅色</button>
+      <button data-mode="dark" type="button">深色</button>
+      <button data-mode="auto" type="button">跟随系统</button>
     </div>
     <h4>配色方案</h4>
     <div class="swatches" id="swatches"></div>
@@ -313,14 +316,14 @@
       <div><b>原版 2048 配色</b><span class="sub">使用经典的米色棋盘与橙黄方块（开启后将替代上方配色）</span></div>
       <div class="switch" id="classicSwitch" role="switch" aria-checked="false" tabindex="0"></div>
     </div>
-    <div class="foot"><button class="btn text" data-close>完成</button></div>
+    <div class="foot"><button class="btn text" data-close type="button">完成</button></div>
   </div>
 </dialog>
 
 <!-- Menu dialog -->
 <dialog id="menuDlg">
   <div class="dlg">
-    <h3>关于 YiPuzzles Web <button class="icon-btn" data-close aria-label="关闭"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></h3>
+    <h3>关于 YiPuzzles Web <button class="icon-btn" data-close aria-label="关闭" type="button"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></h3>
     <p>YiPuzzles Web 是 Android 版 YiPuzzles 2048 的网页版，沿用 Material You 设计语言，无广告、无追踪、完全离线可玩。</p>
     <h4>玩法</h4>
     <ul>
@@ -335,10 +338,10 @@
       <li><kbd>Z</kbd> 撤销　<kbd>R</kbd> 重新开始</li>
     </ul>
     <h4>数据</h4>
-    <p style="margin:0">分数、最高分与对局进度按棋盘大小分别自动保存在本机浏览器中。</p>
+    <p class="tight">分数、最高分与对局进度按棋盘大小分别自动保存在本机浏览器中。</p>
     <div class="foot">
-      <button class="btn text" id="clearBtn" style="color:#ff8a80">清除全部记录</button>
-      <button class="btn text" data-close>关闭</button>
+      <button class="btn text danger" id="clearBtn" type="button">清除全部记录</button>
+      <button class="btn text" data-close type="button">关闭</button>
     </div>
   </div>
 </dialog>
@@ -365,7 +368,8 @@
     { id: 'pink',   name: '樱花粉',   h: 330 },
     { id: 'red',    name: '玫瑰红',   h: 356 }
   ];
-  const DARK_T  = [[0,8,22],[0,12,28],[0,18,34],[0,24,78],[60,24,30],[60,32,38],[60,42,74],[0,46,62],[0,56,70],[60,56,64],[0,72,80],[30,82,86]];
+  /* [色相偏移, 饱和度, 亮度]；深色模式下低值方块必须明显亮于空格（--cell），否则"2"看起来像空位 */
+  const DARK_T  = [[0,10,31],[0,15,39],[0,21,47],[0,26,78],[60,26,36],[60,34,46],[60,44,74],[0,46,62],[0,56,70],[60,56,66],[0,72,80],[30,82,86]];
   const LIGHT_T = [[0,30,97],[0,40,90],[0,48,72],[0,40,40],[60,40,82],[60,46,66],[60,46,40],[0,50,32],[0,56,26],[60,56,30],[0,72,24],[30,82,16]];
   const CLASSIC_T = [['#eee4da','#776e65'],['#ede0c8','#776e65'],['#f2b179','#f9f6f2'],['#f59563','#f9f6f2'],['#f67c5f','#f9f6f2'],['#f65e3b','#f9f6f2'],['#edcf72','#f9f6f2'],['#edcc61','#f9f6f2'],['#edc850','#f9f6f2'],['#edc53f','#f9f6f2'],['#edc22e','#f9f6f2'],['#3c3a32','#f9f6f2']];
   const hsl = (h, s, l) => `hsl(${((h % 360) + 360) % 360},${s}%,${l}%)`;
@@ -421,7 +425,7 @@
   /* ---- Theme UI ---- */
   const swatchesEl = $('#swatches');
   SCHEMES.forEach(s => {
-    const b = document.createElement('button');
+    const b = document.createElement('button'); b.type = 'button';
     b.className = 'swatch'; b.setAttribute('role', 'radio'); b.dataset.id = s.id;
     b.innerHTML = `<span class="dot" style="background:conic-gradient(from 135deg, ${hsl(s.h,48,62)} 0 50%, ${hsl(s.h+60,40,55)} 50% 75%, ${hsl(s.h,30,40)} 75% 100%)"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>${s.name}`;
     b.addEventListener('click', () => { settings.scheme = s.id; saveSettings(); applyTheme(); });
@@ -441,7 +445,7 @@
 
   /* ---- Dialogs ---- */
   const themeDlg = $('#themeDlg'), menuDlg = $('#menuDlg');
-  const openDlg = d => d.showModal();
+  const openDlg = d => { if (!d.open) d.showModal(); };
   $('#paletteBtn').addEventListener('click', () => openDlg(themeDlg));
   $('#ctaTheme').addEventListener('click', () => openDlg(themeDlg));
   $('#menuBtn').addEventListener('click', () => openDlg(menuDlg));
@@ -461,6 +465,9 @@
   const SIZES = [4, 5, 6, 7];
   const VEC = [[0, -1], [1, 0], [0, 1], [-1, 0]]; // up right down left
   let N = 4, grid = [], score = 0, best = 0, won = false, over = false, undoStack = [], nextId = 1, overlayType = null;
+  let bestAtRoundStart = 0;   // 本局（或本次载入）开始时的最高分，用于判断"新纪录"
+  let overlayTimer = 0;       // 结算弹层的延时句柄，必须在撤销/重开/换尺寸时取消
+  let pendingMerge = [];      // 已合并、但仍需等动画结束再移除的旧方块
 
   const inb = (x, y) => x >= 0 && y >= 0 && x < N && y < N;
 
@@ -473,7 +480,7 @@
   function renderSizeRow() {
     const row = $('#sizeRow'); row.innerHTML = '';
     SIZES.forEach(s => {
-      const b = document.createElement('button');
+      const b = document.createElement('button'); b.type = 'button';
       b.className = 'chip'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(s === N));
       b.textContent = `${s}×${s}`;
       b.addEventListener('click', () => { if (s !== N) { saveState(); settings.size = s; saveSettings(); init(s); } });
@@ -501,6 +508,7 @@
     return t;
   }
   function loadMatrix(m) {
+    pendingMerge = [];
     tilesEl.innerHTML = '';
     grid = m.map((r, y) => r.map((v, x) => v ? makeTile(v, x, y, false) : null));
   }
@@ -567,8 +575,22 @@
     store.set('yp.state.' + N, { g: snapshot().g, score, won, over, undo: undoStack.slice(-20) });
   }
 
+  /* 合并动画结束后再移除旧方块：登记到 pendingMerge，可被提前结算 */
+  function finishMerge(fn) {
+    if (pendingMerge.indexOf(fn) < 0) return;
+    pendingMerge.splice(pendingMerge.indexOf(fn), 1);
+    fn();
+  }
+  function flushPending() {
+    const list = pendingMerge; pendingMerge = [];
+    list.forEach(fn => fn());
+  }
+
   function move(d) {
     if (over || overlayType) return false;
+    /* 上一次合并的旧方块可能还在等动画结束（115ms）。先让它立即消失，
+       否则快速连按时会在已经空出来的格子里留下"幽灵方块"。 */
+    flushPending();
     const [dx, dy] = VEC[d];
     const xs = [...Array(N).keys()], ys = [...Array(N).keys()];
     if (dx === 1) xs.reverse();
@@ -587,7 +609,9 @@
         o.val *= 2; o.merged = true; gain += o.val;
         t.x = nx; t.y = ny; place(t); moved = true;
         if (o.val === 2048 && !won) reached = true;
-        setTimeout(() => { t.el.remove(); renderTile(o, true); }, 115);
+        const done = () => { t.el.remove(); renderTile(o, true); };
+        pendingMerge.push(done);
+        setTimeout(() => finishMerge(done), 115);
       } else {
         grid[cy][cx] = t;
         if (cx !== x || cy !== y) { moved = true; t.x = cx; t.y = cy; place(t); }
@@ -598,8 +622,8 @@
     score += gain;
     spawn();
     updateHud(gain);
-    if (reached) { won = true; setTimeout(() => showOverlay('win'), 320); }
-    else if (!canMove()) { over = true; setTimeout(() => showOverlay('over'), 420); }
+    if (reached) { won = true; scheduleOverlay('win', 320); }
+    else if (!canMove()) { over = true; scheduleOverlay('over', 420); }
     saveState();
     return true;
   }
@@ -615,13 +639,23 @@
   function showOverlay(type) {
     overlayType = type;
     if (type === 'win') {
-      overlayEl.innerHTML = `<div class="card"><h3>🎉 你赢了！</h3><p>成功拼出 2048，当前得分 ${score}</p><div class="row"><button class="btn filled" data-act="continue">继续挑战</button><button class="btn tonal" data-act="new">新游戏</button></div></div>`;
+      overlayEl.innerHTML = `<div class="card"><h3>🎉 你赢了！</h3><p>成功拼出 2048，当前得分 ${score}</p><div class="row"><button class="btn filled" data-act="continue" type="button">继续挑战</button><button class="btn tonal" data-act="new" type="button">新游戏</button></div></div>`;
     } else {
-      overlayEl.innerHTML = `<div class="card"><h3>游戏结束</h3><p>最终得分 ${score}${score >= best && score > 0 ? ' · 新纪录！' : ''}</p><div class="row"><button class="btn filled" data-act="new">再来一局</button>${undoStack.length ? '<button class="btn tonal" data-act="undo">撤销一步</button>' : ''}</div></div>`;
+      /* 只有真的超过"本局开始时的最高分"才算新纪录（持平不算） */
+      const record = score > bestAtRoundStart && score > 0;
+      overlayEl.innerHTML = `<div class="card"><h3>游戏结束</h3><p>最终得分 ${score}${record ? ' · 新纪录！' : ''}</p><div class="row"><button class="btn filled" data-act="new" type="button">再来一局</button>${undoStack.length ? '<button class="btn tonal" data-act="undo" type="button">撤销一步</button>' : ''}</div></div>`;
     }
     requestAnimationFrame(() => overlayEl.classList.add('show'));
   }
-  function hideOverlay() { overlayType = null; overlayEl.classList.remove('show'); }
+  function hideOverlay() {
+    clearTimeout(overlayTimer); overlayTimer = 0;
+    overlayType = null; overlayEl.classList.remove('show');
+  }
+  /* 结算弹层晚于最后一步出现；期间玩家可能已经撤销/重开，因此必须可取消 */
+  function scheduleOverlay(type, delay) {
+    clearTimeout(overlayTimer);
+    overlayTimer = setTimeout(() => { overlayTimer = 0; showOverlay(type); }, delay);
+  }
   overlayEl.addEventListener('click', e => {
     const a = e.target.closest('[data-act]'); if (!a) return;
     const act = a.dataset.act;
@@ -632,26 +666,57 @@
 
   function newGame(resetBest) {
     hideOverlay();
+    pendingMerge = [];
     grid = emptyGrid(); tilesEl.innerHTML = '';
     score = 0; won = false; over = false; undoStack = [];
     if (resetBest) best = 0;
+    bestAtRoundStart = best;
     spawn(); spawn();
     updateHud(0); saveState();
+  }
+
+  /* ---- 存档校验：localStorage 可能被手工改坏，或来自旧/新版本 ---- */
+  const isTileVal = v => typeof v === 'number' && Number.isInteger(v) && v >= 2 && v <= (1 << 30) && (v & (v - 1)) === 0;
+  const fixScore = v => {
+    const n = (typeof v === 'string' && v.trim() !== '') ? Number(v) : v;   // 兼容历史上被写成字符串的分数
+    return (typeof n === 'number' && isFinite(n) && n > 0) ? Math.floor(n) : 0;
+  };
+  function fixGrid(g) {
+    if (!Array.isArray(g) || g.length !== N) return null;
+    const out = [];
+    for (const row of g) {
+      if (!Array.isArray(row) || row.length !== N) return null;
+      out.push(row.map(v => isTileVal(v) ? v : 0));   // 非法值按空格处理，绝不让 --tb0 之类的无效样式漏到页面上
+    }
+    return out;
+  }
+  function fixUndo(list) {
+    if (!Array.isArray(list)) return [];
+    const out = [];
+    for (const s of list) {
+      if (!s || typeof s !== 'object') continue;
+      const g = fixGrid(s.g);
+      if (g) out.push({ g, score: fixScore(s.score) });
+    }
+    return out.slice(-20);
   }
 
   function init(size) {
     N = size; settings.size = size;
     hudAnimate = false;
     buildBoard(); renderSizeRow();
-    best = store.get('yp.best.' + N, 0);
+    best = fixScore(store.get('yp.best.' + N, 0));
     hideOverlay();
     const st = store.get('yp.state.' + N, null);
-    const valid = st && Array.isArray(st.g) && st.g.length === N && st.g.every(r => Array.isArray(r) && r.length === N);
-    if (valid) {
-      grid = emptyGrid(); loadMatrix(st.g);
-      score = st.score || 0; won = !!st.won; over = !!st.over;
-      undoStack = (st.undo || []).filter(s => s.g && s.g.length === N);
+    const saved = (st && typeof st === 'object') ? fixGrid(st.g) : null;
+    if (saved && saved.some(row => row.some(v => v))) {   // 空棋盘无法自发新块，视为无存档
+      grid = emptyGrid(); loadMatrix(saved);
+      score = fixScore(st.score); won = st.won === true; over = st.over === true;
+      undoStack = fixUndo(st.undo);
+      if (over && canMove()) over = false;        // 存档标记了结束、局面却还能走 → 交回给玩家
+      else if (!over && !canMove()) over = true;  // 存档漏标结束、实际已无解 → 补一个结束提示
       updateHud(0);
+      bestAtRoundStart = best;   // 以载入后实际显示的最高分为基准，避免"新纪录"误报
       if (over) { overlayEl.style.transition = 'none'; showOverlay('over'); setTimeout(() => overlayEl.style.transition = '', 50); }
     } else newGame();
     hudAnimate = true;
