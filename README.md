@@ -15,6 +15,7 @@
 <p align="center">
   [🇺🇸 English] • <a href="README_zh-CN.md">🇨🇳 中文</a> •
   <a href="https://2048.92li.uk">🌐 Official Website</a> •
+  <a href="h5-demo/index.html">🌱 Web (H5)</a> •
   <a href="https://github.com/lingyicute/YiPuzzles/releases">📦 Download APK</a> •
   <a href="https://github.com/lingyicute/YiPuzzles/issues">🐛 Report Bug</a>
 </p>
