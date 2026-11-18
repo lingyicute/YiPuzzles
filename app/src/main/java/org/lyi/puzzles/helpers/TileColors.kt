@@ -176,10 +176,19 @@ object TileColors {
     private fun textColorFor(@ColorInt background: Int): Int {
         val hsl = FloatArray(3)
         ColorUtils.colorToHSL(background, hsl)
-        val dark = ColorUtils.calculateLuminance(background) > 0.30
         hsl[1] = (hsl[1] * 0.6f).coerceAtMost(0.5f)
-        hsl[2] = if (dark) 0.12f else 0.97f
-        return ColorUtils.HSLToColor(hsl)
+        hsl[2] = 0.12f
+        val dark = ColorUtils.HSLToColor(hsl)
+        hsl[2] = 0.97f
+        val light = ColorUtils.HSLToColor(hsl)
+        val darkContrast = ColorUtils.calculateContrast(dark, background)
+        val lightContrast = ColorUtils.calculateContrast(light, background)
+        if (maxOf(darkContrast, lightContrast) >= 4.5) {
+            return if (darkContrast >= lightContrast) dark else light
+        }
+        // Small tiles need normal-text contrast, even for unusual wallpaper hues.
+        return if (ColorUtils.calculateContrast(Color.BLACK, background) >=
+            ColorUtils.calculateContrast(Color.WHITE, background)) Color.BLACK else Color.WHITE
     }
 
     // ------------------------------------------------------------------ static palettes
