@@ -20,12 +20,10 @@ package org.lyi.puzzles.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
 import androidx.preference.PreferenceManager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +35,7 @@ import android.widget.TextView;
 import org.lyi.puzzles.R;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
@@ -91,6 +90,8 @@ public class GameActivity extends BaseActivityWithoutNavBar {
     private boolean moved;
     private boolean newGame;
     private boolean won2048;
+    private boolean winPending;
+    private AlertDialog roundDialog;
     private boolean gameOver;
     private boolean undo;
     private boolean animationActivated;
@@ -125,6 +126,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
     public void onResume() {
         super.onResume();
         startingTime = SystemClock.elapsedRealtime();
+        presentRoundDialog();
     }
 
     @Override
@@ -233,6 +235,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         last_points = gameState.last_points;
         undo = gameState.undo;
         won2048 = false;
+        winPending = gameState.winPending;
         gameOver = false;
     }
 
@@ -250,8 +253,12 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         gameState.points = points;
         gameState.last_points = last_points;
         gameState.undo = undo;
+        boolean hasWon = hasWinningTile();
+        winPending = hasWon && (!won2048 || winPending);
+        won2048 = hasWon;
+        gameState.winPending = winPending;
+        gameOver = !canMove();
         updateHighestNumber();
-        check2048();
 
     }
 
@@ -280,8 +287,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                 elements[i][j].setNumber(gameState.getNumber(i, j));
 
                 elements[i][j].drawItem();
-                if (elements[i][j].getNumber() >= WINTHRESHOLD)
-                    won2048 = true;
                 RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(number_size, number_size);
                 lp.leftMargin = gap + j * (number_size + gap);
                 lp.topMargin = gap + i * (number_size + gap);
@@ -301,13 +306,15 @@ public class GameActivity extends BaseActivityWithoutNavBar {
             }
         }
         if (newGame) {
-            moved = true;
             addNumber();
-            moved = true;
             addNumber();
             newGame = false;
         }
+        // Existing wins from older archives are already acknowledged.
+        won2048 = hasWinningTile();
+        updateGameState();
         setListener();
+        presentRoundDialog();
     }
 
     public void switchElementPositions(Element e1, Element e2) {
@@ -333,6 +340,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
     }
 
     private boolean handleSwipeTop() {
+        if (winPending || gameOver || roundDialog != null) return false;
         Element[][] temp = deepCopy(elements);
         int temp_points = points;
         moved = false;
@@ -394,23 +402,11 @@ public class GameActivity extends BaseActivityWithoutNavBar {
             }
 
         }
-        if (moved) {
-            gameStatistics.addMoves(1);
-            last_points = temp_points;
-            last_elements = temp;
-            undoButton.setVisibility(View.VISIBLE);
-            undo = true;
-        }
-        if (moved)
-            gameStatistics.moveT();
-        addNumber();
-        setDPositions(animationActivated);
-        updateGameState();
-        //es wurde nach oben gewischt, hier den Code einfügen
-        return false;
+        return finishMove(temp, temp_points, gameStatistics::moveT);
     }
 
     private boolean handleSwipeRight() {
+        if (winPending || gameOver || roundDialog != null) return false;
         Element[][] temp = deepCopy(elements);
         int temp_points = points;
         moved = false;
@@ -474,24 +470,11 @@ public class GameActivity extends BaseActivityWithoutNavBar {
             }
 
         }
-        if (moved) {
-            gameStatistics.addMoves(1);
-            last_points = temp_points;
-            last_elements = temp;
-            undoButton.setVisibility(View.VISIBLE);
-            undo = true;
-        }
-        if (moved)
-            gameStatistics.moveR();
-        addNumber();
-        setDPositions(animationActivated);
-        updateGameState();
-
-        //es wurde nach rechts gewischt, hier den Code einfügen
-        return false;
+        return finishMove(temp, temp_points, gameStatistics::moveR);
     }
 
     private boolean handleSwipeLeft() {
+        if (winPending || gameOver || roundDialog != null) return false;
         Element[][] temp = deepCopy(elements);
         int temp_points = points;
         moved = false;
@@ -554,23 +537,11 @@ public class GameActivity extends BaseActivityWithoutNavBar {
             }
 
         }
-        if (moved) {
-            gameStatistics.addMoves(1);
-            last_points = temp_points;
-            last_elements = temp;
-            undoButton.setVisibility(View.VISIBLE);
-            undo = true;
-        }
-        if (moved)
-            gameStatistics.moveL();
-        addNumber();
-        setDPositions(animationActivated);
-        updateGameState();
-        //es wurde nach links gewischt, hier den Code einfügen
-        return false;
+        return finishMove(temp, temp_points, gameStatistics::moveL);
     }
 
     private boolean handleSwipeBottom() {
+        if (winPending || gameOver || roundDialog != null) return false;
         Element[][] temp = deepCopy(elements);
         int temp_points = points;
         moved = false;
@@ -633,20 +604,28 @@ public class GameActivity extends BaseActivityWithoutNavBar {
             }
 
         }
-        if (moved) {
-            gameStatistics.addMoves(1);
-            last_points = temp_points;
-            last_elements = temp;
-            undoButton.setVisibility(View.VISIBLE);
-            undo = true;
-        }
-        if (moved)
-            gameStatistics.moveD();
-        addNumber();
+        return finishMove(temp, temp_points, gameStatistics::moveD);
+    }
+
+    private boolean finishMove(Element[][] previous, int previousPoints, Runnable countDirection) {
+        if (!moved) return false;
+        gameStatistics.addMoves(1);
+        countDirection.run();
+        last_points = previousPoints;
+        last_elements = previous;
+        undo = true;
+        undoButton.setVisibility(View.VISIBLE);
         setDPositions(animationActivated);
+        addNumber();
+        if (points > record) {
+            record = points;
+            gameStatistics.setRecord(record);
+            textFieldRecord.setText(String.valueOf(record));
+        }
+        textFieldPoints.setText(String.valueOf(points));
         updateGameState();
-        //es wurde nach unten gewischt, hier den Code einfügen
-        return false;
+        presentRoundDialog();
+        return true;
     }
 
     @Override
@@ -709,38 +688,23 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         }
     }
 
-    public void check2048() {
-        if (won2048 == false) {
-            for (int i = 0; i < elements.length; i++) {
-                for (int j = 0; j < elements[i].length; j++) {
-                    if (elements[i][j].number == WINTHRESHOLD) {
-
-                        saveStatisticsToFile(gameStatistics);
-                        //MESSAGE
-                        new MaterialAlertDialogBuilder(this)
-                                .setTitle((this.getResources().getString(R.string.Titel_V_Message)))
-                                .setMessage((this.getResources().getString(R.string.Winning_Message)))
-                                .setNegativeButton((this.getResources().getString(R.string.No_Message)), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        onBackPressed();
-
-                                    }
-                                })
-                                .setPositiveButton((this.getResources().getString(R.string.Yes_Message)), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                    }
-                                })
-                                .setCancelable(false)
-                                .create().show();
-                        won2048 = true;
-                    }
-                }
-            }
+    private boolean hasWinningTile() {
+        for (Element[] row : elements) {
+            for (Element tile : row) if (tile.number >= WINTHRESHOLD) return true;
         }
+        return false;
     }
 
+    private boolean canMove() {
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < n; x++) {
+                int value = elements[y][x].number;
+                if (value == 0 || x + 1 < n && elements[y][x + 1].number == value
+                        || y + 1 < n && elements[y + 1][x].number == value) return true;
+            }
+        }
+        return false;
+    }
 
     public void setDPositions(boolean animation) {
         for (Element[] i : elements) {
@@ -846,82 +810,69 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         }
     }
 
-    public void addNumber() {
-
-        if (points > record) {
-            record = points;
-            gameStatistics.setRecord(record);
-            textFieldRecord.setText("" + record);
+    private void addNumber() {
+        Element[] empty = new Element[n * n];
+        int count = 0;
+        for (Element[] row : elements) {
+            for (Element tile : row) if (tile.number == 0) empty[count++] = tile;
         }
-        if (moved) {
-            gameOver = false;
-            moved = false;
-            textFieldPoints.setText("" + points);
-            Element[] empty_fields = new Element[n * n];
-            int counter = 0;
-            for (int i = 0; i < elements.length; i++) {
-                for (int j = 0; j < elements[i].length; j++) {
-                    if (elements[i][j].number == 0) {
-                        empty_fields[counter++] = elements[i][j];
-                    }
-                }
-            }
-            if (counter > 0) {
-                int index = (int) (Math.random() * counter);
-                int number = 2;
-                if (Math.random() > PROBABILITY_FOR_TWO)
-                    number = 4;
-
-                empty_fields[index].setNumber(number);
-                empty_fields[index].drawItem();
-                if (animationActivated) {
-                    empty_fields[index].setAlpha(0);
-                    empty_fields[index].animate().alpha(1).setInterpolator(new LinearInterpolator()).setStartDelay(MOVINGSPEED).setDuration(ADDINGSPEED).start();
-                }
-                if (counter == 1) {
-                    gameOver = true;
-                    for (int i = 0; i < elements.length; i++) {
-                        for (int j = 0; j < elements[i].length; j++) {
-                            if ((i + 1 < elements.length && elements[i][j].number == elements[i + 1][j].number) || (j + 1 < elements[i].length && elements[i][j].number == elements[i][j + 1].number)) {
-                                gameOver = false;
-                            }
-                        }
-                    }
-                }
-            }
-            updateGameState();
-
-            if (gameOver) {
-                gameOver();
-            }
+        if (count == 0) return;
+        Element tile = empty[(int) (Math.random() * count)];
+        tile.setNumber(Math.random() < PROBABILITY_FOR_TWO ? 2 : 4);
+        tile.drawItem();
+        if (animationActivated) {
+            tile.setAlpha(0);
+            tile.animate().alpha(1).setInterpolator(new LinearInterpolator())
+                    .setStartDelay(MOVINGSPEED).setDuration(ADDINGSPEED).start();
         }
-        Log.i("number of elements", "" + number_field.getChildCount() + ", " + number_field_background.getChildCount());
     }
 
-    public void gameOver() {
-        Log.i("record", "" + record + ", " + gameStatistics.getRecord());
-        saveStatisticsToFile(gameStatistics);
-        new MaterialAlertDialogBuilder(this)
-                .setTitle((this.getResources().getString(R.string.Titel_L_Message, points)))
-                .setMessage(this.getResources().getString(R.string.Lost_Message, points))
-                .setNegativeButton((this.getResources().getString(R.string.No_Message)), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+    private void presentRoundDialog() {
+        if ((!winPending && !gameOver) || roundDialog != null || elements == null
+                || startingTime < 0 || isFinishing()) return;
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this).setCancelable(false);
+        if (winPending) {
+            builder.setTitle(R.string.Titel_V_Message)
+                    .setMessage(R.string.Winning_Message)
+                    .setNegativeButton(R.string.No_Message, (dialog, which) -> {
+                        acknowledgeWin();
+                        finish();
+                    })
+                    .setPositiveButton(R.string.Yes_Message, (dialog, which) -> acknowledgeWin());
+        } else {
+            builder.setTitle(getString(R.string.Titel_L_Message, points))
+                    .setMessage(getString(R.string.Lost_Message, points))
+                    .setNegativeButton(R.string.No_Message, (dialog, which) -> {
                         saveState = false;
                         GameStorage.deleteState(getFilesDir(), n);
                         finish();
+                    })
+                    .setPositiveButton(R.string.Yes_Message, (dialog, which) -> createNewGame());
+            if (undo) builder.setNeutralButton(R.string.undo, (dialog, which) -> handleUndo());
+        }
 
-                    }
-                })
-                .setPositiveButton((this.getResources().getString(R.string.Yes_Message)), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        createNewGame();
-                    }
-                })
-                .setCancelable(false)
-                .create().show();
-        Log.i("record", "danach");
+        saveStatisticsToFile(gameStatistics);
+        roundDialog = builder.create();
+        roundDialog.setOnDismissListener(dialog -> {
+            roundDialog = null;
+            // The winning move can also fill the last playable cell.
+            presentRoundDialog();
+        });
+        roundDialog.show();
+    }
+
+    private void acknowledgeWin() {
+        winPending = false;
+        gameState.winPending = false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (roundDialog != null) {
+            roundDialog.setOnDismissListener(null);
+            roundDialog.dismiss();
+        }
+        super.onDestroy();
     }
 
     @Override

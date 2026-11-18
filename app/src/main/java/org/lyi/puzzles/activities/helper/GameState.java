@@ -41,6 +41,7 @@ public class GameState implements Serializable {
     public int points = 0;
     public int last_points = 0;
     public boolean undo = false;
+    public boolean winPending;
 
     public GameState(int size) {
         n = size;

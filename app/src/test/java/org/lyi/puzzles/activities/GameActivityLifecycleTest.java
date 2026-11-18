@@ -3,8 +3,11 @@ package org.lyi.puzzles.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.View;
+
+import androidx.appcompat.app.AlertDialog;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,12 +20,14 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowDialog;
 import org.robolectric.shadows.ShadowSystemClock;
 
 import java.io.File;
 import java.time.Duration;
 
 import static org.junit.Assert.*;
+import static org.robolectric.Shadows.shadowOf;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 34)
@@ -93,6 +98,48 @@ public class GameActivityLifecycleTest {
             long second = GameStorage.readStatistics(files, 4).getTimePlayed() - first;
             assertTrue(second >= 3_000 && second < 5_000);
         }
+    }
+
+    @Test public void pendingWinSurvivesRecreationAndCanBeAcknowledged() {
+        GameState state = new GameState(4);
+        state.numbers[0] = state.numbers[1] = 1024;
+        GameStorage.writeState(files, 4, state);
+        try (ActivityController<GameActivity> controller = open(4, false)) {
+            press(controller.get(), KeyEvent.KEYCODE_DPAD_LEFT);
+            assertTrue(visibleDialog().isShowing());
+            controller.recreate();
+            layout(controller.get());
+            AlertDialog restored = visibleDialog();
+            assertTrue(restored.isShowing());
+            restored.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+            shadowOf(Looper.getMainLooper()).idle();
+            assertFalse(restored.isShowing());
+            controller.pause();
+            assertFalse(GameStorage.readState(files, 4).winPending);
+        }
+    }
+
+    @Test public void savedTerminalBoardOffersUndoAndCannotReuseItAfterResume() {
+        GameState state = new GameState(4);
+        state.numbers = new int[]{2, 4, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 4, 2, 4, 2};
+        state.last_numbers = state.numbers.clone();
+        state.last_numbers[15] = 0;
+        state.undo = true;
+        GameStorage.writeState(files, 4, state);
+        try (ActivityController<GameActivity> controller = open(4, false)) {
+            AlertDialog dialog = visibleDialog();
+            assertTrue(dialog.isShowing());
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).performClick();
+            shadowOf(Looper.getMainLooper()).idle();
+            assertFalse(dialog.isShowing());
+            assertArrayEquals(state.last_numbers, numbers(controller.get()));
+            controller.pause();
+            assertFalse(GameStorage.readState(files, 4).undo);
+        }
+    }
+
+    private static AlertDialog visibleDialog() {
+        return (AlertDialog) ShadowDialog.getLatestDialog();
     }
 
     private ActivityController<GameActivity> open(int size, boolean fresh) {
