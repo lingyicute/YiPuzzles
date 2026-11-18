@@ -81,7 +81,7 @@ YiPuzzles 在清单文件中**不申请任何权限**。所有游戏数据（棋
 在 Android 12+ 上，YiPuzzles 会从你的壁纸中派生整套配色，让棋盘、数字块与主页预览与设备浑然一体。如果你更喜欢固定的外观，随时可以切回 2048 经典配色或深蓝方案。
 
 ### 3. 稳健、有测试保障的游戏引擎
-游戏核心（棋盘状态、合并与计分逻辑）保持小而纯粹，并由 **JUnit / Robolectric 单元测试**覆盖棋盘逻辑。**GitHub Actions** 会在每次推送时构建 Release APK，并自动发布**每日构建（nightly）**，保证始终有新鲜的、可复现的下载。
+**JUnit / Robolectric 测试**覆盖棋盘预览、存档与 Activity 生命周期。**GitHub Actions** 仅在默认分支通过测试与 Lint 后发布已签名的 Nightly。
 
 <br>
 
@@ -119,7 +119,9 @@ YiPuzzles 在清单文件中**不申请任何权限**。所有游戏数据（棋
    ./gradlew assembleRelease
    ```
 
-生成的 APK 位于 `app/build/outputs/apk/`（文件名为 `yipuzzles-<variant>-v<version>.apk`）。
+生成的 APK 位于 `app/build/outputs/apk/`（文件名为 `yipuzzles-<variant>-v<version>.apk`）。 本地构建的 Release APK 未签名；本地测试请安装 Debug APK，或先自行签名。
+
+Nightly 采用独立应用 ID `org.lyi.puzzles.nightly`，不会覆盖正式版或其存档。若需要直接升级 Nightly，请为 GitHub Actions 配置专用且持久的签名密钥：`NIGHTLY_KEYSTORE_BASE64`、`NIGHTLY_KEYSTORE_PASSWORD`、`NIGHTLY_KEY_ALIAS` 和 `NIGHTLY_KEY_PASSWORD`。未配置时每次构建使用一次性密钥；更新前须卸载旧 Nightly，并会丢失该 Nightly 的本地进度。
 
 <br>
 

@@ -81,13 +81,13 @@ YiPuzzles declares **no permissions at all** in its manifest. All game state (bo
 On Android 12+, YiPuzzles derives its color scheme from your wallpaper, so the board, tiles, and home-screen previews all blend with the rest of your device. Prefer a fixed look? Fall back to the original 2048 palette or the deep blue scheme at any time.
 
 ### 3. Robust, Test-Backed Game Engine
-The game core (board state, merges, and score calculation) is kept small and pure, with **JUnit / Robolectric unit tests** covering the board logic. **GitHub Actions** builds the release APK on every push and automatically publishes a **nightly build**, so there is always a fresh, reproducible download.
+**JUnit / Robolectric tests** cover board previews, saved games and activity lifecycle. **GitHub Actions** runs tests and lint before publishing signed nightlies from the default branch.
 
 <br>
 
 ## 📥 Download & Installation
 
-- **[GitHub Releases](https://github.com/lingyicute/YiPuzzles/releases)** — stable releases plus an automatically built **nightly** on every push.
+- **[GitHub Releases](https://github.com/lingyicute/YiPuzzles/releases)** — stable releases plus a verified **nightly** for the default branch.
 
 ### System Requirements
 - **Android Version**: Android 5.0 (Lollipop, API Level 21) or above.
@@ -119,7 +119,9 @@ The game core (board state, merges, and score calculation) is kept small and pur
    ./gradlew assembleRelease
    ```
 
-The compiled APKs will be located under `app/build/outputs/apk/` (named `yipuzzles-<variant>-v<version>.apk`).
+The compiled APKs will be located under `app/build/outputs/apk/` (named `yipuzzles-<variant>-v<version>.apk`). The local release build is unsigned; install the debug build for local testing or sign the release yourself.
+
+Nightlies use the separate application ID `org.lyi.puzzles.nightly`, so they do not overwrite the stable app or its data. To enable in-place nightly updates, configure the GitHub Actions secrets `NIGHTLY_KEYSTORE_BASE64`, `NIGHTLY_KEYSTORE_PASSWORD`, `NIGHTLY_KEY_ALIAS` and `NIGHTLY_KEY_PASSWORD` with a dedicated, persistent signing key. Without these secrets, CI signs nightlies with a disposable key; uninstall the previous nightly before installing another one, which removes that nightly's local progress.
 
 <br>
 
