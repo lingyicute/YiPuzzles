@@ -138,6 +138,23 @@ public class GameActivityLifecycleTest {
         }
     }
 
+    @Test public void largestTilesDoNotOverflowAndScoreStaysRepresentable() {
+        GameState state = new GameState(4);
+        state.numbers[0] = state.numbers[1] = 1 << 30;
+        state.numbers[4] = state.numbers[5] = 1 << 29;
+        state.points = Integer.MAX_VALUE - 10;
+        GameStorage.writeState(files, 4, state);
+        try (ActivityController<GameActivity> controller = open(4, false)) {
+            GameActivity activity = controller.get();
+            press(activity, KeyEvent.KEYCODE_DPAD_LEFT);
+            assertEquals(1 << 30, activity.elements[0][0].number);
+            assertEquals(1 << 30, activity.elements[0][1].number);
+            assertEquals(1 << 30, activity.elements[1][0].number);
+            controller.pause();
+            assertEquals(Integer.MAX_VALUE, GameStorage.readState(files, 4).points);
+        }
+    }
+
     private static AlertDialog visibleDialog() {
         return (AlertDialog) ShadowDialog.getLatestDialog();
     }

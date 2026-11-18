@@ -98,6 +98,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
     private boolean saveState = true;
 
     private static final int WINTHRESHOLD = 2048;
+    private static final int MAX_TILE = 1 << 30;
     private static final double PROBABILITY_FOR_TWO = 0.9;
     private View.OnTouchListener swipeListener;
     private GameStatistics gameStatistics;
@@ -353,7 +354,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
 
             for (int j = 1; j < elements[i].length; j++) {
-                if (elements[j][i].number != 0 && (s.number == 0 || s.number == elements[j][i].number)) {
+                if (elements[j][i].number != 0 && (s.number == 0 || canMerge(s.number, elements[j][i].number))) {
                     moved = true;
                     elements[j][i].setNumber(s.number + elements[j][i].number);
                     elements[s.posX][s.posY].setNumber(0);
@@ -362,7 +363,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                     elements[j][i] = elements[s.posX][s.posY];
                     elements[s.posX][s.posY] = z;
                     if (s.number != 0)
-                        points += elements[s.posX][s.posY].number;
+                        points = (int) Math.min(Integer.MAX_VALUE, (long) points + elements[s.posX][s.posY].number);
                     if (s.number != 0)
                         s.posX++;
                     j = s.posX;
@@ -418,7 +419,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
 
             for (int j = elements[i].length - 2; j >= 0; j--) {
-                if (elements[i][j].number != 0 && (s.number == 0 || s.number == elements[i][j].number)) {
+                if (elements[i][j].number != 0 && (s.number == 0 || canMerge(s.number, elements[i][j].number))) {
                     moved = true;
 
                     elements[i][j].setNumber(s.number + elements[i][j].number);
@@ -429,7 +430,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                     elements[s.posX][s.posY] = z;
 
                     if (s.number != 0)
-                        points += elements[s.posX][s.posY].number;
+                        points = (int) Math.min(Integer.MAX_VALUE, (long) points + elements[s.posX][s.posY].number);
                     if (s.number != 0)
                         s.posY--;
                     j = s.posY;
@@ -486,7 +487,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
 
             for (int j = 1; j < elements[i].length; j++) {
-                if (elements[i][j].number != 0 && (s.number == 0 || s.number == elements[i][j].number)) {
+                if (elements[i][j].number != 0 && (s.number == 0 || canMerge(s.number, elements[i][j].number))) {
                     moved = true;
 
 
@@ -498,7 +499,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                     elements[s.posX][s.posY] = z;
 
                     if (s.number != 0)
-                        points += elements[s.posX][s.posY].number;
+                        points = (int) Math.min(Integer.MAX_VALUE, (long) points + elements[s.posX][s.posY].number);
                     if (s.number != 0)
                         s.posY++;
                     j = s.posY;
@@ -553,7 +554,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
 
             for (int j = elements[i].length - 2; j >= 0; j--) {
-                if (elements[j][i].number != 0 && (s.number == 0 || s.number == elements[j][i].number)) {
+                if (elements[j][i].number != 0 && (s.number == 0 || canMerge(s.number, elements[j][i].number))) {
                     moved = true;
 
                     elements[j][i].setNumber(s.number + elements[j][i].number);
@@ -564,7 +565,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                     elements[s.posX][s.posY] = z;
 
                     if (s.number != 0)
-                        points += elements[s.posX][s.posY].number;
+                        points = (int) Math.min(Integer.MAX_VALUE, (long) points + elements[s.posX][s.posY].number);
                     if (s.number != 0)
                         s.posX--;
                     j = s.posX;
@@ -695,12 +696,16 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         return false;
     }
 
+    private static boolean canMerge(int first, int second) {
+        return first < MAX_TILE && first == second;
+    }
+
     private boolean canMove() {
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
                 int value = elements[y][x].number;
-                if (value == 0 || x + 1 < n && elements[y][x + 1].number == value
-                        || y + 1 < n && elements[y + 1][x].number == value) return true;
+                if (value == 0 || (x + 1 < n && canMerge(value, elements[y][x + 1].number))
+                        || (y + 1 < n && canMerge(value, elements[y + 1][x].number))) return true;
             }
         }
         return false;
