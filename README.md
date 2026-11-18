@@ -59,7 +59,7 @@ Most 2048 games in the stores fall into one of two camps: cluttered with adverti
   - Optional **tile move & merge animations** for smooth, satisfying feedback.
 
 - **🔒 100% Privacy, Offline & Ad-Free**
-  - **Zero permissions** — the app literally cannot touch anything outside itself.
+  - **No Android runtime permissions.** If Android system backup is enabled, Android may back up local saves and preferences under your device settings.
   - **No ads, no tracking, no analytics, no accounts, no network access at all.**
   - Licensed under **GPL-3.0**.
 
