@@ -155,8 +155,6 @@ public class MainActivity extends BaseActivity {
                 Intent intent = new Intent(MainActivity.this, GameActivity.class);
                 intent.putExtra("n", temp);
                 intent.putExtra("new", true);
-                intent.putExtra("filename", "state" + temp + ".txt");
-                intent.putExtra("undo", false);
                 createBackStack(intent);
             }
         });
@@ -166,8 +164,6 @@ public class MainActivity extends BaseActivity {
                 Intent intent = new Intent(MainActivity.this, GameActivity.class);
                 intent.putExtra("n", temp);
                 intent.putExtra("new", false);
-                intent.putExtra("filename", "state" + temp + ".txt");
-                intent.putExtra("undo", false);
                 createBackStack(intent);
             }
         });

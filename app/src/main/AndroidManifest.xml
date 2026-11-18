@@ -67,7 +67,7 @@
                 android:value="org.lyi.puzzles.activities.MainActivity" />
         </activity>
         <activity
-            android:exported="true"
+            android:exported="false"
             android:name=".activities.GameActivity"
             android:label="@string/title_activity_game"
             android:parentActivityName=".activities.MainActivity">

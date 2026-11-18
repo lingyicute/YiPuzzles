@@ -113,8 +113,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
     View.OnTouchListener swipeListener;
 
 
-    static String filename;
-
     SharedPreferences sharedPref;
 
     GameStatistics gameStatistics = new GameStatistics(n);
@@ -196,7 +194,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle(R.string.title_activity_game);
-            int size = getIntent().getIntExtra("n", 4);
+            int size = requestedBoardSize();
             actionBar.setSubtitle(size + "x" + size);
         }
     }
@@ -279,13 +277,21 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
     }
 
+    private int requestedBoardSize() {
+        int size = getIntent().getIntExtra("n", 4);
+        return size >= 4 && size <= 7 ? size : 4;
+    }
+
+    private String stateFilename() {
+        return "state" + n + ".txt";
+    }
+
     public void initializeState() {
         points = 0;
         Intent intent = getIntent();
-        n = intent.getIntExtra("n", 4);
+        n = requestedBoardSize();
         newGame = intent.getBooleanExtra("new", true);
-        filename = intent.getStringExtra("filename");
-        undo = intent.getBooleanExtra("undo", false);
+        undo = false;
         if (!newGame) {
             gameState = readStateFromFile();
             points = gameState.points;
@@ -322,7 +328,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
     public void initialize() {
         Log.i("activity", "initialize");
-        if (getIntent().getIntExtra("n", 4) != n || createNewGame) {
+        if (requestedBoardSize() != n || createNewGame) {
             initializeState();
 
         }
@@ -1042,9 +1048,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
     public void saveStateToFile(GameState nS) {
         if (saveState) {
             try {
-                if (filename == null)
-                    filename = "state" + n + ".txt";
-                File file = new File(getFilesDir(), filename);
+                File file = new File(getFilesDir(), stateFilename());
                 FileOutputStream fileOut = new FileOutputStream(file);
                 ObjectOutputStream out = new ObjectOutputStream(fileOut);
                 out.writeObject(nS);
@@ -1058,10 +1062,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
     public boolean deleteStateFile() {
         try {
-            if (filename == null)
-                filename = "state" + n + ".txt";
-            File directory = getFilesDir();
-            File f = new File(directory, filename);
+            File f = new File(getFilesDir(), stateFilename());
             return f.delete();
         } catch (Exception e) {
             e.printStackTrace();
@@ -1072,7 +1073,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
     public GameState readStateFromFile() {
         GameState nS = new GameState(n);
         try {
-            File file = new File(getFilesDir(), filename);
+            File file = new File(getFilesDir(), stateFilename());
             FileInputStream fileIn = new FileInputStream(file);
             ObjectInputStream in = new ObjectInputStream(fileIn);
             nS = (GameState) in.readObject();
