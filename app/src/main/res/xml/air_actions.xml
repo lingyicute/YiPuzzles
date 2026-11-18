@@ -36,7 +36,7 @@
         id="undo"
         label="@string/undo"
         priority="5"
-        trigger_key="CTRL+Z">
+        trigger_key="CTRL_LEFT+Z">
         <preference name="gesture" value="circle_cw|circle_ccw"/>
         <preference name="motion_only" value="true"/>
     </action>
