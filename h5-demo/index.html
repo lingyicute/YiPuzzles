@@ -102,10 +102,10 @@
   .titlebar h2 { margin:0; font-size:32px; font-weight:800; }
   .titlebar span { color:var(--on-var); font-size:14px; font-weight:600; }
   .hud { display:flex; gap:10px; align-items:center; margin-bottom:14px; }
-  .score-card { flex:1; min-width:0; position:relative; border-radius:22px; padding:12px 8px 10px; text-align:center; background:var(--sec-c); color:var(--on-sec-c); transition:background .35s; }
+  .score-card { flex:1; min-width:0; container-type:inline-size; position:relative; border-radius:22px; padding:12px 8px 10px; text-align:center; background:var(--sec-c); color:var(--on-sec-c); transition:background .35s; }
   .score-card.best { background:var(--pri-c); color:var(--on-pri-c); }
   .score-card .label { font-size:12px; font-weight:700; letter-spacing:2px; opacity:.8; }
-  .score-card .value { font-size:clamp(22px,6vw,28px); font-weight:800; margin-top:2px; font-variant-numeric:tabular-nums; }
+  .score-card .value { font-size:min(clamp(22px,6vw,28px), calc(150cqw / var(--digits,1))); font-weight:800; margin-top:2px; font-variant-numeric:tabular-nums; }
   /* 机械翻滚数字（分位滚动） */
   .score-card .value { display:flex; justify-content:center; line-height:1.2; }
   .rd { display:block; height:1.2em; width:1ch; overflow:hidden; }
@@ -145,7 +145,7 @@
   }
   .tile .inner.d3 { font-size:calc(100cqw / var(--n) * .34); }
   .tile .inner.d4 { font-size:calc(100cqw / var(--n) * .27); }
-  .tile .inner.d5 { font-size:calc(100cqw / var(--n) * .22); }
+  .tile .inner.d5 { font-size:calc(110cqw / var(--n) / var(--digits)); }
   .tile .inner.glow { box-shadow:0 0 22px 2px color-mix(in srgb, currentColor 0%, var(--glow, transparent)); }
   .tile .inner.new { animation:appear .2s ease .1s backwards; }
   .tile .inner.pop { animation:pop .2s ease; }
@@ -503,6 +503,7 @@
   const scoreEl = $('#score'), bestEl = $('#best'), undoBtn = $('#undoBtn');
   const SIZES = [4, 5, 6, 7];
   const UNDO_LIMIT = 30;
+  const MAX_TILE = 2 ** 52; // 最大的安全整数形式的 2 的幂
   const VEC = [[0, -1], [1, 0], [0, 1], [-1, 0]]; // up right down left
   let N = 4, grid = [], score = 0, best = 0, won = false, winPending = false, over = false, undoStack = [], nextId = 1, overlayType = null;
   let bestAtRoundStart = 0;   // 本局开始时的最高分，恢复对局时不改写
@@ -537,6 +538,7 @@
     inner.style.background = `var(--tb${k})`;
     inner.style.color = `var(--tf${k})`;
     const len = String(t.val).length;
+    inner.style.setProperty('--digits', len);
     inner.className = 'inner' + (len >= 3 ? ' d' + Math.min(len, 5) : '') + (inner.classList.contains('new') ? ' new' : '');
     if (k >= 11) inner.style.boxShadow = `0 0 24px 4px color-mix(in srgb, var(--tb${k}) 55%, transparent)`; else inner.style.boxShadow = '';
     if (pop) { inner.classList.remove('new'); void inner.offsetWidth; inner.classList.add('pop'); }
@@ -570,8 +572,8 @@
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
       const value = g[y][x];
       if (!value) return true;
-      if (x + 1 < N && g[y][x + 1] === value) return true;
-      if (y + 1 < N && g[y + 1][x] === value) return true;
+      if (value < MAX_TILE && ((x + 1 < N && g[y][x + 1] === value) ||
+          (y + 1 < N && g[y + 1][x] === value))) return true;
     }
     return false;
   }
@@ -604,6 +606,7 @@
     const s = String(val);
     if (el.dataset.v === s) return;
     el.dataset.v = s; el.setAttribute('role', 'img'); el.setAttribute('aria-label', s);
+    el.style.setProperty('--digits', s.length);
     const cols = el._cols || (el._cols = []);
     if (!cols.length) el.textContent = '';
     while (cols.length > s.length) cols.shift().el.remove();
@@ -651,7 +654,7 @@
       const nx = cx + dx, ny = cy + dy;
       const o = inb(nx, ny) ? grid[ny][nx] : null;
       grid[y][x] = null;
-      if (o && o.val === t.val && !o.merged) {
+      if (o && o.val === t.val && o.val < MAX_TILE && !o.merged) {
         o.val *= 2; o.merged = true; gain += o.val;
         t.x = nx; t.y = ny; place(t); moved = true;
         if (o.val === 2048 && !won) reached = true;
@@ -665,7 +668,7 @@
     }
     if (!moved) return false;
     undoStack.push(snap); if (undoStack.length > UNDO_LIMIT) undoStack.shift();
-    score += gain;
+    score = Math.min(score + gain, Number.MAX_SAFE_INTEGER);
     spawn();
     updateHud();
     over = !canMove();
@@ -725,7 +728,7 @@
   }
 
   /* ---- 存档校验：localStorage 可能被手工改坏，或来自旧/新版本 ---- */
-  const isTileVal = v => typeof v === 'number' && Number.isInteger(v) && v >= 2 && v <= (1 << 30) && (v & (v - 1)) === 0;
+  const isTileVal = v => Number.isSafeInteger(v) && v >= 2 && v <= MAX_TILE && 2 ** Math.round(Math.log2(v)) === v;
   const readScore = v => {
     const n = (typeof v === 'string' && v.trim() !== '') ? Number(v) : v;   // 兼容字符串分数
     return Number.isFinite(n) && n >= 0 && n <= Number.MAX_SAFE_INTEGER ? Math.floor(n) : null;
