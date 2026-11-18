@@ -15,7 +15,7 @@
     --pri:#c5bbe6; --on-pri:#2a1f4a; --pri-c:#433a68; --on-pri-c:#e6deff;
     --sec-c:#454357; --on-sec-c:#e3dff2; --ter-c:#4f3a4d; --on-ter-c:#ffd7f2;
     --outline:#6f6a78; --board:#1e1c22; --cell:#28262d; --danger:#ff8a80;
-    --font: "Nebulove","Google Sans","Product Sans","Nunito","Segoe UI","PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    --font: "Google Sans","Product Sans","Nunito","Segoe UI","PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
     --ease: cubic-bezier(.2,0,0,1);
   }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -211,15 +211,6 @@
 
   @media (prefers-reduced-motion:reduce){ *{ animation:.01ms none !important; transition:none !important; } }
 </style>
-<style>
-@font-face {
-    font-family: 'Nebulove';
-    src: url('https://nebulove.92li.uk/Nebulove.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-</style>
 </head>
 <body>
 
@@ -327,7 +318,7 @@
 <dialog id="menuDlg" aria-labelledby="menuTitle">
   <div class="dlg">
     <h3><span id="menuTitle">关于 YiPuzzles Web</span> <button class="icon-btn" data-close aria-label="关闭" type="button"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></h3>
-    <p>YiPuzzles Web 是 Android 版 YiPuzzles 2048 的网页版，沿用 Material You 设计语言，无广告、无追踪、完全离线可玩。</p>
+    <p>YiPuzzles Web 是 Android 版 YiPuzzles 2048 的网页版，沿用 Material You 设计语言，无广告、无追踪。页面载入后，游玩不需要联网。</p>
     <h4>玩法</h4>
     <ul>
       <li>滑动或按方向键，所有方块向同一方向移动。</li>
