@@ -152,7 +152,6 @@ section { scroll-margin-top: 88px; }
   background: var(--surface-container); border-radius: 14px;
   box-shadow: var(--shadow-3); padding: 8px; display: none; z-index: 70;
 }
-.menu-drop.open { display: block; animation: menuIn .18s ease; }
 @keyframes menuIn { from { opacity: 0; transform: translateY(-6px); } }
 .menu-drop a {
   display: block; padding: 11px 16px; border-radius: 10px;
@@ -537,9 +536,10 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
   background: var(--primary-container); color: var(--on-primary-container);
   display: flex; align-items: center; justify-content: center;
   box-shadow: var(--shadow-3);
-  transform: translateY(110px); transition: transform .4s cubic-bezier(.2,.9,.3,1.1), background-color .35s ease;
+  visibility: hidden; transform: translateY(110px);
+  transition: transform .4s cubic-bezier(.2,.9,.3,1.1), background-color .35s ease;
 }
-.fab.show { transform: translateY(0); }
+.fab.show { visibility: visible; transform: translateY(0); }
 .fab:hover { filter: brightness(1.05); }
 .fab svg { width: 24px; height: 24px; }
 
@@ -555,6 +555,7 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
   .bar-actions { grid-column: 2; grid-row: 1; }
   .menu-ready .nav-links { display: none; }
   .menu-ready .menu-toggle { display: inline-flex; }
+  .menu-drop.open { display: block; animation: menuIn .18s ease; }
 }
 @media (max-width: 900px) {
   .hero-grid { grid-template-columns: 1fr; gap: 52px; }
@@ -634,19 +635,19 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
       <a class="icon-btn" data-ripple href="https://github.com/lingyicute/YiPuzzles" target="_blank" rel="noopener" aria-label="GitHub 仓库" title="GitHub 仓库">
         <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
       </a>
-      <button class="icon-btn menu-toggle" id="menuBtn" data-ripple aria-label="打开菜单" aria-expanded="false">
+      <button class="icon-btn menu-toggle" id="menuBtn" data-ripple aria-label="页面导航" aria-expanded="false" aria-controls="menuDrop">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 7h16v2H4zm0 4h16v2H4zm0 4h16v2H4z"/></svg>
       </button>
     </div>
   </div>
-  <div class="menu-drop" id="menuDrop">
+  <nav class="menu-drop" id="menuDrop" aria-label="移动端页面导航">
     <a href="#features">✨ 特性</a>
     <a href="#theme">🎨 动态主题</a>
     <a href="#privacy">🔒 隐私</a>
     <a href="#download">📥 下载</a>
     <a href="#web">🌐 网页版</a>
     <a href="#build">🔨 构建</a>
-  </div>
+  </nav>
 </header>
 
 <main>
@@ -933,7 +934,7 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
           </div>
           <div class="req-item">
             <span class="rk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2.6"/><path d="M6.4 10h.01M9.7 10h.01M13 10h.01M16.3 10h.01M8.2 13.8h7.6"/></svg></span>
-            <div><b>键盘 + 触屏</b><span>方向键 / WASD 移动，Z 撤销，R 重新开始；手机上直接滑动屏幕</span></div>
+            <div><b>键盘 + 触屏</b><span>聚焦棋盘后用方向键 / WASD 移动、Z 撤销、R 重新开始；触屏可滑动棋盘</span></div>
           </div>
           <div class="req-item">
             <span class="rk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 0 0 18h1.6a2.4 2.4 0 0 0 0-4.8h-.9a2 2 0 0 1 0-4h2.8A5.5 5.5 0 0 0 21 6.7C21 4.5 17 3 12 3z"/><path d="M7.6 11.4h.01M10.4 7.6h.01M14.6 7.6h.01"/></svg></span>
@@ -1256,10 +1257,11 @@ cd YiPuzzles</pre>
   /* ============ 6. 窄屏菜单 ============ */
   var menuBtn = document.getElementById('menuBtn');
   var menuDrop = document.getElementById('menuDrop');
-  function closeMenu() {
-    if (!menuDrop) return;
+  function closeMenu(restoreFocus) {
+    if (!menuDrop.classList.contains('open')) return;
     menuDrop.classList.remove('open');
-    if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+    menuBtn.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) menuBtn.focus();
   }
   if (menuBtn && menuDrop) {
     document.getElementById('topbar').classList.add('menu-ready');
@@ -1272,25 +1274,44 @@ cd YiPuzzles</pre>
       if (!menuDrop.contains(e.target) && e.target !== menuBtn) closeMenu();
     });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeMenu();
+      if (e.key === 'Escape') closeMenu(menuDrop.contains(document.activeElement) || document.activeElement === menuBtn);
+    });
+    var narrow = window.matchMedia('(max-width: 860px)');
+    if (narrow.addEventListener) narrow.addEventListener('change', function () { closeMenu(); });
+    menuDrop.addEventListener('focusout', function (e) {
+      if (e.relatedTarget && e.relatedTarget !== menuBtn && !menuDrop.contains(e.relatedTarget)) closeMenu();
     });
     menuDrop.addEventListener('click', function (e) {
-      if (e.target.tagName === 'A') closeMenu();
+      var link = e.target.closest('a');
+      if (!link) return;
+      var target = document.getElementById(link.hash.slice(1));
+      closeMenu(!target);
+      if (target) {
+        target.setAttribute('tabindex', '-1');
+        target.focus({ preventScroll: true });
+      }
     });
   }
 
   /* ============ 7. 顶栏阴影 / FAB ============ */
   var topbar = document.getElementById('topbar');
   var fab = document.getElementById('fab');
-  window.addEventListener('scroll', function () {
+  function updateScrolled() {
     var y = window.scrollY || document.documentElement.scrollTop;
     if (topbar) topbar.classList.toggle('scrolled', y > 12);
     if (fab) fab.classList.toggle('show', y > 460);
-  }, { passive: true });
+  }
+  window.addEventListener('scroll', updateScrolled, { passive: true });
+  window.addEventListener('pageshow', updateScrolled);
+  updateScrolled();
   if (fab) {
     fab.addEventListener('click', function () {
       var t = document.getElementById('download');
-      if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (t) {
+        t.setAttribute('tabindex', '-1');
+        t.focus({ preventScroll: true });
+        t.scrollIntoView({ block: 'start' });
+      }
     });
   }
 
