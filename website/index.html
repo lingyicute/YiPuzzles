@@ -1362,29 +1362,37 @@ cd YiPuzzles</pre>
     clearTimeout(snackTimer);
     snackTimer = setTimeout(function () { snackbar.classList.remove('show'); }, 2400);
   }
-  function copyText(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(text).then(function () { return true; }, function () { return fallbackCopy(text); });
-    }
-    return Promise.resolve(fallbackCopy(text));
-  }
-  function fallbackCopy(text) {
+  async function copyText(text) {
     try {
-      var ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
-      return true;
-    } catch (e) { return false; }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (e) { /* try the legacy path on denied permission */ }
+
+    var focus = document.activeElement;
+    var textarea = document.createElement('textarea');
+    try {
+      textarea.value = text;
+      textarea.readOnly = true;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      return document.execCommand('copy');
+    } catch (e) {
+      return false;
+    } finally {
+      textarea.remove();
+      if (focus) focus.focus({ preventScroll: true });
+    }
   }
   Array.prototype.forEach.call(document.querySelectorAll('.copy-btn'), function (btn) {
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click', async function () {
       var target = document.getElementById(btn.dataset.copy);
       if (!target) return;
-      copyText(target.textContent).then(function () { snack('已复制到剪贴板 📋'); });
+      var copied = await copyText(target.textContent);
+      snack(copied ? '已复制到剪贴板 📋' : '无法访问剪贴板，请手动选择并复制命令。');
     });
   });
 
