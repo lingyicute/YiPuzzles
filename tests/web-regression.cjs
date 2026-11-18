@@ -186,3 +186,38 @@ test('copy failures are reported while preserving focus and removing fallback in
   await button.press('Enter');
   await page.waitForFunction(() => document.querySelector('#snackbar').textContent.includes('已复制'));
 });
+
+for (const failure of ['quota', 'denied']) {
+  test(`session progress survives board switches when storage is ${failure}`, async t => {
+    const { page } = await open(t, '/h5-demo/', {
+      records: failure === 'quota' ? {
+        'yp.best.4': 8, 'yp.state.4': { g: board([2, 2]), score: 8 },
+        'yp.best.5': 40, 'yp.state.5': { g: Array.from({ length: 5 }, () => [2, 0, 0, 0, 0]), score: 40 }
+      } : undefined,
+      setup: failure === 'quota' ? () => {
+        Storage.prototype.setItem = Storage.prototype.removeItem = () => { throw new DOMException('Full', 'QuotaExceededError'); };
+      } : () => {
+        Math.random = () => 0;
+        Object.defineProperty(window, 'localStorage', { get() { throw new DOMException('Denied', 'SecurityError'); } });
+      }
+    });
+    await page.locator('#board').press('ArrowLeft');
+    const score = await page.locator('#score').getAttribute('aria-label');
+    const state = await page.locator('#boardState').textContent();
+    assert.equal(score, failure === 'quota' ? '12' : '4');
+    await page.getByRole('radio', { name: '5×5' }).click();
+    await page.getByRole('radio', { name: '4×4' }).click();
+    assert.equal(await page.locator('#score').getAttribute('aria-label'), score);
+    assert.equal(await page.locator('#best').getAttribute('aria-label'), score);
+    assert.equal(await page.locator('#boardState').textContent(), state);
+    assert.equal(await page.locator('#storageNotice').isVisible(), true);
+    await page.locator('#undoBtn').click();
+    assert.equal(await page.locator('#score').getAttribute('aria-label'), failure === 'quota' ? '8' : '0');
+    await page.locator('#menuBtn').click();
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('#clearBtn').click();
+    await page.getByRole('radio', { name: '5×5' }).click();
+    assert.equal(await page.locator('#score').getAttribute('aria-label'), '0');
+    assert.equal(await page.locator('#best').getAttribute('aria-label'), '0');
+  });
+}

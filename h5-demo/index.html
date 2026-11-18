@@ -256,6 +256,7 @@
       <div id="overlay" role="region" aria-label="对局结果" inert></div>
     </div>
     <p class="sr-only" role="status" id="boardState"></p>
+    <p class="hint" id="storageNotice" role="status" hidden>浏览器存储不可用，进度仅在当前页面保留；刷新或关闭页面会丢失未保存的记录。</p>
 
     <div class="size-row" id="sizeRow" role="radiogroup" aria-label="棋盘大小"></div>
     <p class="hint" id="gameHint">滑动棋盘，或聚焦棋盘后使用 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> / <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移动方块<br>相同数字相撞即合并，目标：拼出 2048</p>
@@ -358,10 +359,26 @@
   }
   const root = document.documentElement;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  // Keep serialized copies so board switches still work if storage is denied or full.
+  const sessionStore = new Map();
+  const storageUnavailable = () => { $('#storageNotice').hidden = false; };
   const store = {
-    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
-    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
-    remove(k) { try { localStorage.removeItem(k); } catch (e) {} }
+    get(k, d) {
+      let v;
+      try { v = sessionStore.has(k) ? sessionStore.get(k) : localStorage.getItem(k); }
+      catch (e) { storageUnavailable(); return d; }
+      try { return v == null ? d : JSON.parse(v); } catch (e) { return d; }
+    },
+    set(k, v) {
+      const serialized = JSON.stringify(v);
+      sessionStore.set(k, serialized);
+      try { localStorage.setItem(k, serialized); } catch (e) { storageUnavailable(); }
+    },
+    remove(k) {
+      // A tombstone prevents a failed removal from reviving an old saved round.
+      sessionStore.set(k, null);
+      try { localStorage.removeItem(k); } catch (e) { storageUnavailable(); }
+    }
   };
 
   /* ================= Theme ================= */
