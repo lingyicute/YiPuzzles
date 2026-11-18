@@ -22,7 +22,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -47,15 +46,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import org.lyi.puzzles.activities.helper.BaseActivityWithoutNavBar;
 import org.lyi.puzzles.activities.helper.GameState;
+import org.lyi.puzzles.activities.helper.GameStorage;
 import org.lyi.puzzles.activities.helper.GameStatistics;
 import org.lyi.puzzles.activities.helper.Gestures;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Calendar;
 
 /**
@@ -139,8 +133,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         saveState = true;
 
         if (savedInstanceState == null) {
-            Intent intent = getIntent();
-            if (firstTime && intent.getBooleanExtra("new", true)) {
+            if (firstTime && getIntent().getBooleanExtra("new", true)) {
                 createNewGame = true;
                 firstTime = false;
             }
@@ -161,6 +154,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
     private void handleUndo() {
         undoButton.setVisibility(View.INVISIBLE);
         if (undo && last_elements != null) {
+            undo = false;
             gameStatistics.undo();
             elements = last_elements;
             points = last_points;
@@ -184,7 +178,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
             drawAllElements(elements);
             number_field.refreshDrawableState();
         }
-        undo = false;
     }
     /** Material 3 top app bar with up navigation and the board size as subtitle. */
     private void setupToolbar() {
@@ -282,23 +275,15 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         return size >= 4 && size <= 7 ? size : 4;
     }
 
-    private String stateFilename() {
-        return "state" + n + ".txt";
-    }
-
     public void initializeState() {
-        points = 0;
-        Intent intent = getIntent();
         n = requestedBoardSize();
-        newGame = intent.getBooleanExtra("new", true);
-        undo = false;
-        if (!newGame) {
-            gameState = readStateFromFile();
-            points = gameState.points;
-            last_points = gameState.last_points;
-        } else {
-            gameState = new GameState(n);
-        }
+        GameState stored = getIntent().getBooleanExtra("new", true)
+                ? null : GameStorage.readState(getFilesDir(), n);
+        newGame = stored == null;
+        gameState = newGame ? new GameState(n) : stored;
+        points = gameState.points;
+        last_points = gameState.last_points;
+        undo = gameState.undo;
         elements = new Element[n][n];
         last_elements = new Element[n][n];
         backgroundElements = new Element[n][n];
@@ -332,7 +317,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
             initializeState();
 
         }
-        gameStatistics = readStatisticsFromFile();
+        gameStatistics = GameStorage.readStatistics(getFilesDir(), n);
         record = gameStatistics.getRecord();
         last_points = gameState.last_points;
         createNewGame = false;
@@ -997,7 +982,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                         createNewGame = true;
                         getIntent().putExtra("new", true);
                         initialize();
-                        deleteStateFile();
+                        GameStorage.deleteState(getFilesDir(), n);
                         saveState = false;
                         GameActivity.this.onBackPressed();
 
@@ -1045,83 +1030,11 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
     }
 
-    public void saveStateToFile(GameState nS) {
-        if (saveState) {
-            try {
-                File file = new File(getFilesDir(), stateFilename());
-                FileOutputStream fileOut = new FileOutputStream(file);
-                ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                out.writeObject(nS);
-                out.close();
-                fileOut.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+    private void saveStateToFile(GameState state) {
+        if (saveState && state != null) GameStorage.writeState(getFilesDir(), n, state);
     }
 
-    public boolean deleteStateFile() {
-        try {
-            File f = new File(getFilesDir(), stateFilename());
-            return f.delete();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public GameState readStateFromFile() {
-        GameState nS = new GameState(n);
-        try {
-            File file = new File(getFilesDir(), stateFilename());
-            FileInputStream fileIn = new FileInputStream(file);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            nS = (GameState) in.readObject();
-            boolean emptyField = true;
-            for (int i = 0; i < nS.numbers.length; i++) {
-                if (nS.numbers[i] > 0) {
-                    emptyField = false;
-                    break;
-                }
-            }
-            if (emptyField || nS.n != n) {
-                nS = new GameState(n);
-                newGame = true;
-            }
-            in.close();
-            fileIn.close();
-        } catch (Exception e) {
-            newGame = true;
-            e.printStackTrace();
-        }
-        return nS;
-    }
-
-    public GameStatistics readStatisticsFromFile() {
-        GameStatistics gS = new GameStatistics(n);
-        try {
-            File file = new File(getFilesDir(), "statistics" + n + ".txt");
-            FileInputStream fileIn = new FileInputStream(file);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            gS = (GameStatistics) in.readObject();
-            in.close();
-            fileIn.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return gS;
-    }
-
-    public void saveStatisticsToFile(GameStatistics gS) {
-        try {
-            File file = new File(getFilesDir(), gS.getFilename());
-            FileOutputStream fileOut = new FileOutputStream(file);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(gS);
-            out.close();
-            fileOut.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void saveStatisticsToFile(GameStatistics statistics) {
+        GameStorage.writeStatistics(getFilesDir(), n, statistics);
     }
 }

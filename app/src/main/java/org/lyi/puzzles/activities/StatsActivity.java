@@ -38,12 +38,9 @@ import com.google.android.material.tabs.TabLayout;
 import org.lyi.puzzles.R;
 import org.lyi.puzzles.activities.helper.BaseActivity;
 import org.lyi.puzzles.activities.helper.GameStatistics;
+import org.lyi.puzzles.activities.helper.GameStorage;
 import org.lyi.puzzles.views.BoardPreviewView;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InvalidClassException;
-import java.io.ObjectInputStream;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
@@ -142,15 +139,9 @@ public class StatsActivity extends BaseActivity {
 
     public void resetGameStatistics() {
         for (int n = 4; n <= 7; n++) {
-            try {
-                File file = new File(getFilesDir(), "statistics" + n + ".txt");
-                file.delete();
-            } catch (Exception e) {
-
-            }
+            GameStorage.deleteStatistics(getFilesDir(), n);
         }
-        finish();
-        startActivity(getIntent());
+        recreate();
     }
 
 
@@ -239,7 +230,7 @@ public class StatsActivity extends BaseActivity {
                     if (img != null) img.setBoardSize(7);
                     break;
             }
-            GameStatistics gameStatistics = readStatisticsFromFile(position + 4);
+            GameStatistics gameStatistics = GameStorage.readStatistics(getFilesDir(), position + 4);
             highestNumber.setText("" + gameStatistics.getHighestNumber());
             timePlayed.setText(formatMillis(gameStatistics.getTimePlayed()));
             undo.setText("" + gameStatistics.getUndo());
@@ -309,24 +300,5 @@ public class StatsActivity extends BaseActivity {
             container.removeView(view);
         }
 
-        public GameStatistics readStatisticsFromFile(int n) {
-            GameStatistics gS = new GameStatistics(n);
-            try {
-                File file = new File(getFilesDir(), "statistics" + n + ".txt");
-                FileInputStream fileIn = new FileInputStream(file);
-                ObjectInputStream in = new ObjectInputStream(fileIn);
-                gS = (GameStatistics) in.readObject();
-                in.close();
-                fileIn.close();
-            } catch (InvalidClassException ice) {
-                File file = new File(getFilesDir(), "statistics" + n + ".txt");
-                file.delete();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return gS;
-        }
     }
-
-
 }

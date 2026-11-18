@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,9 +37,8 @@ import com.google.android.material.color.MaterialColors;
 
 import org.lyi.puzzles.R;
 import org.lyi.puzzles.activities.helper.BaseActivity;
+import org.lyi.puzzles.activities.helper.GameStorage;
 import org.lyi.puzzles.views.BoardPreviewView;
-
-import java.io.File;
 
 /**
  * The MainActivity is the activity from which the game in each mode is started.
@@ -69,22 +67,20 @@ public class MainActivity extends BaseActivity {
             R.layout.choose_slide3,
             R.layout.choose_slide4,
     };
-    private boolean[] gameResumeable = new boolean[]{
-            false,
-            false,
-            false,
-            false
-    };
-
     @Override
     protected void onStart() {
         super.onStart();
         preferences = getApplicationContext().getSharedPreferences(mypref, Context.MODE_PRIVATE);
         editor = preferences.edit();
-        currentPage = preferences.getInt("currentPage", 0);
+        currentPage = Math.max(0, Math.min(layouts.length - 1, preferences.getInt("currentPage", 0)));
         viewPager.setCurrentItem(currentPage);
-        updateButtons(currentPage);
         updateMovingButtons(currentPage);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateButtons(viewPager.getCurrentItem());
     }
 
     @Override
@@ -99,19 +95,6 @@ public class MainActivity extends BaseActivity {
         dotsLayout = (LinearLayout) findViewById(R.id.layoutDots);
         btnPrev = (MaterialButton) findViewById(R.id.btn_prev);
         btnNext = (MaterialButton) findViewById(R.id.btn_next);
-
-
-        //checking resumable
-        File directory = getFilesDir();
-        File[] files = directory.listFiles();
-
-        for (int i = 0; i < files.length; i++) {
-            Log.i("files", files[i].getName());
-            for (int j = 0; j < gameResumeable.length; j++) {
-                if (files[i].getName().equals("state" + (j + 4) + ".txt"))
-                    gameResumeable[j] = true;
-            }
-        }
 
 
         // adding bottom dots
@@ -206,8 +189,7 @@ public class MainActivity extends BaseActivity {
         public void onPageSelected(int position) {
             addBottomDots(position);
             currentPage = position;
-            editor.putInt("currentPage", currentPage);
-            editor.commit();
+            editor.putInt("currentPage", currentPage).apply();
             updateButtons(position);
 
             updateMovingButtons(position);
@@ -244,13 +226,9 @@ public class MainActivity extends BaseActivity {
     public void updateButtons(int position) {
         MaterialButton newGameButton = MainActivity.this.findViewById(R.id.button_newGame);
         MaterialButton continueButton = MainActivity.this.findViewById(R.id.button_continueGame);
-        try {
-            // MaterialButton renders its own disabled state (Material 3 tonal button)
-            continueButton.setEnabled(gameResumeable[position]);
-        } catch (Exception aie) {
-            aie.printStackTrace();
-        }
-        addListener(newGameButton, continueButton, position + 4);
+        int size = position + 4;
+        continueButton.setEnabled(GameStorage.readState(getFilesDir(), size) != null);
+        addListener(newGameButton, continueButton, size);
     }
 
     /**

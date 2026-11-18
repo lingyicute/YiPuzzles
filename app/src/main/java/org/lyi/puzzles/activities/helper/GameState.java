@@ -43,6 +43,7 @@ public class GameState implements Serializable {
     public boolean undo = false;
 
     public GameState(int size) {
+        n = size;
         numbers = new int[size * size];
     }
 
@@ -66,26 +67,30 @@ public class GameState implements Serializable {
         }
     }
 
-    public int getNumber(int i, int j) {
+    boolean hasValidBoard(int size) {
+        return n == size && isPlayableGrid(numbers, size);
+    }
 
-        try {
-            return numbers[i * n + j];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            e.printStackTrace();
+    boolean hasValidUndo() {
+        return undo && last_points >= 0 && last_points <= points && isPlayableGrid(last_numbers, n);
+    }
+
+    private static boolean isPlayableGrid(int[] grid, int size) {
+        if (grid == null || grid.length != size * size) return false;
+        boolean nonempty = false;
+        for (int value : grid) {
+            if (value == 0) continue;
+            if (value < 2 || (value & (value - 1)) != 0) return false;
+            nonempty = true;
         }
+        return nonempty;
+    }
 
-        return 0;
+    public int getNumber(int i, int j) {
+        return numbers[i * n + j];
     }
 
     public int getLastNumber(int i, int j) {
-
-        try {
-            return last_numbers[i * n + j];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
+        return last_numbers[i * n + j];
     }
-
 }
