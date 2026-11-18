@@ -57,16 +57,21 @@ public class SettingsActivity extends BaseActivity implements SharedPreferences.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        super.mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
         setContentView(R.layout.activity_settings);
 
         overridePendingTransition(0, 0);
     }
 
     @Override
-    protected void onDestroy() {
-        super.mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
-        super.onDestroy();
+    protected void onStart() {
+        super.onStart();
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected void onStop() {
+        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+        super.onStop();
     }
 
     @Override
