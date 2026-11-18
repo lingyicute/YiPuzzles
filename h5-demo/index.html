@@ -367,7 +367,7 @@
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
-    clear() { try { Object.keys(localStorage).filter(k => k.startsWith('yp.')).forEach(k => localStorage.removeItem(k)); } catch (e) {} }
+    remove(k) { try { localStorage.removeItem(k); } catch (e) {} }
   };
 
   /* ================= Theme ================= */
@@ -398,10 +398,13 @@
     }, 0);
   }
 
-  let settings = Object.assign({ mode: 'auto', scheme: 'purple', classic: false, size: 4 }, store.get('yp.settings', {}));
-  if (!['auto', 'light', 'dark'].includes(settings.mode)) settings.mode = 'auto';
-  if (!SCHEMES.some(s => s.id === settings.scheme)) settings.scheme = 'purple';
-  settings.classic = settings.classic === true;
+  const savedSettings = store.get('yp.settings', null) || {};
+  const settings = {
+    mode: ['auto', 'light', 'dark'].includes(savedSettings.mode) ? savedSettings.mode : 'auto',
+    scheme: SCHEMES.some(s => s.id === savedSettings.scheme) ? savedSettings.scheme : 'purple',
+    classic: savedSettings.classic === true,
+    size: savedSettings.size
+  };
   const mq = window.matchMedia('(prefers-color-scheme: dark)');
   const isDark = () => settings.mode === 'dark' || (settings.mode === 'auto' && mq.matches);
 
@@ -487,7 +490,10 @@
   });
   $('#clearBtn').addEventListener('click', () => {
     if (confirm('确定要清除所有分数与对局记录吗？（外观设置将保留）')) {
-      const keep = settings; store.clear(); store.set('yp.settings', keep);
+      for (const size of SIZES) {
+        store.remove('yp.best.' + size);
+        store.remove('yp.state.' + size);
+      }
       menuDlg.close(); newGame(true);
     }
   });
@@ -496,9 +502,10 @@
   const boardEl = $('#board'), tilesEl = $('#tiles'), cellsEl = $('#cells'), overlayEl = $('#overlay');
   const scoreEl = $('#score'), bestEl = $('#best'), undoBtn = $('#undoBtn');
   const SIZES = [4, 5, 6, 7];
+  const UNDO_LIMIT = 30;
   const VEC = [[0, -1], [1, 0], [0, 1], [-1, 0]]; // up right down left
-  let N = 4, grid = [], score = 0, best = 0, won = false, over = false, undoStack = [], nextId = 1, overlayType = null;
-  let bestAtRoundStart = 0;   // 本局（或本次载入）开始时的最高分，用于判断"新纪录"
+  let N = 4, grid = [], score = 0, best = 0, won = false, winPending = false, over = false, undoStack = [], nextId = 1, overlayType = null;
+  let bestAtRoundStart = 0;   // 本局开始时的最高分，恢复对局时不改写
   let overlayTimer = 0;       // 结算弹层的延时句柄，必须在撤销/重开/换尺寸时取消
   let overlayFrame = 0;       // 防止已取消的弹层在下一帧重新显示
   let pendingMerge = [];      // 已合并、但仍需等动画结束再移除的旧方块
@@ -519,7 +526,7 @@
       b.className = 'chip'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(s === N));
       b.tabIndex = s === N ? 0 : -1;
       b.textContent = `${s}×${s}`;
-      b.addEventListener('click', () => { if (s !== N) { saveState(); settings.size = s; saveSettings(); init(s); } });
+      b.addEventListener('click', () => { if (s !== N) { settings.size = s; saveSettings(); init(s); } });
       row.appendChild(b);
     });
   }
@@ -548,7 +555,8 @@
     tilesEl.innerHTML = '';
     grid = m.map((r, y) => r.map((v, x) => v ? makeTile(v, x, y, false) : null));
   }
-  const snapshot = () => ({ g: grid.map(r => r.map(t => t ? t.val : 0)), score, won });
+  const matrix = () => grid.map(row => row.map(t => t ? t.val : 0));
+  const snapshot = () => ({ g: matrix(), score, won });
   function emptyGrid() { return Array.from({ length: N }, () => Array(N).fill(null)); }
 
   function spawn() {
@@ -558,15 +566,16 @@
     const [x, y] = empties[Math.floor(Math.random() * empties.length)];
     grid[y][x] = makeTile(Math.random() < 0.9 ? 2 : 4, x, y, true);
   }
-  function canMove() {
+  function canMove(g = matrix()) {
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-      const t = grid[y][x];
-      if (!t) return true;
-      if (x + 1 < N && grid[y][x + 1] && grid[y][x + 1].val === t.val) return true;
-      if (y + 1 < N && grid[y + 1][x] && grid[y + 1][x].val === t.val) return true;
+      const value = g[y][x];
+      if (!value) return true;
+      if (x + 1 < N && g[y][x + 1] === value) return true;
+      if (y + 1 < N && g[y + 1][x] === value) return true;
     }
     return false;
   }
+  const hasTiles = g => g.some(row => row.some(Boolean));
   const hasWinningTile = g => g.some(row => row.some(v => v >= 2048));
 
   /* ---- 机械翻滚计数器：每一位独立向前滚动 ---- */
@@ -609,7 +618,7 @@
     undoBtn.disabled = undoStack.length === 0;
   }
   function saveState() {
-    store.set('yp.state.' + N, { g: snapshot().g, score, won, over, undo: undoStack.slice(-20) });
+    store.set('yp.state.' + N, { ...snapshot(), over, winPending, bestAtRoundStart, undo: undoStack });
   }
 
   /* 合并动画结束后再移除旧方块：登记到 pendingMerge，可被提前结算 */
@@ -655,12 +664,12 @@
       }
     }
     if (!moved) return false;
-    undoStack.push(snap); if (undoStack.length > 30) undoStack.shift();
+    undoStack.push(snap); if (undoStack.length > UNDO_LIMIT) undoStack.shift();
     score += gain;
     spawn();
-    updateHud(gain);
+    updateHud();
     over = !canMove();
-    if (reached) { won = true; scheduleOverlay('win', 320); }
+    if (reached) { won = winPending = true; scheduleOverlay('win', 320); }
     else if (over) scheduleOverlay('over', 420);
     saveState();
     return true;
@@ -670,8 +679,8 @@
     if (!undoStack.length) return;
     const s = undoStack.pop();
     hideOverlay();
-    loadMatrix(s.g); score = s.score; won = s.won === true; over = false;
-    updateHud(0); saveState();
+    loadMatrix(s.g); score = s.score; won = s.won; winPending = false; over = false;
+    updateHud(); saveState();
   }
 
   function showOverlay(type) {
@@ -699,7 +708,7 @@
   overlayEl.addEventListener('click', e => {
     const a = e.target.closest('[data-act]'); if (!a) return;
     const act = a.dataset.act;
-    if (act === 'continue') { hideOverlay(); if (over) showOverlay('over'); saveState(); }
+    if (act === 'continue') { winPending = false; hideOverlay(); if (over) showOverlay('over'); saveState(); }
     else if (act === 'new') newGame();
     else if (act === 'undo') undo();
   });
@@ -708,18 +717,18 @@
     hideOverlay();
     pendingMerge = [];
     grid = emptyGrid(); tilesEl.innerHTML = '';
-    score = 0; won = false; over = false; undoStack = [];
+    score = 0; won = false; winPending = false; over = false; undoStack = [];
     if (resetBest) best = 0;
     bestAtRoundStart = best;
     spawn(); spawn();
-    updateHud(0); saveState();
+    updateHud(); saveState();
   }
 
   /* ---- 存档校验：localStorage 可能被手工改坏，或来自旧/新版本 ---- */
   const isTileVal = v => typeof v === 'number' && Number.isInteger(v) && v >= 2 && v <= (1 << 30) && (v & (v - 1)) === 0;
-  const fixScore = v => {
-    const n = (typeof v === 'string' && v.trim() !== '') ? Number(v) : v;   // 兼容历史上被写成字符串的分数
-    return (typeof n === 'number' && Number.isFinite(n) && n > 0 && n <= Number.MAX_SAFE_INTEGER) ? Math.floor(n) : 0;
+  const readScore = v => {
+    const n = (typeof v === 'string' && v.trim() !== '') ? Number(v) : v;   // 兼容字符串分数
+    return Number.isFinite(n) && n >= 0 && n <= Number.MAX_SAFE_INTEGER ? Math.floor(n) : null;
   };
   function fixGrid(g) {
     if (!Array.isArray(g) || g.length !== N) return null;
@@ -733,31 +742,32 @@
   function fixUndo(list) {
     if (!Array.isArray(list)) return [];
     const out = [];
-    for (const s of list) {
+    for (const s of list.slice(-UNDO_LIMIT)) {
       if (!s || typeof s !== 'object') continue;
-      const g = fixGrid(s.g);
-      if (g) out.push({ g, score: fixScore(s.score), won: s.won === true || hasWinningTile(g) });
+      const g = fixGrid(s.g), score = readScore(s.score);
+      if (g && hasTiles(g) && canMove(g) && score !== null) out.push({ g, score, won: hasWinningTile(g) });
     }
-    return out.slice(-20);
+    return out;
   }
 
   function init(size) {
     N = size; settings.size = size;
     hudAnimate = false;
     buildBoard(); renderSizeRow();
-    best = fixScore(store.get('yp.best.' + N, 0));
+    best = readScore(store.get('yp.best.' + N, 0)) ?? 0;
     hideOverlay();
     const st = store.get('yp.state.' + N, null);
     const saved = (st && typeof st === 'object') ? fixGrid(st.g) : null;
-    if (saved && saved.some(row => row.some(v => v))) {   // 空棋盘无法自发新块，视为无存档
-      grid = emptyGrid(); loadMatrix(saved);
-      score = fixScore(st.score); won = st.won === true || hasWinningTile(saved); over = st.over === true;
+    if (saved && hasTiles(saved)) {
+      loadMatrix(saved);
+      score = readScore(st.score) ?? 0;
+      won = hasWinningTile(saved);
+      winPending = won && st.winPending === true;
+      over = !canMove(saved);
       undoStack = fixUndo(st.undo);
-      if (over && canMove()) over = false;        // 存档标记了结束、局面却还能走 → 交回给玩家
-      else if (!over && !canMove()) over = true;  // 存档漏标结束、实际已无解 → 补一个结束提示
-      updateHud(0);
-      bestAtRoundStart = best;   // 以载入后实际显示的最高分为基准，避免"新纪录"误报
-      if (over) { overlayEl.style.transition = 'none'; showOverlay('over'); setTimeout(() => overlayEl.style.transition = '', 50); }
+      updateHud();
+      bestAtRoundStart = Math.min(readScore(st.bestAtRoundStart) ?? best, best);
+      if (winPending || over) showOverlay(winPending ? 'win' : 'over');
     } else newGame();
     hudAnimate = true;
   }
