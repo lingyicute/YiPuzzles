@@ -31,6 +31,8 @@
   }
   button { font-family:inherit; color:inherit; border:0; background:none; cursor:pointer; padding:0; touch-action:manipulation; }
   svg { display:block; fill:currentColor; }
+  :focus-visible { outline:2px solid var(--pri); outline-offset:3px; }
+  .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 
   /* ---------- App bar ---------- */
   .appbar {
@@ -188,10 +190,10 @@
   .seg button { flex:1; height:42px; font-weight:600; font-size:14px; color:var(--on-var); display:flex; align-items:center; justify-content:center; gap:6px; transition:background .2s; }
   .seg button + button { border-left:1px solid var(--outline); }
   .seg button[aria-pressed="true"] { background:var(--sec-c); color:var(--on-sec-c); }
-  .swatches { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; transition:opacity .25s; }
+  .swatches { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; transition:opacity .25s; }
   .swatches.dim { opacity:.35; pointer-events:none; }
   .swatch { display:flex; flex-direction:column; align-items:center; gap:6px; font-size:12px; color:var(--on-var); }
-  .swatch .dot { width:52px; height:52px; border-radius:50%; position:relative; display:grid; place-items:center; transition:transform .2s var(--ease), box-shadow .2s; color:#fff; }
+  .swatch .dot { width:min(52px,100%); aspect-ratio:1; border-radius:50%; position:relative; display:grid; place-items:center; transition:transform .2s var(--ease), box-shadow .2s; color:#fff; }
   .swatch:hover .dot { transform:scale(1.08); }
   .swatch .dot svg { width:24px; height:24px; opacity:0; transform:scale(.4); transition:all .25s var(--ease); }
   .swatch[aria-checked="true"] .dot { box-shadow:0 0 0 3px var(--s-high), 0 0 0 5px var(--pri); }
@@ -207,7 +209,7 @@
 
   footer { text-align:center; color:var(--on-var); font-size:13px; opacity:.7; padding:0 16px 32px; line-height:1.8; }
 
-  @media (prefers-reduced-motion:reduce){ *{ animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+  @media (prefers-reduced-motion:reduce){ *{ animation:.01ms none !important; transition:none !important; } }
 </style>
 <style>
 @font-face {
@@ -257,14 +259,15 @@
       </button>
     </div>
 
-    <div id="board" role="group" aria-label="2048 游戏棋盘">
-      <div id="cells"></div>
-      <div id="tiles"></div>
-      <div id="overlay" inert></div>
+    <div id="board" role="group" tabindex="0" aria-label="2048 游戏棋盘" aria-describedby="gameHint boardState">
+      <div id="cells" aria-hidden="true"></div>
+      <div id="tiles" aria-hidden="true"></div>
+      <div id="overlay" role="region" aria-label="对局结果" inert></div>
     </div>
+    <p class="sr-only" role="status" id="boardState"></p>
 
     <div class="size-row" id="sizeRow" role="radiogroup" aria-label="棋盘大小"></div>
-    <p class="hint">滑动屏幕或使用 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> / <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移动方块<br>相同数字相撞即合并，目标：拼出 2048</p>
+    <p class="hint" id="gameHint">滑动棋盘，或聚焦棋盘后使用 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> / <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移动方块<br>相同数字相撞即合并，目标：拼出 2048</p>
   </section>
 
   <!-- Intro -->
@@ -300,9 +303,9 @@
 <footer>YiPuzzles Web · Made with ❤️ by lingyicute</footer>
 
 <!-- Appearance dialog -->
-<dialog id="themeDlg">
+<dialog id="themeDlg" aria-labelledby="themeTitle">
   <div class="dlg">
-    <h3>外观与配色 <button class="icon-btn" data-close aria-label="关闭" type="button"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></h3>
+    <h3><span id="themeTitle">外观与配色</span> <button class="icon-btn" data-close aria-label="关闭" type="button"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></h3>
     <h4>显示模式</h4>
     <div class="seg" id="modeSeg">
       <button data-mode="light" type="button">浅色</button>
@@ -312,18 +315,18 @@
     <h4>配色方案</h4>
     <div class="swatches" id="swatches" role="radiogroup" aria-label="配色方案"></div>
     <h4>游戏配色</h4>
-    <div class="switch-row" id="classicRow" role="presentation">
-      <div><b>原版 2048 配色</b><span class="sub">使用经典的米色棋盘与橙黄方块（开启后将替代上方配色）</span></div>
-      <div class="switch" id="classicSwitch" role="switch" aria-label="原版 2048 配色" aria-checked="false" tabindex="0"></div>
+    <div class="switch-row" id="classicRow">
+      <div><b id="classicLabel">原版 2048 配色</b><span class="sub" id="classicDescription">使用经典的米色棋盘与橙黄方块（开启后将替代上方配色）</span></div>
+      <button class="switch" id="classicSwitch" type="button" role="switch" aria-labelledby="classicLabel" aria-describedby="classicDescription" aria-checked="false"></button>
     </div>
     <div class="foot"><button class="btn text" data-close type="button">完成</button></div>
   </div>
 </dialog>
 
 <!-- Menu dialog -->
-<dialog id="menuDlg">
+<dialog id="menuDlg" aria-labelledby="menuTitle">
   <div class="dlg">
-    <h3>关于 YiPuzzles Web <button class="icon-btn" data-close aria-label="关闭" type="button"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></h3>
+    <h3><span id="menuTitle">关于 YiPuzzles Web</span> <button class="icon-btn" data-close aria-label="关闭" type="button"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></h3>
     <p>YiPuzzles Web 是 Android 版 YiPuzzles 2048 的网页版，沿用 Material You 设计语言，无广告、无追踪、完全离线可玩。</p>
     <h4>玩法</h4>
     <ul>
@@ -332,7 +335,7 @@
       <li>拼出 2048 即获胜，之后仍可继续挑战更高分。</li>
       <li>棋盘填满且无法合并时游戏结束，可随时撤销。</li>
     </ul>
-    <h4>快捷键</h4>
+    <h4>棋盘聚焦时的快捷键</h4>
     <ul>
       <li><kbd>↑↓←→</kbd> / <kbd>WASD</kbd> 移动</li>
       <li><kbd>Z</kbd> 撤销　<kbd>R</kbd> 重新开始</li>
@@ -351,7 +354,7 @@
   'use strict';
   const $ = (s, r = document) => r.querySelector(s);
   function radioKeydown(e) {
-    if (!['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'Home', 'End'].includes(e.key)) return;
+    if (e.ctrlKey || e.metaKey || e.altKey || !['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'Home', 'End'].includes(e.key)) return;
     const container = e.currentTarget;
     const radios = [...container.querySelectorAll('[role="radio"]:not(:disabled)')];
     const current = radios.indexOf(document.activeElement);
@@ -360,10 +363,10 @@
     const next = e.key === 'Home' ? 0 : e.key === 'End' ? radios.length - 1 :
       (current + (e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : -1) + radios.length) % radios.length;
     radios[next].click();
-    const selected = [...container.querySelectorAll('[role="radio"]')].find(b => b.getAttribute('aria-checked') === 'true' && !b.disabled);
-    (selected || radios[next]).focus();
+    radios[next].focus();
   }
   const root = document.documentElement;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
@@ -476,7 +479,6 @@
   document.querySelectorAll('#modeSeg button').forEach(b => b.addEventListener('click', () => { settings.mode = b.dataset.mode; saveSettings(); applyTheme(); }));
   function toggleClassic() { settings.classic = !settings.classic; saveSettings(); applyTheme(); }
   $('#classicRow').addEventListener('click', toggleClassic);
-  $('#classicSwitch').addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); toggleClassic(); } });
   $('#themeBtn').addEventListener('click', () => { settings.mode = isDark() ? 'light' : 'dark'; saveSettings(); applyTheme(); });
 
   /* ---- Dialogs ---- */
@@ -510,6 +512,7 @@
   let overlayTimer = 0;       // 结算弹层的延时句柄，必须在撤销/重开/换尺寸时取消
   let overlayFrame = 0;       // 防止已取消的弹层在下一帧重新显示
   let pendingMerge = [];      // 已合并、但仍需等动画结束再移除的旧方块
+  let sx = 0, sy = 0, activePointer = null;
 
   const inb = (x, y) => x >= 0 && y >= 0 && x < N && y < N;
 
@@ -519,16 +522,20 @@
     tilesEl.innerHTML = '';
     $('#sizeLabel').textContent = `${N}×${N}`;
   }
-  function renderSizeRow() {
-    const row = $('#sizeRow'); row.innerHTML = '';
-    row.onkeydown = radioKeydown;
-    SIZES.forEach(s => {
-      const b = document.createElement('button'); b.type = 'button';
-      b.className = 'chip'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(s === N));
-      b.tabIndex = s === N ? 0 : -1;
-      b.textContent = `${s}×${s}`;
-      b.addEventListener('click', () => { if (s !== N) { settings.size = s; saveSettings(); init(s); } });
-      row.appendChild(b);
+  const sizeRow = $('#sizeRow');
+  sizeRow.addEventListener('keydown', radioKeydown);
+  const sizeButtons = SIZES.map(s => {
+    const b = document.createElement('button'); b.type = 'button';
+    b.className = 'chip'; b.setAttribute('role', 'radio'); b.textContent = `${s}×${s}`;
+    b.addEventListener('click', () => { if (s !== N) { settings.size = s; saveSettings(); init(s); } });
+    sizeRow.appendChild(b);
+    return b;
+  });
+  function updateSizeRow() {
+    sizeButtons.forEach((b, i) => {
+      const selected = SIZES[i] === N;
+      b.setAttribute('aria-checked', String(selected));
+      b.tabIndex = selected ? 0 : -1;
     });
   }
 
@@ -616,9 +623,11 @@
   let hudAnimate = true;
   function updateHud() {
     if (score > best) { best = score; store.set('yp.best.' + N, best); }
-    setRoll(scoreEl, score, hudAnimate);
-    setRoll(bestEl, best, hudAnimate);
+    const animate = hudAnimate && !reduceMotion.matches;
+    setRoll(scoreEl, score, animate);
+    setRoll(bestEl, best, animate);
     undoBtn.disabled = undoStack.length === 0;
+    $('#boardState').textContent = matrix().map((row, i) => `第 ${i + 1} 行：${row.map(v => v || '空').join('、')}`).join('；');
   }
   function saveState() {
     store.set('yp.state.' + N, { ...snapshot(), over, winPending, bestAtRoundStart, undo: undoStack });
@@ -659,8 +668,11 @@
         t.x = nx; t.y = ny; place(t); moved = true;
         if (o.val === 2048 && !won) reached = true;
         const done = () => { t.el.remove(); renderTile(o, true); };
-        pendingMerge.push(done);
-        setTimeout(() => finishMerge(done), 115);
+        if (reduceMotion.matches) done();
+        else {
+          pendingMerge.push(done);
+          setTimeout(() => finishMerge(done), 115);
+        }
       } else {
         grid[cy][cx] = t;
         if (cx !== x || cy !== y) { moved = true; t.x = cx; t.y = cy; place(t); }
@@ -687,7 +699,8 @@
   }
 
   function showOverlay(type) {
-    overlayType = type; overlayEl.inert = false;
+    overlayType = type;
+    overlayEl.inert = true;
     if (type === 'win') {
       overlayEl.innerHTML = `<div class="card"><h3>🎉 你赢了！</h3><p>成功拼出 2048，当前得分 ${score}</p><div class="row"><button class="btn filled" data-act="continue" type="button">继续挑战</button><button class="btn tonal" data-act="new" type="button">新游戏</button></div></div>`;
     } else {
@@ -696,17 +709,24 @@
       overlayEl.innerHTML = `<div class="card"><h3>游戏结束</h3><p>最终得分 ${score}${record ? ' · 新纪录！' : ''}</p><div class="row"><button class="btn filled" data-act="new" type="button">再来一局</button>${undoStack.length ? '<button class="btn tonal" data-act="undo" type="button">撤销一步</button>' : ''}</div></div>`;
     }
     cancelAnimationFrame(overlayFrame);
-    overlayFrame = requestAnimationFrame(() => { overlayFrame = 0; overlayEl.classList.add('show'); });
+    overlayFrame = requestAnimationFrame(() => {
+      overlayFrame = 0;
+      overlayEl.classList.add('show');
+      overlayEl.inert = false;
+      if (document.activeElement === boardEl) overlayEl.querySelector('button').focus({ preventScroll: true });
+    });
   }
   function hideOverlay() {
     clearTimeout(overlayTimer); overlayTimer = 0;
     cancelAnimationFrame(overlayFrame); overlayFrame = 0;
+    if (overlayEl.contains(document.activeElement)) boardEl.focus({ preventScroll: true });
     overlayType = null; overlayEl.inert = true; overlayEl.classList.remove('show');
+    activePointer = null;
   }
   /* 结算弹层晚于最后一步出现；期间玩家可能已经撤销/重开，因此必须可取消 */
   function scheduleOverlay(type, delay) {
     clearTimeout(overlayTimer);
-    overlayTimer = setTimeout(() => { overlayTimer = 0; showOverlay(type); }, delay);
+    overlayTimer = setTimeout(() => { overlayTimer = 0; showOverlay(type); }, reduceMotion.matches ? 0 : delay);
   }
   overlayEl.addEventListener('click', e => {
     const a = e.target.closest('[data-act]'); if (!a) return;
@@ -756,7 +776,7 @@
   function init(size) {
     N = size; settings.size = size;
     hudAnimate = false;
-    buildBoard(); renderSizeRow();
+    buildBoard(); updateSizeRow();
     best = readScore(store.get('yp.best.' + N, 0)) ?? 0;
     hideOverlay();
     const st = store.get('yp.state.' + N, null);
@@ -780,21 +800,26 @@
     const b = e.currentTarget; b.classList.remove('spin'); void b.offsetWidth; b.classList.add('spin');
     newGame();
   });
-  $('#ctaNew').addEventListener('click', () => { newGame(); boardEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+  $('#ctaNew').addEventListener('click', () => {
+    newGame();
+    boardEl.focus({ preventScroll: true });
+    boardEl.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'center' });
+  });
   undoBtn.addEventListener('click', undo);
 
   const KEYS = { ArrowUp: 0, ArrowRight: 1, ArrowDown: 2, ArrowLeft: 3, w: 0, d: 1, s: 2, a: 3, W: 0, D: 1, S: 2, A: 3 };
-  document.addEventListener('keydown', e => {
-    if (document.querySelector('dialog[open]') || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (e.key in KEYS) { e.preventDefault(); move(KEYS[e.key]); }
+  boardEl.addEventListener('keydown', e => {
+    if (e.target !== boardEl || e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (Object.hasOwn(KEYS, e.key)) { e.preventDefault(); move(KEYS[e.key]); }
     else if (e.key === 'z' || e.key === 'Z' || e.key === 'Backspace') { e.preventDefault(); undo(); }
-    else if (e.key === 'r' || e.key === 'R') { newGame(); }
+    else if (!e.repeat && (e.key === 'r' || e.key === 'R')) newGame();
   });
 
   // Swipe (touch + mouse drag) on board
-  let sx = 0, sy = 0, activePointer = null;
   boardEl.addEventListener('pointerdown', e => {
     if (activePointer !== null || !e.isPrimary || e.button !== 0 || e.target.closest('#overlay.show')) return;
+    boardEl.focus({ preventScroll: true });
+    boardEl.setPointerCapture(e.pointerId);
     activePointer = e.pointerId; sx = e.clientX; sy = e.clientY;
   });
   window.addEventListener('pointerup', e => {
@@ -804,9 +829,10 @@
     if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
     move(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
   });
-  window.addEventListener('pointercancel', e => { if (e.pointerId === activePointer) activePointer = null; });
+  const cancelPointer = e => { if (e.pointerId === activePointer) activePointer = null; };
+  window.addEventListener('pointercancel', cancelPointer);
+  boardEl.addEventListener('lostpointercapture', cancelPointer);
   window.addEventListener('blur', () => { activePointer = null; });
-  boardEl.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
 
   /* ---- Boot ---- */
   applyTheme();
