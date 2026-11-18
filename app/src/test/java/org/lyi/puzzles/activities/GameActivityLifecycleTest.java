@@ -155,6 +155,26 @@ public class GameActivityLifecycleTest {
         }
     }
 
+    @Test public void aNewMoveSettlesInterruptedTileAnimations() {
+        GameState state = new GameState(4);
+        state.numbers[0] = 2;
+        state.numbers[1] = 8;
+        state.numbers[2] = 16;
+        state.numbers[3] = 32;
+        GameStorage.writeState(files, 4, state);
+        try (ActivityController<GameActivity> controller = open(4, false)) {
+            GameActivity activity = controller.get();
+            Element tile = activity.elements[0][3];
+            press(activity, KeyEvent.KEYCODE_DPAD_DOWN);
+            tile.setAlpha(0.4f);
+            tile.setScaleX(1.1f);
+            press(activity, KeyEvent.KEYCODE_DPAD_UP);
+            assertEquals(32, tile.number);
+            assertEquals(1f, tile.getAlpha(), 0f);
+            assertEquals(1f, tile.getScaleX(), 0f);
+        }
+    }
+
     private static AlertDialog visibleDialog() {
         return (AlertDialog) ShadowDialog.getLatestDialog();
     }

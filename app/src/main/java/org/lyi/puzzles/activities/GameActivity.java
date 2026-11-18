@@ -342,6 +342,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
     private boolean handleSwipeTop() {
         if (winPending || gameOver || roundDialog != null) return false;
+        settleAnimations();
         Element[][] temp = deepCopy(elements);
         int temp_points = points;
         moved = false;
@@ -408,6 +409,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
     private boolean handleSwipeRight() {
         if (winPending || gameOver || roundDialog != null) return false;
+        settleAnimations();
         Element[][] temp = deepCopy(elements);
         int temp_points = points;
         moved = false;
@@ -476,6 +478,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
     private boolean handleSwipeLeft() {
         if (winPending || gameOver || roundDialog != null) return false;
+        settleAnimations();
         Element[][] temp = deepCopy(elements);
         int temp_points = points;
         moved = false;
@@ -543,6 +546,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
 
     private boolean handleSwipeBottom() {
         if (winPending || gameOver || roundDialog != null) return false;
+        settleAnimations();
         Element[][] temp = deepCopy(elements);
         int temp_points = points;
         moved = false;
@@ -709,6 +713,22 @@ public class GameActivity extends BaseActivityWithoutNavBar {
             }
         }
         return false;
+    }
+
+    private void settleAnimations() {
+        if (!animationActivated) return;
+        for (Element[] row : elements) {
+            for (Element tile : row) {
+                tile.animate().setListener(null).cancel();
+                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) tile.getLayoutParams();
+                tile.setTranslationX(tile.dPosX - params.leftMargin);
+                tile.setTranslationY(tile.dPosY - params.topMargin);
+                tile.setAlpha(1f);
+                tile.setScaleX(1f);
+                tile.setScaleY(1f);
+                if (tile.dNumber != tile.number) tile.drawItem();
+            }
+        }
     }
 
     public void setDPositions(boolean animation) {

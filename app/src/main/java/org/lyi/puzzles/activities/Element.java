@@ -28,6 +28,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.RelativeLayout;
 
 import org.lyi.puzzles.R;
 import org.lyi.puzzles.helpers.TileColors;
@@ -134,7 +135,9 @@ public class Element extends androidx.appcompat.widget.AppCompatButton {
         temp.animateMoving = animateMoving;
         temp.setColor(color);
         temp.setVisibility(getVisibility());
-        temp.setLayoutParams(getLayoutParams());
+        if (getLayoutParams() instanceof RelativeLayout.LayoutParams) {
+            temp.setLayoutParams(new RelativeLayout.LayoutParams((RelativeLayout.LayoutParams) getLayoutParams()));
+        }
         return temp;
     }
 }
