@@ -87,7 +87,7 @@ YiPuzzles 在清单文件中**不申请任何权限**。所有游戏数据（棋
 
 ## 📥 下载与安装
 
-- **[GitHub Releases](https://github.com/lingyicute/YiPuzzles/releases)** —— 稳定版本，外加每次推送自动构建的 **nightly** 版本。
+- **[GitHub Releases](https://github.com/lingyicute/YiPuzzles/releases)** —— 正式版以及默认分支通过检查后发布的 **Nightly**。
 
 ### 系统要求
 - **Android 版本**：Android 5.0（Lollipop，API Level 21）及以上。
