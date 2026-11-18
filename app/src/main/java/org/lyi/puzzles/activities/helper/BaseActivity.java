@@ -95,6 +95,22 @@ public abstract class BaseActivity extends AppCompatActivity implements OnNaviga
     }
 
     @Override
+    protected void onStop() {
+        mHandler.removeCallbacksAndMessages(null);
+        restoreNavigationContent();
+        super.onStop();
+    }
+
+    private void restoreNavigationContent() {
+        if (mNavigationView != null) selectNavigationItem(getNavigationDrawerID());
+        View mainContent = findViewById(R.id.main_content);
+        if (mainContent != null) {
+            mainContent.animate().cancel();
+            mainContent.setAlpha(1f);
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -115,8 +131,10 @@ public abstract class BaseActivity extends AppCompatActivity implements OnNaviga
 
 
     protected boolean goToNavigationItem(final int itemId) {
-
+        // A new choice supersedes the previous delayed launch.
+        mHandler.removeCallbacksAndMessages(null);
         if (itemId == getNavigationDrawerID()) {
+            restoreNavigationContent();
             // just close drawer because we are already in this activity
             mDrawerLayout.closeDrawer(GravityCompat.START);
             return true;
