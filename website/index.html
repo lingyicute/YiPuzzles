@@ -595,11 +595,10 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
 <script>
 /* 首屏前应用主题，避免闪烁 */
 (function () {
-  try {
-    var t = localStorage.getItem("yi-theme");
-    if (!t) t = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    document.documentElement.setAttribute("data-theme", t);
-  } catch (e) { /* ignore */ }
+  var theme;
+  try { theme = localStorage.getItem('yi-theme'); } catch (e) { /* storage can be unavailable */ }
+  if (theme !== 'dark' && theme !== 'light') theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', theme);
 })();
 </script>
 <noscript><style>#themeToggle, .copy-btn { display: none; }</style></noscript>
@@ -1172,16 +1171,21 @@ cd YiPuzzles</pre>
     { name: '山茶粉', hex: '#C93A63' },
     { name: '橄榄绿', hex: '#5C6620' }
   ];
-  var state = { seed: SEEDS[0].hex, theme: 'light' };
+  var root = document.documentElement;
+  var schemeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+  var state = { seed: SEEDS[0].hex, theme: root.getAttribute('data-theme'), followsSystem: true };
   try {
     var savedSeed = localStorage.getItem('yi-seed');
     if (savedSeed && /^#[0-9a-fA-F]{6}$/.test(savedSeed)) state.seed = savedSeed;
     var savedTheme = localStorage.getItem('yi-theme');
-    if (savedTheme === 'dark' || savedTheme === 'light') state.theme = savedTheme;
-    else state.theme = document.documentElement.getAttribute('data-theme') || 'light';
-  } catch (e) { /* ignore */ }
-
-  var root = document.documentElement;
+    state.followsSystem = savedTheme !== 'dark' && savedTheme !== 'light';
+  } catch (e) { /* storage can be unavailable */ }
+  if (schemeMedia.addEventListener) schemeMedia.addEventListener('change', function (e) {
+    if (state.followsSystem) {
+      state.theme = e.matches ? 'dark' : 'light';
+      applyTheme();
+    }
+  });
   var metaTheme = document.getElementById('metaTheme');
 
   function applyTheme() {
@@ -1204,10 +1208,10 @@ cd YiPuzzles</pre>
     Array.prototype.forEach.call(sws, function (el) {
       el.setAttribute('aria-pressed', el.dataset.seed.toLowerCase() === state.seed.toLowerCase() ? 'true' : 'false');
     });
-    try {
-      localStorage.setItem('yi-seed', state.seed);
-      localStorage.setItem('yi-theme', state.theme);
-    } catch (e) { /* ignore */ }
+  }
+
+  function setPreference(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) { /* storage can be unavailable */ }
   }
 
   /* ============ 4. 种子色色板 ============ */
@@ -1224,6 +1228,7 @@ cd YiPuzzles</pre>
       b.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
       b.addEventListener('click', function () {
         state.seed = s.hex;
+        setPreference('yi-seed', s.hex);
         applyTheme();
         snack('主题已切换：' + s.name);
       });
@@ -1238,6 +1243,7 @@ cd YiPuzzles</pre>
     dice.addEventListener('click', function () {
       var hex = hslToHex(Math.random() * 360, 45 + Math.random() * 30, 34 + Math.random() * 14);
       state.seed = hex;
+      setPreference('yi-seed', hex);
       applyTheme();
       snack('随机主题色：' + hex.toUpperCase());
     });
@@ -1249,6 +1255,8 @@ cd YiPuzzles</pre>
   if (themeToggle) {
     themeToggle.addEventListener('click', function () {
       state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      state.followsSystem = false;
+      setPreference('yi-theme', state.theme);
       applyTheme();
       snack(state.theme === 'dark' ? '已切换到深色模式 🌙' : '已切换到浅色模式 ☀️');
     });
