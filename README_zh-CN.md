@@ -125,6 +125,23 @@ Nightly 采用独立应用 ID `org.lyi.puzzles.nightly`，不会覆盖正式版�
 
 <br>
 
+## 🧪 回归测试
+
+浏览器测试需要 Node.js 22 或更新版本。将固定版本的 Playwright 安装到临时目录即可，静态页面不需要 npm 运行时依赖。
+
+```bash
+./gradlew testDebugUnitTest lintDebug
+web_tools="$(mktemp -d)"
+npm install --prefix "$web_tools" --no-package-lock playwright@1.65.1
+"$web_tools/node_modules/.bin/playwright" install --with-deps chromium
+NODE_PATH="$web_tools/node_modules" node --test tests/web-regression.cjs
+rm -rf "$web_tools"
+```
+
+如需使用已有的 Chromium，可设置 `CHROMIUM_PATH`，省略浏览器下载步骤。CI 只有在 Android 检查和浏览器测试均通过后才会发布夜间版。
+
+<br>
+
 ## 🤗 贡献
 
 欢迎任何形式的贡献！

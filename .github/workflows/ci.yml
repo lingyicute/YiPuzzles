@@ -38,8 +38,28 @@ jobs:
           path: app/build/outputs/apk/nightly/*.apk
           if-no-files-found: error
 
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install browser test tools
+        run: |
+          npm install --prefix "$RUNNER_TEMP/web-tests" --no-package-lock --no-audit --no-fund playwright@1.65.1
+          "$RUNNER_TEMP/web-tests/node_modules/.bin/playwright" install --with-deps chromium
+
+      - name: Run browser regression tests
+        run: NODE_PATH="$RUNNER_TEMP/web-tests/node_modules" node --test tests/web-regression.cjs
+
   publish:
-    needs: verify
+    needs: [verify, web]
     if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-latest
     permissions:

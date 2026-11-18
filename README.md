@@ -125,6 +125,23 @@ Nightlies use the separate application ID `org.lyi.puzzles.nightly`, so they do 
 
 <br>
 
+## 🧪 Regression Tests
+
+The browser suite requires Node.js 22 or newer. Install its pinned Playwright version in a temporary directory; the static pages do not need runtime npm dependencies.
+
+```bash
+./gradlew testDebugUnitTest lintDebug
+web_tools="$(mktemp -d)"
+npm install --prefix "$web_tools" --no-package-lock playwright@1.65.1
+"$web_tools/node_modules/.bin/playwright" install --with-deps chromium
+NODE_PATH="$web_tools/node_modules" node --test tests/web-regression.cjs
+rm -rf "$web_tools"
+```
+
+Set `CHROMIUM_PATH` to use an existing Chromium executable instead of downloading one. CI runs both the Android checks and the browser suite before publishing a nightly.
+
+<br>
+
 ## 🤗 Contributing
 
 Contributions are always welcome!
