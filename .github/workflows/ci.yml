@@ -24,7 +24,7 @@ jobs:
         run: sdkmanager 'platforms;android-34' 'build-tools;34.0.0'
 
       - name: Test, lint and build APKs
-        run: ./gradlew testDebugUnitTest lintDebug assembleDebug assembleRelease
+        run: ./gradlew testDebugUnitTest lintDebug assembleDebug assembleRelease assembleNightly
 
       - uses: actions/upload-artifact@v4
         with:
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: nightly-input
-          path: app/build/outputs/apk/release/*.apk
+          path: app/build/outputs/apk/nightly/*.apk
           if-no-files-found: error
 
   publish:
@@ -48,10 +48,29 @@ jobs:
       group: nightly-release
       cancel-in-progress: false
     steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
       - uses: actions/download-artifact@v4
         with:
           name: nightly-input
           path: nightly-input
+
+      - name: Install APK signing tools
+        run: sdkmanager 'build-tools;34.0.0'
+
+      - name: Sign and verify installable nightly APK
+        env:
+          NIGHTLY_KEYSTORE_BASE64: ${{ secrets.NIGHTLY_KEYSTORE_BASE64 }}
+          NIGHTLY_KEYSTORE_PASSWORD: ${{ secrets.NIGHTLY_KEYSTORE_PASSWORD }}
+          NIGHTLY_KEY_ALIAS: ${{ secrets.NIGHTLY_KEY_ALIAS }}
+          NIGHTLY_KEY_PASSWORD: ${{ secrets.NIGHTLY_KEY_PASSWORD }}
+        run: |
+          set -- nightly-input/*.apk
+          test "$#" -eq 1 && test -f "$1"
+          mkdir -p signed
+          scripts/sign-nightly.sh "$1" "signed/yipuzzles-nightly-${GITHUB_SHA:0:12}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.apk"
 
       - name: Publish nightly release
         env:
@@ -63,9 +82,23 @@ jobs:
             echo 'Skipping an outdated build.'
             exit 0
           fi
+          apk=(signed/*.apk)
+          asset=${apk[0]##*/}
+          notes=$(printf 'Verified build · Commit: %s\n\nInstalls alongside stable. If the signing key changed, uninstall the previous nightly before installing (its local progress will be removed).\n' "$GITHUB_SHA")
           if gh release view nightly >/dev/null 2>&1; then
-            gh release delete nightly --yes --cleanup-tag
+            # Keep the previous download until the new and verified asset is uploaded.
+            gh release upload nightly "${apk[0]}"
+            gh api --method PATCH "repos/$GH_REPO/git/refs/tags/nightly" \
+              -f sha="$GITHUB_SHA" -F force=true >/dev/null
+            gh release edit nightly --title 'Nightly Build' --notes "$notes" --prerelease --latest=false
+            gh release view nightly --json assets --jq '.assets[].name' | while IFS= read -r old; do
+              [[ "$old" == "$asset" ]] && continue
+              case "$old" in
+                yipuzzles-nightly-*.apk|yipuzzles-release-*.apk) gh release delete-asset nightly "$old" --yes ;;
+              esac
+            done
+          else
+            gh release create nightly "${apk[0]}" \
+              --title 'Nightly Build' --notes "$notes" \
+              --prerelease --latest=false --target "$GITHUB_SHA"
           fi
-          gh release create nightly nightly-input/*.apk \
-            --title 'Nightly Build' --notes "Verified build · Commit: ${GITHUB_SHA:0:7}" \
-            --prerelease --latest=false --target "$GITHUB_SHA"

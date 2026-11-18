@@ -19,6 +19,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        nightly {
+            initWith release
+            applicationIdSuffix '.nightly'
+            matchingFallbacks = ['release']
+        }
     }
 
     compileOptions {
