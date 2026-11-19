@@ -359,7 +359,8 @@
   }
   const root = document.documentElement;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  // Keep serialized copies so board switches still work if storage is denied or full.
+  // Keeps only the writes that storage rejected, so board switches still work if storage is
+  // denied or full while values saved by other tabs stay visible.
   const sessionStore = new Map();
   const storageUnavailable = () => { $('#storageNotice').hidden = false; };
   const store = {
@@ -371,13 +372,15 @@
     },
     set(k, v) {
       const serialized = JSON.stringify(v);
-      sessionStore.set(k, serialized);
-      try { localStorage.setItem(k, serialized); } catch (e) { storageUnavailable(); }
+      try { localStorage.setItem(k, serialized); sessionStore.delete(k); }
+      catch (e) { sessionStore.set(k, serialized); storageUnavailable(); }
     },
     remove(k) {
-      // A tombstone prevents a failed removal from reviving an old saved round.
-      sessionStore.set(k, null);
-      try { localStorage.removeItem(k); } catch (e) { storageUnavailable(); }
+      try { localStorage.removeItem(k); sessionStore.delete(k); }
+      catch (e) {
+        // A tombstone prevents a failed removal from reviving an old saved round.
+        sessionStore.set(k, null); storageUnavailable();
+      }
     }
   };
 
@@ -841,6 +844,16 @@
   window.addEventListener('pointercancel', cancelPointer);
   boardEl.addEventListener('lostpointercapture', cancelPointer);
   window.addEventListener('blur', () => { activePointer = null; });
+
+  /* 其他标签页刷新了最高分时同步过来，否则本页稍后会用较低的分数覆盖它 */
+  window.addEventListener('storage', e => {
+    if (e.key !== 'yp.best.' + N || e.newValue === null) return;
+    let other = null;
+    try { other = readScore(JSON.parse(e.newValue)); } catch (err) { /* 忽略无法解析的值 */ }
+    if (other === null || other <= best) return;
+    best = other; bestAtRoundStart = Math.max(bestAtRoundStart, other);
+    updateHud();
+  });
 
   /* ---- Boot ---- */
   applyTheme();

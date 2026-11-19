@@ -187,6 +187,24 @@ test('copy failures are reported while preserving focus and removing fallback in
   await page.waitForFunction(() => document.querySelector('#snackbar').textContent.includes('已复制'));
 });
 
+test('a higher best score saved by another tab is adopted instead of overwritten', async t => {
+  const { context, page } = await open(t, '/h5-demo/', {
+    records: { 'yp.state.4': { g: board([2, 2, 4]), score: 0 } },
+    setup: () => { Math.random = () => 0; }
+  });
+  await page.locator('#board').press('ArrowLeft');
+  const other = await context.newPage();
+  await other.goto(origin + '/h5-demo/');
+  await other.evaluate(() => localStorage.setItem('yp.best.4', '132'));
+  await page.waitForFunction(() => document.querySelector('#best').getAttribute('aria-label') === '132');
+  await page.locator('#board').press('ArrowLeft');
+  assert.equal(await page.locator('#score').getAttribute('aria-label'), '12');
+  assert.equal(await page.evaluate(() => localStorage.getItem('yp.best.4')), '132');
+  await page.getByRole('radio', { name: '5×5' }).click();
+  await page.getByRole('radio', { name: '4×4' }).click();
+  assert.equal(await page.locator('#best').getAttribute('aria-label'), '132');
+});
+
 for (const failure of ['quota', 'denied']) {
   test(`session progress survives board switches when storage is ${failure}`, async t => {
     const { page } = await open(t, '/h5-demo/', {
