@@ -233,6 +233,11 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         newGame = stored == null;
         gameState = newGame ? new GameState(n) : stored;
         points = gameState.points;
+        if (points > record) {
+            // The statistics may have been reset while this round was still in progress.
+            record = points;
+            gameStatistics.setRecord(record);
+        }
         last_points = gameState.last_points;
         undo = gameState.undo;
         won2048 = false;

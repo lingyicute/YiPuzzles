@@ -155,6 +155,19 @@ public class GameActivityLifecycleTest {
         }
     }
 
+    @Test public void resumedRoundRaisesAResetRecordToItsScore() {
+        GameState state = new GameState(4);
+        state.numbers[0] = 8;
+        state.numbers[1] = 2;
+        state.points = 500;
+        GameStorage.writeState(files, 4, state);
+        try (ActivityController<GameActivity> controller = open(4, false)) {
+            assertEquals("500", controller.get().textFieldRecord.getText().toString());
+            controller.pause();
+            assertEquals(500, GameStorage.readStatistics(files, 4).getRecord());
+        }
+    }
+
     @Test public void aNewMoveSettlesInterruptedTileAnimations() {
         GameState state = new GameState(4);
         state.numbers[0] = 2;
