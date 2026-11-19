@@ -255,7 +255,7 @@ public class StatsActivity extends BaseActivity {
                 sign = "-";
                 timeInMillis = Math.abs(timeInMillis);
             }
-            Double seconds = new Double(((double) timeInMillis) / (double) TimeUnit.SECONDS.toMillis(1));
+            double seconds = ((double) timeInMillis) / (double) TimeUnit.SECONDS.toMillis(1);
             StringBuilder sb = new StringBuilder(",##0.00");
             DecimalFormat df = new DecimalFormat(sb.toString());
             df.setRoundingMode(RoundingMode.HALF_UP);
@@ -272,7 +272,7 @@ public class StatsActivity extends BaseActivity {
                 sign = "-";
                 timeInMillis = Math.abs(timeInMillis);
             }
-            Double seconds = new Double(((double) timeInMillis) / (double) TimeUnit.HOURS.toMillis(1));
+            double seconds = ((double) timeInMillis) / (double) TimeUnit.HOURS.toMillis(1);
             StringBuilder sb = new StringBuilder(",##0.00");
             DecimalFormat df = new DecimalFormat(sb.toString());
             df.setRoundingMode(RoundingMode.HALF_UP);
