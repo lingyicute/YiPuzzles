@@ -4,6 +4,7 @@ package org.lyi.puzzles;
 import android.content.Context;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.core.graphics.ColorUtils;
+import androidx.preference.PreferenceManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.lyi.puzzles.helpers.TileColors;
@@ -24,12 +25,15 @@ public class TileColorsContrastTest {
 
     private void assertReadablePalette() {
         Context context = new ContextThemeWrapper(RuntimeEnvironment.getApplication(), R.style.Theme_YiPuzzles);
-        TileColors.invalidate();
-        for (Map.Entry<Integer, TileColors.Tile> entry : TileColors.palette(context).entrySet()) {
-            if (entry.getKey() == 0) continue;
-            TileColors.Tile tile = entry.getValue();
-            double contrast = ColorUtils.calculateContrast(tile.getText(), tile.getBackground());
-            assertTrue("Tile " + entry.getKey() + " contrast: " + contrast, contrast >= 4.5);
+        for (String scheme : new String[] {TileColors.SCHEME_MATERIAL_YOU, TileColors.SCHEME_ORIGINAL, TileColors.SCHEME_CLASSIC_BLUE}) {
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString(TileColors.PREF_KEY, scheme).commit();
+            TileColors.invalidate();
+            for (Map.Entry<Integer, TileColors.Tile> entry : TileColors.palette(context).entrySet()) {
+                if (entry.getKey() == 0) continue;
+                TileColors.Tile tile = entry.getValue();
+                double contrast = ColorUtils.calculateContrast(tile.getText(), tile.getBackground());
+                assertTrue("Scheme " + scheme + " tile " + entry.getKey() + " contrast: " + contrast, contrast >= 4.5);
+            }
         }
     }
 }

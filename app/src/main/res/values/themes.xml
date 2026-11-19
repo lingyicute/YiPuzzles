@@ -120,7 +120,7 @@
         <item name="button4">@color/button4</item>
         <item name="button4Text">@color/black</item>
         <item name="button8">@color/button8</item>
-        <item name="button8Text">@color/white</item>
+        <item name="button8Text">@color/black</item>
         <item name="button16">@color/button16</item>
         <item name="button16Text">@color/white</item>
         <item name="button32">@color/button32</item>
@@ -134,17 +134,17 @@
         <item name="button512">@color/button512</item>
         <item name="button512Text">@color/white</item>
         <item name="button1024">@color/button1024</item>
-        <item name="button1024Text">@color/white</item>
+        <item name="button1024Text">@color/black</item>
         <item name="button2048">@color/button2048</item>
-        <item name="button2048Text">@color/white</item>
+        <item name="button2048Text">@color/black</item>
         <item name="button4096">@color/button4096</item>
         <item name="button4096Text">@color/black</item>
         <item name="button8192">@color/button8192</item>
         <item name="button8192Text">@color/black</item>
         <item name="button16384">@color/button16384</item>
-        <item name="button16384Text">@color/white</item>
+        <item name="button16384Text">@color/black</item>
         <item name="button32768">@color/button32768</item>
-        <item name="button32768Text">@color/white</item>
+        <item name="button32768Text">@color/black</item>
     </style>
 
     <style name="ThemeOverlay.YiPuzzles.Tiles.Original" parent="">
@@ -153,31 +153,31 @@
         <item name="button4">@color/button4_2</item>
         <item name="button4Text">@color/black</item>
         <item name="button8">@color/button8_2</item>
-        <item name="button8Text">@color/white</item>
+        <item name="button8Text">@color/black</item>
         <item name="button16">@color/button16_2</item>
-        <item name="button16Text">@color/white</item>
+        <item name="button16Text">@color/black</item>
         <item name="button32">@color/button32_2</item>
-        <item name="button32Text">@color/white</item>
+        <item name="button32Text">@color/black</item>
         <item name="button64">@color/button64_2</item>
-        <item name="button64Text">@color/white</item>
+        <item name="button64Text">@color/black</item>
         <item name="button128">@color/button128_2</item>
-        <item name="button128Text">@color/white</item>
+        <item name="button128Text">@color/black</item>
         <item name="button256">@color/button256_2</item>
-        <item name="button256Text">@color/white</item>
+        <item name="button256Text">@color/black</item>
         <item name="button512">@color/button512_2</item>
-        <item name="button512Text">@color/white</item>
+        <item name="button512Text">@color/black</item>
         <item name="button1024">@color/button1024_2</item>
-        <item name="button1024Text">@color/white</item>
+        <item name="button1024Text">@color/black</item>
         <item name="button2048">@color/button2048_2</item>
-        <item name="button2048Text">@color/white</item>
+        <item name="button2048Text">@color/black</item>
         <item name="button4096">@color/button4096_2</item>
-        <item name="button4096Text">@color/white</item>
+        <item name="button4096Text">@color/black</item>
         <item name="button8192">@color/button8192_2</item>
-        <item name="button8192Text">@color/white</item>
+        <item name="button8192Text">@color/black</item>
         <item name="button16384">@color/button16384_2</item>
-        <item name="button16384Text">@color/white</item>
+        <item name="button16384Text">@color/black</item>
         <item name="button32768">@color/button32768_2</item>
-        <item name="button32768Text">@color/white</item>
+        <item name="button32768Text">@color/black</item>
     </style>
 
 </resources>
