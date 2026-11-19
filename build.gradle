@@ -16,10 +16,6 @@ buildscript {
     }
 }
 
-plugins {
-    id 'com.google.devtools.ksp' version "$kotlin_version-1.0.20" apply false
-}
-
 allprojects {
     repositories {
         mavenCentral()
