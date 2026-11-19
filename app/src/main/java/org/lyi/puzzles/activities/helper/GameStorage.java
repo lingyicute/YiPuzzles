@@ -59,7 +59,7 @@ public final class GameStorage {
             return type.isInstance(data) ? type.cast(data) : null;
         } catch (FileNotFoundException missing) {
             return null;
-        } catch (IOException | ClassNotFoundException malformed) {
+        } catch (IOException | ClassNotFoundException | RuntimeException malformed) {
             Log.w(TAG, "Could not read " + file.getBaseFile().getName(), malformed);
             return null;
         }

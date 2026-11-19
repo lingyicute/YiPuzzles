@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.util.Arrays;
 
@@ -66,6 +67,17 @@ public class GameStorageTest {
         assertFalse(GameStorage.readState(dir, 7).undo);
     }
 
+    @Test public void treatsUncheckedDeserializationFailuresAsUnreadable() throws IOException {
+        File dir = files.getRoot();
+        for (String name : new String[] {"state6.txt", "statistics6.txt"}) {
+            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(new File(dir, name)))) {
+                out.writeObject(new Exploding());
+            }
+        }
+        assertNull(GameStorage.readState(dir, 6));
+        assertEquals(0, GameStorage.readStatistics(dir, 6).getRecord());
+    }
+
     @Test public void interruptedWriteLeavesOldSaveAndResetOnlyDeletesSelectedData() throws IOException {
         File dir = files.getRoot();
         GameState state = new GameState(4);
@@ -88,5 +100,12 @@ public class GameStorageTest {
         assertEquals(128, GameStorage.readStatistics(dir, 5).getRecord());
         GameStorage.deleteStatistics(dir, 5);
         assertEquals(0, GameStorage.readStatistics(dir, 5).getRecord());
+    }
+
+    /** Stands in for corrupt streams that ObjectInputStream reports with unchecked exceptions. */
+    private static class Exploding implements Serializable {
+        private Object readResolve() {
+            throw new IllegalStateException("corrupt");
+        }
     }
 }
