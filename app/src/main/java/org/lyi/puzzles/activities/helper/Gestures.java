@@ -20,7 +20,6 @@
 package org.lyi.puzzles.activities.helper;
 
 import android.content.Context;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -32,56 +31,49 @@ import android.view.View;
  */
 public class Gestures implements View.OnTouchListener {
 
-    private final GestureDetector gestureDetector;
+    private final float swipeThreshold;
+    private int activePointer = -1;
+    private float startX;
+    private float startY;
 
     public Gestures(Context context) {
-        gestureDetector = new GestureDetector(context, new GestureListener());
+        swipeThreshold = 24 * context.getResources().getDisplayMetrics().density;
     }
 
-    public boolean onTouch(View v, MotionEvent event) {
-        boolean res = gestureDetector.onTouchEvent(event);
-        return res;
-    }
-
-    private final class GestureListener extends GestureDetector.SimpleOnGestureListener {
-
-        private static final int SWIPE_THRESHOLD = 50;
-        private static final int SWIPE_VELOCITY_THRESHOLD = 0;
-
-        @Override
-        public boolean onDown(MotionEvent e) {
-            return true;
-        }
-
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-
-            boolean result = false;
-            try {
-                float diffY = e2.getY() - e1.getY();
-                float diffX = e2.getX() - e1.getX();
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                        if (diffX > 0) {
-                            result = onSwipeRight();
-                        } else {
-                            result = onSwipeLeft();
-                        }
-                    }
+    @Override
+    public boolean onTouch(View view, MotionEvent event) {
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                activePointer = event.getPointerId(0);
+                // Screen coordinates stay stable even when the touched tile is animating.
+                startX = event.getRawX();
+                startY = event.getRawY();
+                break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+            case MotionEvent.ACTION_POINTER_UP:
+            case MotionEvent.ACTION_CANCEL:
+                activePointer = -1;
+                break;
+            case MotionEvent.ACTION_UP:
+                if (activePointer == -1 || event.getPointerId(0) != activePointer) break;
+                activePointer = -1;
+                float diffX = event.getRawX() - startX;
+                float diffY = event.getRawY() - startY;
+                if (Math.max(Math.abs(diffX), Math.abs(diffY)) < swipeThreshold) {
+                    view.performClick();
+                } else if (Math.abs(diffX) > Math.abs(diffY)) {
+                    if (diffX > 0) onSwipeRight();
+                    else onSwipeLeft();
                 } else {
-                    if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                        if (diffY > 0) {
-                            result = onSwipeBottom();
-                        } else {
-                            result = onSwipeTop();
-                        }
-                    }
+                    if (diffY > 0) onSwipeBottom();
+                    else onSwipeTop();
                 }
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
-            return result;
+                break;
+            default:
+                break;
         }
+        // Own the entire gesture, including slow drags and moves that cannot change the board.
+        return true;
     }
 
     public boolean onSwipeRight() {
