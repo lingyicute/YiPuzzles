@@ -58,7 +58,7 @@
     <!-- ###SETTINGS### -->
     <string name="settings_name">Settings</string>
     <string name="settings_animation">Activate Animation</string>
-    <string name="settings_display">Activate Screen Lock</string>
+    <string name="settings_display">Keep Screen On</string>
     <string name="settings_color">Select Color Scheme</string>
     <string name="settings_color_system">System</string>
     <string name="settings_color_light">Light</string>
