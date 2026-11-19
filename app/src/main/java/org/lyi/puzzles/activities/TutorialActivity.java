@@ -88,13 +88,6 @@ public class TutorialActivity extends AppCompatActivity {
         viewPager.setAdapter(myViewPagerAdapter);
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener);
 
-
-        try {
-            ImageView imageView = (ImageView) findViewById(R.id.image1);
-            Glide.with(TutorialActivity.this).load(R.mipmap.ic_launcher_foreground).into(imageView);
-        } catch (NullPointerException ne) {
-        }
-
         btnSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
