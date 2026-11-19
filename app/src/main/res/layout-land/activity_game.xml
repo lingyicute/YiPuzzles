@@ -62,12 +62,11 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.YiPuzzles.ScoreCard"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 app:contentPaddingBottom="10dp"
                 app:contentPaddingLeft="16dp"
                 app:contentPaddingRight="16dp"
@@ -87,7 +86,8 @@
 
                     <TextView
                         android:id="@+id/points"
-                        android:layout_width="wrap_content"
+                        style="@style/Widget.YiPuzzles.ScoreValue"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:textAppearance="@style/TextAppearance.YiPuzzles.ScoreValue" />
@@ -96,10 +96,9 @@
 
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.YiPuzzles.ScoreCard"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
+                android:layout_marginTop="8dp"
                 app:cardBackgroundColor="?attr/colorTertiaryContainer"
                 app:contentPaddingBottom="10dp"
                 app:contentPaddingLeft="16dp"
@@ -121,7 +120,8 @@
 
                     <TextView
                         android:id="@+id/record"
-                        android:layout_width="wrap_content"
+                        style="@style/Widget.YiPuzzles.ScoreValue"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:textAppearance="@style/TextAppearance.YiPuzzles.ScoreValue"

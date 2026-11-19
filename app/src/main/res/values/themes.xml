@@ -109,6 +109,16 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="Widget.YiPuzzles.ScoreValue" parent="android:Widget.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.YiPuzzles.ScoreValue</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:gravity">center</item>
+        <item name="autoSizeTextType">uniform</item>
+        <item name="autoSizeMinTextSize">10sp</item>
+        <item name="autoSizeMaxTextSize">22sp</item>
+        <item name="autoSizeStepGranularity">1sp</item>
+    </style>
+
     <!-- ================================================================
          Static tile colour overlays. The former default ("1") is now the
          dynamic Material You palette computed at runtime, "2" is the

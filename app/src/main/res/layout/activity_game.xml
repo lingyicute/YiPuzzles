@@ -59,7 +59,8 @@
 
                     <TextView
                         android:id="@+id/points"
-                        android:layout_width="wrap_content"
+                        style="@style/Widget.YiPuzzles.ScoreValue"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:textAppearance="@style/TextAppearance.YiPuzzles.ScoreValue" />
@@ -93,13 +94,23 @@
 
                     <TextView
                         android:id="@+id/record"
-                        android:layout_width="wrap_content"
+                        style="@style/Widget.YiPuzzles.ScoreValue"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:textAppearance="@style/TextAppearance.YiPuzzles.ScoreValue"
                         android:textColor="?attr/colorOnTertiaryContainer" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="end"
+            android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/undoButton"
