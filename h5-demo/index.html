@@ -827,6 +827,10 @@
   });
 
   // Swipe (touch + mouse drag) on board
+  // A second finger cancels the gesture, even if it lands outside the board.
+  window.addEventListener('pointerdown', e => {
+    if (activePointer !== null && e.pointerId !== activePointer) activePointer = null;
+  }, true);
   boardEl.addEventListener('pointerdown', e => {
     if (activePointer !== null || !e.isPrimary || e.button !== 0 || e.target.closest('#overlay.show')) return;
     boardEl.focus({ preventScroll: true });

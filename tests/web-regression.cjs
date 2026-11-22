@@ -239,3 +239,36 @@ for (const failure of ['quota', 'denied']) {
     assert.equal(await page.locator('#best').getAttribute('aria-label'), '0');
   });
 }
+
+for (const outside of [false, true]) {
+  test(`a second finger ${outside ? 'outside' : 'inside'} the board cancels the swipe`, async t => {
+    const { context, page } = await open(t, '/h5-demo/', {
+      options: { hasTouch: true, viewport: { width: 480, height: 900 } },
+      records: { 'yp.state.4': { g: board([2, 2]), score: 8 } },
+      setup: () => { Math.random = () => 0; }
+    });
+    const before = await archive(page);
+    const box = await page.locator('#board').boundingBox();
+    const first = { id: 0, x: Math.round(box.x + 150), y: Math.round(box.y + 100) };
+    const second = outside ? { id: 1, x: 8, y: 8 } : { ...first, id: 1, x: first.x + 70 };
+    const session = await context.newCDPSession(page);
+    const touch = (type, touchPoints) => session.send('Input.dispatchTouchEvent', { type, touchPoints });
+    await touch('touchStart', [first]);
+    first.x -= 60;
+    await touch('touchMove', [first]);
+    await touch('touchStart', [first, second]);
+    await touch('touchMove', [second]);
+    await touch('touchEnd', []);
+    assert.deepEqual(await archive(page), before, 'multi-touch must not change the saved round');
+
+    first.id = 2;
+    first.x += 60;
+    await touch('touchStart', [first]);
+    first.x -= 60;
+    await touch('touchMove', [first]);
+    await touch('touchEnd', []);
+    const after = await archive(page);
+    assert.equal(after.score, 12, 'the next single-finger swipe still works');
+    assert.equal(after.undo.length, 1);
+  });
+}
