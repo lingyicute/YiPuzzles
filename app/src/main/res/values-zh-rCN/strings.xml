@@ -18,6 +18,7 @@
 
     <!-- ###GAME###-->
     <string name="title_activity_game">2048</string>
+    <string name="game_board_description">%1$d × %1$d 棋盘</string>
 
     <!--###HELP###-->
     <string name="help">帮助</string>

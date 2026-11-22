@@ -17,6 +17,7 @@
 
     <!-- ###GAME###-->
     <string name="title_activity_game">2048</string>
+    <string name="game_board_description">Game board: %1$d × %1$d</string>
 
     <!--###HELP###-->
     <string name="help">Help</string>

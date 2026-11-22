@@ -24,6 +24,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
 import androidx.preference.PreferenceManager;
+import androidx.core.view.ViewCompat;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -664,6 +665,18 @@ public class GameActivity extends BaseActivityWithoutNavBar {
     }
 
     public void setListener() {
+        // Screen readers consume touch swipes; expose the same moves in their actions menu.
+        touch_field.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+        touch_field.setContentDescription(getString(R.string.game_board_description, n));
+        ViewCompat.addAccessibilityAction(touch_field, getString(R.string.swipe_up),
+                (view, arguments) -> handleSwipeTop());
+        ViewCompat.addAccessibilityAction(touch_field, getString(R.string.swipe_right),
+                (view, arguments) -> handleSwipeRight());
+        ViewCompat.addAccessibilityAction(touch_field, getString(R.string.swipe_down),
+                (view, arguments) -> handleSwipeBottom());
+        ViewCompat.addAccessibilityAction(touch_field, getString(R.string.swipe_left),
+                (view, arguments) -> handleSwipeLeft());
+
         swipeListener = new Gestures(this) {
             public boolean onSwipeTop() {
                 return handleSwipeTop();
