@@ -136,7 +136,10 @@ public class Element extends androidx.appcompat.widget.AppCompatButton {
         temp.setColor(color);
         temp.setVisibility(getVisibility());
         if (getLayoutParams() instanceof RelativeLayout.LayoutParams) {
-            temp.setLayoutParams(new RelativeLayout.LayoutParams((RelativeLayout.LayoutParams) getLayoutParams()));
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams((RelativeLayout.LayoutParams) getLayoutParams());
+            lp.leftMargin = dPosX;
+            lp.topMargin = dPosY;
+            temp.setLayoutParams(lp);
         }
         return temp;
     }

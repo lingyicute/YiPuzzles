@@ -147,14 +147,29 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         if (undo && last_elements != null) {
             undo = false;
             gameStatistics.undo();
+            for (Element[] row : elements) {
+                for (Element tile : row) {
+                    tile.animate().setListener(null).cancel();
+                }
+            }
             elements = last_elements;
             points = last_points;
             number_field.removeAllViews();
             textFieldPoints.setText("" + points);
-            setDPositions(false);
             for (Element[] i : elements) {
                 for (Element j : i) {
-                    j.setVisibility(View.INVISIBLE);
+                    j.animate().setListener(null).cancel();
+                    j.setTranslationX(0f);
+                    j.setTranslationY(0f);
+                    j.setAlpha(1f);
+                    j.setScaleX(1f);
+                    j.setScaleY(1f);
+                    ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) j.getLayoutParams();
+                    if (lp != null) {
+                        lp.leftMargin = j.dPosX;
+                        lp.topMargin = j.dPosY;
+                        j.setLayoutParams(lp);
+                    }
                     number_field.addView(j);
                     j.drawItem();
                 }
@@ -166,7 +181,6 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                 }
             }
             updateGameState();
-            drawAllElements(elements);
             number_field.refreshDrawableState();
         }
     }
