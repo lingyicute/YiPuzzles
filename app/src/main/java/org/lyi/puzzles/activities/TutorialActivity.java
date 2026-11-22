@@ -71,7 +71,7 @@ public class TutorialActivity extends AppCompatActivity {
         EdgeToEdgeHelper.enableEdgeToEdgeDisplay(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tutorial);
-        EdgeToEdgeHelper.applySystemBarPadding(findViewById(R.id.main_content), true, true);
+        EdgeToEdgeHelper.applySystemBarPadding(findViewById(R.id.main_content), true, true, true);
 
         firstLaunchManager = new FirstLaunchManager(this);
 

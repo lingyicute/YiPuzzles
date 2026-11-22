@@ -69,17 +69,23 @@ fun applyBottomSystemBarPadding(view: View?) = applySystemBarPadding(view, top =
 /**
  * Applies the system bar insets of the requested edges as padding to [view]. Unlike
  * `android:fitsSystemWindows` the insets are *not* consumed, so sibling views still receive them.
+ * Opt into horizontal padding for full-screen layouts without an insetting parent.
  */
-fun applySystemBarPadding(view: View?, top: Boolean, bottom: Boolean) {
+@JvmOverloads
+fun applySystemBarPadding(view: View?, top: Boolean, bottom: Boolean, horizontal: Boolean = false) {
     if (view == null) return
+    val initialLeft = view.paddingLeft
     val initialTop = view.paddingTop
+    val initialRight = view.paddingRight
     val initialBottom = view.paddingBottom
     ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
         val bars = insets.getInsets(
             WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
         )
         v.updatePadding(
+            left = if (horizontal) initialLeft + bars.left else v.paddingLeft,
             top = if (top) initialTop + bars.top else v.paddingTop,
+            right = if (horizontal) initialRight + bars.right else v.paddingRight,
             bottom = if (bottom) initialBottom + bars.bottom else v.paddingBottom
         )
         insets
