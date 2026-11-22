@@ -35,7 +35,7 @@
     <string name="help_tip">如何赢得游戏？</string>
     <string name="help_tip_answer">赢得游戏的策略有很多。你可以在网络上找到许多相关视频。</string>
     <string name="help_permission">应用需要哪些权限？</string>
-    <string name="help_permission_answer">此应用不需要任何权限。</string>
+    <string name="help_permission_answer">应用不请求运行时权限或网络权限。AndroidX 会添加应用专属的内部签名权限以保护广播接收器；它不会赋予访问个人数据的能力。</string>
 
     <!-- 帮助条目的展开状态，由屏幕阅读器朗读 -->
     <string name="help_state_expanded">已展开</string>

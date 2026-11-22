@@ -34,7 +34,7 @@
     <string name="help_tip">How to beat the game?</string>
     <string name="help_tip_answer">There are a few strategies to win this game. You can find a lot of videos which are covering this topic on the internet.</string>
     <string name="help_permission">Which permissions does the app require?</string>
-    <string name="help_permission_answer">This app does not require any permission.</string>
+    <string name="help_permission_answer">This app does not request runtime or network permissions. AndroidX adds an app-scoped signature permission to protect internal broadcast receivers. This does not grant access to your personal data.</string>
 
     <!-- Expansion state of a help entry, announced by screen readers -->
     <string name="help_state_expanded">Expanded</string>

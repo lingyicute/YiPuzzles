@@ -33,7 +33,7 @@
 
 Most 2048 games in the stores fall into one of two camps: cluttered with advertisements, leaderboards, and accounts, or locked to a single 4×4 grid.
 
-**YiPuzzles** takes a privacy-first, fully offline approach to the classic. It declares **zero permissions**, ships with **four board sizes** and **per-board statistics**, and wraps it all in a polished **Material You** interface that can take its colors straight from your wallpaper.
+**YiPuzzles** takes a privacy-first, fully offline approach to the classic. It requests **no Android runtime permissions**, ships with **four board sizes** and **per-board statistics**, and wraps it all in a polished **Material You** interface that can take its colors straight from your wallpaper.
 
 <br>
 
@@ -74,8 +74,8 @@ Most 2048 games in the stores fall into one of two camps: cluttered with adverti
 
 ## 🛠️ Why YiPuzzles? (Under the Hood)
 
-### 1. Zero-Permission Architecture
-YiPuzzles declares **no permissions at all** in its manifest. All game state (boards, scores, statistics) is stored locally on the device, the game runs 100% offline, and there is nothing to grant in the settings because there is nothing to audit in the code.
+### 1. No Runtime Permission Requests
+YiPuzzles requests **no Android runtime permissions** and has no `INTERNET` permission. AndroidX adds an app-scoped **signature permission** (`${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`) to the merged APK manifest to protect internal broadcast receivers; this does not grant access to personal data. Game state and preferences are stored locally. If system backup is enabled, Android may back them up according to your device settings.
 
 ### 2. Material You Dynamic Theming
 On Android 12+, YiPuzzles derives its color scheme from your wallpaper, so the board, tiles, and home-screen previews all blend with the rest of your device. Prefer a fixed look? Fall back to the original 2048 palette or the deep blue scheme at any time.
@@ -91,7 +91,7 @@ On Android 12+, YiPuzzles derives its color scheme from your wallpaper, so the b
 
 ### System Requirements
 - **Android Version**: Android 5.0 (Lollipop, API Level 21) or above.
-- **Permissions**: None. There is nothing to grant — install and play.
+- **Permissions**: No runtime permission prompts. AndroidX declares its internal signature permission automatically.
 
 <br>
 
