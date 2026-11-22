@@ -272,3 +272,55 @@ for (const outside of [false, true]) {
     assert.equal(after.undo.length, 1);
   });
 }
+
+test('site theme text stays readable across presets and the random hue range', async t => {
+  const { page } = await open(t, '/website/');
+  const failures = await page.evaluate(() => {
+    const failures = [];
+    const root = document.documentElement;
+    const value = name => root.style.getPropertyValue('--' + name).trim();
+    const luminance = hex => hex.slice(1).match(/../g)
+      .map(v => parseInt(v, 16) / 255)
+      .map(v => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)
+      .reduce((sum, v, i) => sum + v * [0.2126, 0.7152, 0.0722][i], 0);
+    const check = (seed, foreground, background) => {
+      const a = luminance(value(foreground)), b = luminance(value(background));
+      const ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+      if (ratio < 4.5 && failures.length < 20) {
+        failures.push(`${root.dataset.theme} ${seed}: ${foreground}/${background} = ${ratio.toFixed(3)}`);
+      }
+    };
+    const checkScheme = seed => {
+      for (const role of ['primary', 'secondary', 'tertiary']) {
+        check(seed, 'on-' + role, role);
+        check(seed, 'on-' + role + '-container', role + '-container');
+        check(seed, role, 'surface-container-highest');
+      }
+      check(seed, 'on-primary', 'tertiary'); // The 2048 tile uses a two-color gradient.
+      check(seed, 'on-surface', 'outline-variant');
+      check(seed, 'on-surface-variant', 'surface-container-highest');
+      check(seed, 'inverse-on-surface', 'inverse-surface');
+    };
+    const random = Math.random;
+    try {
+      for (const theme of ['light', 'dark']) {
+        if (root.dataset.theme !== theme) document.querySelector('#themeToggle').click();
+        for (const swatch of document.querySelectorAll('[data-seed]')) {
+          swatch.click();
+          checkScheme(swatch.dataset.seed);
+        }
+        for (let hue = 0; hue < 360; hue++) {
+          let index = 0;
+          const samples = [hue / 360, (hue % 3) / 2, (hue % 5) / 4];
+          Math.random = () => samples[index++ % samples.length];
+          document.querySelector('.swatch.dice').click();
+          checkScheme('hue ' + hue);
+        }
+      }
+    } finally {
+      Math.random = random;
+    }
+    return failures;
+  });
+  assert.deepEqual(failures, [], 'normal-size theme text must have at least 4.5:1 contrast');
+});

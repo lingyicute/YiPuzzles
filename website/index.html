@@ -1099,6 +1099,40 @@ cd YiPuzzles</pre>
   }
   function clamp(v, lo, hi) { return Math.min(Math.max(v, lo), hi); }
 
+  function luminance(hex) {
+    return hex.slice(1).match(/../g).reduce(function (sum, channel, i) {
+      var v = parseInt(channel, 16) / 255;
+      var linear = v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      return sum + linear * [0.2126, 0.7152, 0.0722][i];
+    }, 0);
+  }
+  function contrast(first, second) {
+    var a = luminance(first), b = luminance(second);
+    return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  }
+  function contrastTone(color, against, lighter) {
+    var tone = hexToHsl(color), limit = lighter ? 100 : 0;
+    while (contrast(color, against) < 4.5 && tone.l !== limit) {
+      tone.l = clamp(tone.l + (lighter ? 1 : -1), 0, 100);
+      color = hslToHex(tone.h, tone.s, tone.l);
+    }
+    return color;
+  }
+  function readableScheme(scheme, dark) {
+    // HSL lightness alone does not ensure readable yellow/green text or buttons.
+    ['primary', 'secondary', 'tertiary'].forEach(function (role) {
+      var accent = '--' + role, container = accent + '-container';
+      // These accents are also used as small link and eyebrow text on surfaces.
+      scheme[accent] = contrastTone(scheme[accent], scheme['--surface-container-highest'], dark);
+      scheme[container] = contrastTone(scheme[container], scheme['--on-' + role + '-container'], !dark);
+    });
+    // The 2048 preview uses on-primary text across both gradient endpoints.
+    if (contrast(scheme['--on-primary'], scheme['--tertiary']) < 4.5) {
+      scheme['--on-primary'] = dark ? '#000000' : '#ffffff';
+    }
+    return scheme;
+  }
+
   /* ============ 2. Material You 色调方案生成 ============ */
   function buildScheme(seed, dark) {
     var c = hexToHsl(seed);
@@ -1107,7 +1141,7 @@ cd YiPuzzles</pre>
     var neu = Math.min(ps * 0.18, 12);        // 表面中性饱和度
     function T(hh, ss, ll) { return hslToHex(hh, clamp(ss, 0, 100), clamp(ll, 0, 100)); }
     if (!dark) {
-      return {
+      return readableScheme({
         '--primary': T(h, ps, 40),
         '--on-primary': T(h, ps, 100),
         '--primary-container': T(h, ps, 90),
@@ -1132,9 +1166,9 @@ cd YiPuzzles</pre>
         '--outline-variant': T(h, neu, 80),
         '--inverse-surface': T(h, neu, 20),
         '--inverse-on-surface': T(h, neu, 95)
-      };
+      }, dark);
     }
-    return {
+    return readableScheme({
       '--primary': T(h, Math.min(ps, 60), 80),
       '--on-primary': T(h, ps, 18),
       '--primary-container': T(h, ps * 0.9, 30),
@@ -1159,7 +1193,7 @@ cd YiPuzzles</pre>
       '--outline-variant': T(h, neu * 0.8, 30),
       '--inverse-surface': T(h, neu * 0.8, 90),
       '--inverse-on-surface': T(h, neu * 0.8, 15)
-    };
+    }, dark);
   }
 
   /* ============ 3. 状态与应用 ============ */
