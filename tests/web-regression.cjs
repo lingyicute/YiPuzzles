@@ -324,3 +324,37 @@ test('site theme text stays readable across presets and the random hue range', a
   });
   assert.deepEqual(failures, [], 'normal-size theme text must have at least 4.5:1 contrast');
 });
+
+for (const inactive of [false, true]) {
+  test(`cross-tab records replace stale fallback scores for ${inactive ? 'inactive' : 'active'} boards`, async t => {
+    const { context, page } = await open(t, '/h5-demo/', {
+      records: { 'yp.best.4': 8, 'yp.state.4': { g: board([2, 2, 4]), score: 8 } },
+      setup: () => {
+        Math.random = () => 0;
+        const write = Storage.prototype.setItem;
+        window.restoreWrites = () => { Storage.prototype.setItem = write; };
+        Storage.prototype.setItem = () => { throw new DOMException('Full', 'QuotaExceededError'); };
+        window.addEventListener('storage', e => {
+          if (e.key === 'yp.best.4') window.observedBest = e.newValue;
+        });
+      }
+    });
+    await page.locator('#board').press('ArrowLeft');
+    assert.equal(await page.locator('#best').getAttribute('aria-label'), '12');
+    if (inactive) await page.getByRole('radio', { name: '5×5' }).click();
+    const other = await context.newPage();
+    await other.goto(origin + '/h5-demo/');
+    await other.evaluate(() => localStorage.setItem('yp.best.4', '132'));
+    await page.waitForFunction(() => window.observedBest === '132');
+    if (!inactive) await page.getByRole('radio', { name: '5×5' }).click();
+    await page.getByRole('radio', { name: '4×4' }).click();
+    assert.equal(await page.locator('#best').getAttribute('aria-label'), '132',
+      'a rejected local write must not shadow a newer durable record');
+    assert.equal(await page.locator('#score').getAttribute('aria-label'), '12');
+
+    await page.evaluate(() => window.restoreWrites());
+    await page.locator('#board').press('ArrowLeft');
+    assert.equal(await page.locator('#score').getAttribute('aria-label'), '20');
+    assert.equal(await page.evaluate(() => localStorage.getItem('yp.best.4')), '132');
+  });
+}
