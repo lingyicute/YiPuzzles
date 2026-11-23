@@ -770,7 +770,12 @@ public class GameActivity extends BaseActivityWithoutNavBar {
     public void setDPositions(boolean animation) {
         for (Element[] i : elements) {
             for (Element j : i) {
-                if (j.dPosX != j.getX()) {
+                // Without animations the margins are authoritative: getX()/getY() only catch up in
+                // the next layout pass, and another move can arrive before it.
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) j.getLayoutParams();
+                float x = animation ? j.getX() : lp.leftMargin;
+                float y = animation ? j.getY() : lp.topMargin;
+                if (j.dPosX != x) {
                     if (j.animateMoving && animation) {
                         if (j.number != j.dNumber)
                             j.animate().x(j.dPosX).setDuration(MOVINGSPEED).setStartDelay(0).setInterpolator(new LinearInterpolator()).setListener(new MovingListener(j, true)).start();
@@ -789,7 +794,7 @@ public class GameActivity extends BaseActivityWithoutNavBar {
                     }
 
                 }
-                if (j.dPosY != j.getY()) {
+                if (j.dPosY != y) {
                     if (j.animateMoving && animation) {
                         if (j.number != j.dNumber)
                             j.animate().y(j.dPosY).setDuration(MOVINGSPEED).setStartDelay(0).setInterpolator(new LinearInterpolator()).setListener(new MovingListener(j, true)).start();
