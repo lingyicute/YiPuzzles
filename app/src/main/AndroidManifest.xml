@@ -27,7 +27,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.TutorialActivity">
+            android:name=".activities.TutorialActivity"
+            android:label="@string/action_tutorial"
+            android:parentActivityName=".activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.lyi.puzzles.activities.MainActivity" />
@@ -52,7 +54,9 @@
                 android:value="org.lyi.puzzles.activities.MainActivity" />
         </activity>
         <activity
-            android:name="org.lyi.puzzles.activities.StatsActivity">
+            android:name="org.lyi.puzzles.activities.StatsActivity"
+            android:label="@string/action_stat"
+            android:parentActivityName=".activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.lyi.puzzles.activities.MainActivity" />
