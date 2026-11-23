@@ -70,6 +70,7 @@ public class TutorialActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         EdgeToEdgeHelper.enableEdgeToEdgeDisplay(this);
         super.onCreate(savedInstanceState);
+        EdgeToEdgeHelper.applyDynamicColorsSettled(this);
         setContentView(R.layout.activity_tutorial);
         EdgeToEdgeHelper.applySystemBarPadding(findViewById(R.id.main_content), true, true, true);
 

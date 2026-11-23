@@ -40,6 +40,7 @@ public class AboutActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         EdgeToEdgeHelper.enableEdgeToEdgeDisplay(this);
         super.onCreate(savedInstanceState);
+        EdgeToEdgeHelper.applyDynamicColorsSettled(this);
         setContentView(R.layout.activity_about);
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
