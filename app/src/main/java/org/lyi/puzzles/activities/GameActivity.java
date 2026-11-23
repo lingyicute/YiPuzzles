@@ -211,6 +211,10 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         // Directions are physical left/right, regardless of the surrounding UI language.
         number_field.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
         number_field_background.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+        // Keep every finger on the view that got the first one, so that a second finger on
+        // another tile cancels the swipe instead of starting a gesture of its own.
+        touch_field.setMotionEventSplittingEnabled(false);
+        number_field.setMotionEventSplittingEnabled(false);
         touch_field.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
             ViewGroup.MarginLayoutParams margins = (ViewGroup.MarginLayoutParams) number_field.getLayoutParams();
             int width = right - left - margins.leftMargin - margins.rightMargin;
