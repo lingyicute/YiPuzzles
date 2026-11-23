@@ -70,8 +70,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        preferences = getApplicationContext().getSharedPreferences(mypref, Context.MODE_PRIVATE);
-        editor = preferences.edit();
         currentPage = Math.max(0, Math.min(layouts.length - 1, preferences.getInt("currentPage", 0)));
         viewPager.setCurrentItem(currentPage);
         updateMovingButtons(currentPage);
@@ -81,11 +79,25 @@ public class MainActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         updateButtons(viewPager.getCurrentItem());
+        refreshBoardPreviews();
+    }
+
+    private void refreshBoardPreviews() {
+        int[] previewIds = {R.id.main_menu_img1, R.id.main_menu_img2, R.id.main_menu_img3, R.id.main_menu_img4};
+        for (int i = 0; i < viewPager.getChildCount(); i++) {
+            View page = viewPager.getChildAt(i);
+            for (int id : previewIds) {
+                View preview = page.findViewById(id);
+                if (preview != null) preview.invalidate();
+            }
+        }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        preferences = getApplicationContext().getSharedPreferences(mypref, Context.MODE_PRIVATE);
+        editor = preferences.edit();
         setContentView(R.layout.activity_main);
 
 

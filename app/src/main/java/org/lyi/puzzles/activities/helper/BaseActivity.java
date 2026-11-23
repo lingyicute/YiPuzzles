@@ -20,6 +20,7 @@ package org.lyi.puzzles.activities.helper;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -39,6 +40,7 @@ import androidx.preference.PreferenceManager;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
 
+import org.lyi.puzzles.PF2048;
 import org.lyi.puzzles.R;
 import org.lyi.puzzles.activities.AboutActivity;
 import org.lyi.puzzles.activities.HelpActivity;
@@ -47,6 +49,7 @@ import org.lyi.puzzles.activities.SettingsActivity;
 import org.lyi.puzzles.activities.StatsActivity;
 import org.lyi.puzzles.activities.TutorialActivity;
 import org.lyi.puzzles.helpers.EdgeToEdgeHelper;
+import org.lyi.puzzles.helpers.TileColors;
 
 /**
  * @author Christopher Beckmann, Karola Marky
@@ -77,6 +80,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnNaviga
     // Helper
     private Handler mHandler;
     protected SharedPreferences mSharedPreferences;
+    private boolean mDynamicColorsEnabled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,11 +91,25 @@ public abstract class BaseActivity extends AppCompatActivity implements OnNaviga
         // super.onCreate): make sure the Material You dynamic colour overlay
         // matches it before the content is inflated (see helper for details).
         EdgeToEdgeHelper.applyDynamicColorsSettled(this);
+        mDynamicColorsEnabled = PF2048.isDynamicColorEnabled(this);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mHandler = new Handler(Looper.getMainLooper());
 
         overridePendingTransition(0, 0);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        boolean dynamicColors = PF2048.isDynamicColorEnabled(this);
+        if (mDynamicColorsEnabled != dynamicColors) {
+            mDynamicColorsEnabled = dynamicColors;
+            TileColors.invalidate();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                recreate();
+            }
+        }
     }
 
     @Override

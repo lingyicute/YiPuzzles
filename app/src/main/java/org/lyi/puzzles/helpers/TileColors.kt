@@ -118,7 +118,10 @@ object TileColors {
         val scheme = currentScheme(context)
         val night = isNight(context)
         val primary = themeColor(context, com.google.android.material.R.attr.colorPrimary)
-        val key = "$scheme|$night|$primary"
+        val secondary = themeColor(context, com.google.android.material.R.attr.colorSecondary)
+        val tertiary = themeColor(context, com.google.android.material.R.attr.colorTertiary)
+        val empty = themeColor(context, com.google.android.material.R.attr.colorSurfaceContainerHighest)
+        val key = "$scheme|$night|$primary|$secondary|$tertiary|$empty"
         if (key == cacheKey && cache.isNotEmpty()) return cache
 
         val palette = when (scheme) {
