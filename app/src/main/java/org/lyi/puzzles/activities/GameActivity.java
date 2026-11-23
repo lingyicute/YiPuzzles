@@ -676,8 +676,9 @@ public class GameActivity extends BaseActivityWithoutNavBar {
             case KeyEvent.KEYCODE_Z:
                 if (event.isCtrlPressed()) {
                     handleUndo();
+                    return true;
                 }
-                return true;
+                break;
         }
         return super.onKeyDown(keyCode, event);
     }
