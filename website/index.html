@@ -538,9 +538,12 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
   display: flex; align-items: center; justify-content: center;
   box-shadow: var(--shadow-3);
   visibility: hidden; transform: translateY(110px);
-  transition: transform .4s cubic-bezier(.2,.9,.3,1.1), background-color .35s ease;
+  transition: transform .4s cubic-bezier(.2,.9,.3,1.1), background-color .35s ease, visibility 0s linear .4s;
 }
-.fab.show { visibility: visible; transform: translateY(0); }
+.fab.show {
+  visibility: visible; transform: translateY(0);
+  transition: transform .4s cubic-bezier(.2,.9,.3,1.1), background-color .35s ease, visibility 0s;
+}
 .fab:hover { filter: brightness(1.05); }
 .fab svg { width: 24px; height: 24px; }
 
