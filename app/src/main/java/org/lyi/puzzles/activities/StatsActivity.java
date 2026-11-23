@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
@@ -76,6 +77,7 @@ public class StatsActivity extends BaseActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private AlertDialog resetDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,13 +124,17 @@ public class StatsActivity extends BaseActivity {
         //noinspection SimplifiableIfStatement
         switch (item.getItemId()) {
             case R.id.action_reset:
-                new MaterialAlertDialogBuilder(this)
-                        .setIcon(R.drawable.ic_delete_sweep)
-                        .setTitle(R.string.reset_stats_confirm_title)
-                        .setMessage(R.string.reset_stats_confirm_message)
-                        .setNegativeButton(R.string.cancel, null)
-                        .setPositiveButton(R.string.reset, (dialog, which) -> resetGameStatistics())
-                        .show();
+                if (resetDialog == null || !resetDialog.isShowing()) {
+                    resetDialog = new MaterialAlertDialogBuilder(this)
+                            .setIcon(R.drawable.ic_delete_sweep)
+                            .setTitle(R.string.reset_stats_confirm_title)
+                            .setMessage(R.string.reset_stats_confirm_message)
+                            .setNegativeButton(R.string.cancel, null)
+                            .setPositiveButton(R.string.reset, (dialog, which) -> resetGameStatistics())
+                            .create();
+                    resetDialog.setOnDismissListener(d -> resetDialog = null);
+                    resetDialog.show();
+                }
                 return true;
             case android.R.id.home:
                 finish();
@@ -136,6 +142,16 @@ public class StatsActivity extends BaseActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (resetDialog != null) {
+            resetDialog.setOnDismissListener(null);
+            resetDialog.dismiss();
+            resetDialog = null;
+        }
+        super.onDestroy();
     }
 
     public void resetGameStatistics() {
@@ -162,71 +178,71 @@ public class StatsActivity extends BaseActivity {
             layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(layouts[position], container, false);
             container.addView(view);
-            BoardPreviewView img;
-            TextView highestNumber = new TextView(StatsActivity.this);
-            TextView timePlayed = new TextView(StatsActivity.this);
-            TextView undo = new TextView(StatsActivity.this);
-            TextView moves_L = new TextView(StatsActivity.this);
-            TextView moves_R = new TextView(StatsActivity.this);
-            TextView moves_T = new TextView(StatsActivity.this);
-            TextView moves_D = new TextView(StatsActivity.this);
-            TextView moves = new TextView(StatsActivity.this);
-            TextView tpm = new TextView(StatsActivity.this);
-            TextView rekord = new TextView(StatsActivity.this);
+            BoardPreviewView img = null;
+            TextView highestNumber = null;
+            TextView timePlayed = null;
+            TextView undo = null;
+            TextView moves_L = null;
+            TextView moves_R = null;
+            TextView moves_T = null;
+            TextView moves_D = null;
+            TextView moves = null;
+            TextView tpm = null;
+            TextView rekord = null;
             switch (position) {
                 case 0:
-                    highestNumber = findViewById(R.id.highest_number1);
-                    timePlayed = findViewById(R.id.time_played1);
-                    undo = findViewById(R.id.undo_number1);
-                    moves_D = findViewById(R.id.moves_D1);
-                    moves_L = findViewById(R.id.moves_L1);
-                    moves_R = findViewById(R.id.moves_R1);
-                    moves_T = findViewById(R.id.moves_T1);
-                    moves = findViewById(R.id.moves_All1);
-                    tpm = findViewById(R.id.time_swipes1);
-                    rekord = findViewById(R.id.highest_score1);
+                    highestNumber = view.findViewById(R.id.highest_number1);
+                    timePlayed = view.findViewById(R.id.time_played1);
+                    undo = view.findViewById(R.id.undo_number1);
+                    moves_D = view.findViewById(R.id.moves_D1);
+                    moves_L = view.findViewById(R.id.moves_L1);
+                    moves_R = view.findViewById(R.id.moves_R1);
+                    moves_T = view.findViewById(R.id.moves_T1);
+                    moves = view.findViewById(R.id.moves_All1);
+                    tpm = view.findViewById(R.id.time_swipes1);
+                    rekord = view.findViewById(R.id.highest_score1);
                     img = view.findViewById(R.id.stat_img1);
                     if (img != null) img.setBoardSize(4);
                     break;
                 case 1:
-                    highestNumber = findViewById(R.id.highest_number2);
-                    timePlayed = findViewById(R.id.time_played2);
-                    undo = findViewById(R.id.undo_number2);
-                    moves_D = findViewById(R.id.moves_D2);
-                    moves_L = findViewById(R.id.moves_L2);
-                    moves_R = findViewById(R.id.moves_R2);
-                    moves_T = findViewById(R.id.moves_T2);
-                    moves = findViewById(R.id.moves_All2);
-                    tpm = findViewById(R.id.time_swipes2);
-                    rekord = findViewById(R.id.highest_score2);
+                    highestNumber = view.findViewById(R.id.highest_number2);
+                    timePlayed = view.findViewById(R.id.time_played2);
+                    undo = view.findViewById(R.id.undo_number2);
+                    moves_D = view.findViewById(R.id.moves_D2);
+                    moves_L = view.findViewById(R.id.moves_L2);
+                    moves_R = view.findViewById(R.id.moves_R2);
+                    moves_T = view.findViewById(R.id.moves_T2);
+                    moves = view.findViewById(R.id.moves_All2);
+                    tpm = view.findViewById(R.id.time_swipes2);
+                    rekord = view.findViewById(R.id.highest_score2);
                     img = view.findViewById(R.id.stat_img2);
                     if (img != null) img.setBoardSize(5);
                     break;
                 case 2:
-                    highestNumber = findViewById(R.id.highest_number3);
-                    timePlayed = findViewById(R.id.time_played3);
-                    undo = findViewById(R.id.undo_number3);
-                    moves_D = findViewById(R.id.moves_D3);
-                    moves_L = findViewById(R.id.moves_L3);
-                    moves_R = findViewById(R.id.moves_R3);
-                    moves_T = findViewById(R.id.moves_T3);
-                    moves = findViewById(R.id.moves_All3);
-                    tpm = findViewById(R.id.time_swipes3);
-                    rekord = findViewById(R.id.highest_score3);
+                    highestNumber = view.findViewById(R.id.highest_number3);
+                    timePlayed = view.findViewById(R.id.time_played3);
+                    undo = view.findViewById(R.id.undo_number3);
+                    moves_D = view.findViewById(R.id.moves_D3);
+                    moves_L = view.findViewById(R.id.moves_L3);
+                    moves_R = view.findViewById(R.id.moves_R3);
+                    moves_T = view.findViewById(R.id.moves_T3);
+                    moves = view.findViewById(R.id.moves_All3);
+                    tpm = view.findViewById(R.id.time_swipes3);
+                    rekord = view.findViewById(R.id.highest_score3);
                     img = view.findViewById(R.id.stat_img3);
                     if (img != null) img.setBoardSize(6);
                     break;
-                case 3:
-                    highestNumber = findViewById(R.id.highest_number4);
-                    timePlayed = findViewById(R.id.time_played4);
-                    undo = findViewById(R.id.undo_number4);
-                    moves_D = findViewById(R.id.moves_D4);
-                    moves_L = findViewById(R.id.moves_L4);
-                    moves_R = findViewById(R.id.moves_R4);
-                    moves_T = findViewById(R.id.moves_T4);
-                    moves = findViewById(R.id.moves_All4);
-                    tpm = findViewById(R.id.time_swipes4);
-                    rekord = findViewById(R.id.highest_score4);
+                default:
+                    highestNumber = view.findViewById(R.id.highest_number4);
+                    timePlayed = view.findViewById(R.id.time_played4);
+                    undo = view.findViewById(R.id.undo_number4);
+                    moves_D = view.findViewById(R.id.moves_D4);
+                    moves_L = view.findViewById(R.id.moves_L4);
+                    moves_R = view.findViewById(R.id.moves_R4);
+                    moves_T = view.findViewById(R.id.moves_T4);
+                    moves = view.findViewById(R.id.moves_All4);
+                    tpm = view.findViewById(R.id.time_swipes4);
+                    rekord = view.findViewById(R.id.highest_score4);
                     img = view.findViewById(R.id.stat_img4);
                     if (img != null) img.setBoardSize(7);
                     break;
@@ -251,12 +267,8 @@ public class StatsActivity extends BaseActivity {
         }
 
         public String formatSmallMillis(long timeInMillis) {
-            String sign = "";
-            if (timeInMillis < 0) {
-                sign = "-";
-                timeInMillis = Math.abs(timeInMillis);
-            }
-            double seconds = ((double) timeInMillis) / (double) TimeUnit.SECONDS.toMillis(1);
+            String sign = timeInMillis < 0 ? "-" : "";
+            double seconds = Math.abs((double) timeInMillis) / (double) TimeUnit.SECONDS.toMillis(1);
             StringBuilder sb = new StringBuilder(",##0.00");
             DecimalFormat df = new DecimalFormat(sb.toString());
             df.setRoundingMode(RoundingMode.HALF_UP);
@@ -268,12 +280,8 @@ public class StatsActivity extends BaseActivity {
         }
 
         public String formatMillis(long timeInMillis) {
-            String sign = "";
-            if (timeInMillis < 0) {
-                sign = "-";
-                timeInMillis = Math.abs(timeInMillis);
-            }
-            double seconds = ((double) timeInMillis) / (double) TimeUnit.HOURS.toMillis(1);
+            String sign = timeInMillis < 0 ? "-" : "";
+            double seconds = Math.abs((double) timeInMillis) / (double) TimeUnit.HOURS.toMillis(1);
             StringBuilder sb = new StringBuilder(",##0.00");
             DecimalFormat df = new DecimalFormat(sb.toString());
             df.setRoundingMode(RoundingMode.HALF_UP);
