@@ -888,9 +888,9 @@ public class GameActivity extends BaseActivityWithoutNavBar {
         tile.setNumber(Math.random() < PROBABILITY_FOR_TWO ? 2 : 4);
         tile.drawItem();
         if (animationActivated) {
-            tile.setAlpha(0);
-            tile.animate().alpha(1).setInterpolator(new LinearInterpolator())
-                    .setStartDelay(MOVINGSPEED).setDuration(ADDINGSPEED).start();
+            tile.setAlpha(0f);
+            tile.animate().alpha(1f).setInterpolator(new LinearInterpolator())
+                    .setStartDelay(MOVINGSPEED).setDuration(ADDINGSPEED).setListener(null).start();
         }
     }
 

@@ -62,6 +62,9 @@ public class Element extends androidx.appcompat.widget.AppCompatButton {
         setAllCaps(false);
         // Material 3 tile: flat rounded surface, no elevation / press animation
         setBackgroundResource(R.drawable.game_brick);
+        if (getBackground() != null) {
+            getBackground().mutate();
+        }
         setStateListAnimator(null);
         setElevation(0f);
         int pad = Math.round(4 * c.getResources().getDisplayMetrics().density);
