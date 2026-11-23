@@ -1501,7 +1501,7 @@ cd YiPuzzles</pre>
   /* ============ 13. 迷你棋盘生成 ============ */
   var tiers = ['a', 'b', 'c', 'd'];
   Array.prototype.forEach.call(document.querySelectorAll('.mini-board'), function (board) {
-    var n = parseInt(board.dataset.size, '10') || 4;
+    var n = parseInt(board.dataset.size, 10) || 4;
     board.style.gridTemplateColumns = 'repeat(' + n + ', 1fr)';
     for (var i = 0; i < n * n; i++) {
       var cellEl = document.createElement('i');
