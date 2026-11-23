@@ -141,6 +141,11 @@ test('a game reset keeps appearance and unrelated origin data', async t => {
     ['{"mode":"dark","size":4}', null, null, '"keep"']);
 });
 
+test('the board fits inside short landscape viewports', async t => {
+  const { page } = await open(t, '/h5-demo/', { options: { viewport: { width: 844, height: 390 } } });
+  const box = await page.locator('#board').boundingBox();
+  assert.ok(box.height <= 390, `the ${box.height}px board must fit a 390px viewport`);
+});
 test('mobile site keeps downloads and navigation available with JavaScript disabled', async t => {
   const { page } = await open(t, '/website/', { options: {
     javaScriptEnabled: false, reducedMotion: 'no-preference', viewport: { width: 375, height: 780 }

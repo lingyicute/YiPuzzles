@@ -69,7 +69,7 @@
 
   /* ---------- Layout ---------- */
   .layout { max-width:1120px; margin:0 auto; padding:8px clamp(16px,4vw,40px) 40px; display:grid; gap:28px; grid-template-columns:minmax(0,1fr); }
-  .game { order:1; width:100%; max-width:540px; margin:0 auto; }
+  .game { order:1; width:100%; max-width:540px; max-width:min(540px, calc(100svh - 24px)); margin:0 auto; }
   .intro { order:2; text-align:center; }
   @media (min-width:960px) {
     .layout { grid-template-columns:minmax(0,1fr) 540px; align-items:center; gap:64px; min-height:calc(100dvh - 110px); }
