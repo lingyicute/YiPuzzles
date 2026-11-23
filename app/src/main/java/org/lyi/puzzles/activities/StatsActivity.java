@@ -243,7 +243,7 @@ public class StatsActivity extends BaseActivity {
             if (gameStatistics.getMoves() != 0)
                 tpm.setText("" + formatSmallMillis(gameStatistics.getTimePlayed() / gameStatistics.getMoves()));
             else
-                tpm.setText("0");
+                tpm.setText(formatSmallMillis(0));
             rekord.setText("" + gameStatistics.getRecord());
 
 
