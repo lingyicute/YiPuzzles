@@ -14,11 +14,11 @@ umask 077
 signing_dir=$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/yipuzzles-signing.XXXXXX")
 trap 'rm -rf -- "$signing_dir"' EXIT
 keystore="$signing_dir/nightly.keystore"
-if [[ -n ${NIGHTLY_KEYSTORE_BASE64:-} ]]; then
+if [[ -n ${NIGHTLY_KEYSTORE_BASE64//[[:space:]]/} ]]; then
   : "${NIGHTLY_KEYSTORE_PASSWORD:?Missing nightly keystore password}"
   : "${NIGHTLY_KEY_ALIAS:?Missing nightly key alias}"
   : "${NIGHTLY_KEY_PASSWORD:?Missing nightly key password}"
-  base64 --decode <<< "$NIGHTLY_KEYSTORE_BASE64" > "$keystore"
+  printf '%s' "$NIGHTLY_KEYSTORE_BASE64" | tr -d '[:space:]' | base64 --decode > "$keystore"
   unset NIGHTLY_KEYSTORE_BASE64
 else
   if [[ -n ${NIGHTLY_KEYSTORE_PASSWORD:-}${NIGHTLY_KEY_ALIAS:-}${NIGHTLY_KEY_PASSWORD:-} ]]; then
