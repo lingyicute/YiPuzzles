@@ -84,7 +84,8 @@ public class StatsActivity extends BaseActivity {
 
         MaterialToolbar toolbar = (MaterialToolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitle(R.string.action_stat);
+        // A title set on the toolbar itself is replaced by the activity label in onPostCreate().
+        if (getSupportActionBar() != null) getSupportActionBar().setTitle(R.string.action_stat);
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
