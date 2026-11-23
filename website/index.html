@@ -603,6 +603,10 @@ footer { padding: clamp(40px, 6vw, 64px) 0 110px; }
   try { theme = localStorage.getItem('yi-theme'); } catch (e) { /* storage can be unavailable */ }
   if (theme !== 'dark' && theme !== 'light') theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   document.documentElement.setAttribute('data-theme', theme);
+  if (theme === 'dark') {
+    var meta = document.getElementById('metaTheme');
+    if (meta) meta.setAttribute('content', '#141218');
+  }
 })();
 </script>
 <noscript><style>#themeToggle, .copy-btn { display: none; }</style></noscript>
