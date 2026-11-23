@@ -34,6 +34,7 @@ public class GameState implements Serializable {
      * class would otherwise make the save files written by earlier versions unreadable.
      */
     private static final long serialVersionUID = -8669012629409113385L;
+    private static final int MAX_TILE = 1 << 30;
 
     public int n = 4;
     public int[] numbers;
@@ -73,7 +74,22 @@ public class GameState implements Serializable {
     }
 
     boolean hasValidUndo() {
-        return undo && last_points >= 0 && last_points <= points && isPlayableGrid(last_numbers, n);
+        return undo && last_points >= 0 && last_points <= points
+                && isPlayableGrid(last_numbers, n) && canMove(last_numbers, n);
+    }
+
+    private static boolean canMove(int[] grid, int size) {
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                int value = grid[y * size + x];
+                if (value == 0) return true;
+                if (value < MAX_TILE && ((x + 1 < size && grid[y * size + x + 1] == value)
+                        || (y + 1 < size && grid[(y + 1) * size + x] == value))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static boolean isPlayableGrid(int[] grid, int size) {

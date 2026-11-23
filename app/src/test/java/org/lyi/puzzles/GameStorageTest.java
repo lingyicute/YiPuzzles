@@ -65,6 +65,14 @@ public class GameStorageTest {
         state.last_numbers = new int[49];
         GameStorage.writeState(dir, 7, state);
         assertFalse(GameStorage.readState(dir, 7).undo);
+
+        for (int y = 0; y < 7; y++) {
+            for (int x = 0; x < 7; x++) {
+                state.last_numbers[y * 7 + x] = (x + y) % 2 == 0 ? 2 : 4;
+            }
+        }
+        GameStorage.writeState(dir, 7, state);
+        assertFalse(GameStorage.readState(dir, 7).undo);
     }
 
     @Test public void treatsUncheckedDeserializationFailuresAsUnreadable() throws IOException {
