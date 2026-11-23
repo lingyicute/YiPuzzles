@@ -42,6 +42,15 @@ public class SplashActivity extends AppCompatActivity {
         SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
 
+        Intent launchIntent = getIntent();
+        if (!isTaskRoot()
+                && launchIntent != null
+                && launchIntent.hasCategory(Intent.CATEGORY_LAUNCHER)
+                && Intent.ACTION_MAIN.equals(launchIntent.getAction())) {
+            finish();
+            return;
+        }
+
         FirstLaunchManager firstStartPref = new FirstLaunchManager(this);
 
         Intent mainIntent;
