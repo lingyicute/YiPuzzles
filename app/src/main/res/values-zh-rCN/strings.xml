@@ -98,7 +98,7 @@
     <!-- ###TUTORIAL### -->
     <string name="next">下一步</string>
     <string name="skip">跳过</string>
-    <string name="Tutorial_Titel">你好呀!</string>
+    <string name="Tutorial_Titel">你好呀！</string>
     <string name="Tutorial_Instruction">接下来的页面将简单介绍 2048 的玩法。</string>
     <string name="Tutorial_Titel_Move">学习如何移动数字</string>
     <string name="Tutorial_Move">请用手指向一个方向滑动，这样所有数字就都会向同一方向移动。</string>
