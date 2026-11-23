@@ -106,7 +106,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/about_author"
                             android:textAppearance="?attr/textAppearanceBodySmall"
-                            android:textColor="@android:color/white" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:layout_width="wrap_content"
