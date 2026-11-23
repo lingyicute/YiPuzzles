@@ -195,25 +195,25 @@ public class TutorialActivity extends AppCompatActivity {
             ImageView imageView;
             switch (position) {
                 case 0:
-                    imageView = (ImageView) findViewById(R.id.image1);
+                    imageView = (ImageView) view.findViewById(R.id.image1);
                     Glide.with(TutorialActivity.this).load(R.mipmap.ic_launcher_foreground).into(imageView);
                     break;
                 case 1:
-                    imageView = (ImageView) findViewById(R.id.image2);
+                    imageView = (ImageView) view.findViewById(R.id.image2);
                     if (!TileColors.currentScheme(TutorialActivity.this).equals(TileColors.SCHEME_ORIGINAL))
                         Glide.with(TutorialActivity.this).load(R.drawable.tutorial_move_s).into(imageView);
                     else
                         Glide.with(TutorialActivity.this).load(R.drawable.tutorial_move_o).into(imageView);
                     break;
                 case 2:
-                    imageView = (ImageView) findViewById(R.id.image3);
+                    imageView = (ImageView) view.findViewById(R.id.image3);
                     if (!TileColors.currentScheme(TutorialActivity.this).equals(TileColors.SCHEME_ORIGINAL))
                         Glide.with(TutorialActivity.this).load(R.drawable.tutorial_swipe_s).into(imageView);
                     else
                         Glide.with(TutorialActivity.this).load(R.drawable.tutorial_swipe_o).into(imageView);
                     break;
                 case 3:
-                    imageView = (ImageView) findViewById(R.id.image4);
+                    imageView = (ImageView) view.findViewById(R.id.image4);
                     if (!TileColors.currentScheme(TutorialActivity.this).equals(TileColors.SCHEME_ORIGINAL))
                         Glide.with(TutorialActivity.this).load(R.drawable.tutorial_add_s).into(imageView);
                     else
