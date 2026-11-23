@@ -110,6 +110,30 @@ public class GameStorageTest {
         assertEquals(0, GameStorage.readStatistics(dir, 5).getRecord());
     }
 
+    @Test public void clampsCorruptNegativeStatisticsFields() throws Exception {
+        File dir = files.getRoot();
+        GameStatistics stats = new GameStatistics(4);
+        for (String name : new String[]{"moves", "timePlayed", "record"}) {
+            java.lang.reflect.Field field = GameStatistics.class.getDeclaredField(name);
+            field.setAccessible(true);
+            field.setLong(stats, -10L);
+        }
+        java.lang.reflect.Field highest = GameStatistics.class.getDeclaredField("highestNumber");
+        highest.setAccessible(true);
+        highest.setLong(stats, 3L);
+        java.lang.reflect.Field undo = GameStatistics.class.getDeclaredField("undo");
+        undo.setAccessible(true);
+        undo.setInt(stats, -2);
+        GameStorage.writeStatistics(dir, 4, stats);
+
+        GameStatistics restored = GameStorage.readStatistics(dir, 4);
+        assertEquals(0L, restored.getMoves());
+        assertEquals(0L, restored.getTimePlayed());
+        assertEquals(0L, restored.getRecord());
+        assertEquals(2L, restored.getHighestNumber());
+        assertEquals(0, restored.getUndo());
+    }
+
     /** Stands in for corrupt streams that ObjectInputStream reports with unchecked exceptions. */
     private static class Exploding implements Serializable {
         private Object readResolve() {

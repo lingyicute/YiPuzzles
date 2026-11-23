@@ -66,7 +66,10 @@ public class GameStatistics implements Serializable {
     }
 
     public void addTimePlayed(long timePlayed) {
-        this.timePlayed += timePlayed;
+        if (timePlayed > 0) {
+            this.timePlayed = Long.MAX_VALUE - this.timePlayed < timePlayed
+                    ? Long.MAX_VALUE : this.timePlayed + timePlayed;
+        }
     }
 
     public long getMoves() {
@@ -74,7 +77,25 @@ public class GameStatistics implements Serializable {
     }
 
     public void addMoves(long moves) {
-        this.moves += moves;
+        if (moves > 0) {
+            this.moves = Long.MAX_VALUE - this.moves < moves
+                    ? Long.MAX_VALUE : this.moves + moves;
+        }
+    }
+
+    void sanitize(int n) {
+        filename = "statistics" + n + ".txt";
+        moves = Math.max(0L, moves);
+        timePlayed = Math.max(0L, timePlayed);
+        record = Math.max(0L, record);
+        if (highestNumber < 2L || (highestNumber & (highestNumber - 1L)) != 0L) {
+            highestNumber = 2L;
+        }
+        undo = Math.max(0, undo);
+        moves_l = Math.max(0, moves_l);
+        moves_r = Math.max(0, moves_r);
+        moves_t = Math.max(0, moves_t);
+        moves_d = Math.max(0, moves_d);
     }
 
     public String getFilename() {

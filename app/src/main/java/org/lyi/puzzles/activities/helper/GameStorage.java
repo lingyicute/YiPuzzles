@@ -30,7 +30,9 @@ public final class GameStorage {
 
     public static GameStatistics readStatistics(File directory, int size) {
         GameStatistics statistics = read(file(directory, "statistics", size), GameStatistics.class);
-        return statistics != null ? statistics : new GameStatistics(size);
+        if (statistics == null) return new GameStatistics(size);
+        statistics.sanitize(size);
+        return statistics;
     }
 
     public static void writeState(File directory, int size, GameState state) {
