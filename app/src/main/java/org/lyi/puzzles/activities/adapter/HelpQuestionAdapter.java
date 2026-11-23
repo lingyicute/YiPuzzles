@@ -210,7 +210,7 @@ public class HelpQuestionAdapter extends RecyclerView.Adapter<HelpQuestionAdapte
         // toggle in the middle of a running animation stays seamless (the start
         // values of a fresh expand are 0, because the container is GONE and has
         // never been laid out or still has height 0).
-        final int startHeight = container.getHeight();
+        final int startHeight = container.getVisibility() == View.VISIBLE ? container.getHeight() : 0;
         final float startAlpha = startHeight > 0 ? container.getAlpha() : 0f;
         final int targetHeight;
         if (expanded) {
