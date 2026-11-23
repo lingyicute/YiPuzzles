@@ -381,6 +381,7 @@ section { scroll-margin-top: 88px; }
 /* ---------- 9. 隐私 ---------- */
 .privacy { padding: clamp(56px, 8vw, 96px) 0; }
 .privacy-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(24px, 4vw, 48px); align-items: center; }
+.privacy-grid > * { min-width: 0; } /* the manifest sample scrolls instead of widening the grid */
 .check-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 26px; }
 .check-item {
   display: flex; align-items: center; gap: 12px;

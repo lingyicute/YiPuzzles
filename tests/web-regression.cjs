@@ -151,6 +151,14 @@ test('mobile site keeps downloads and navigation available with JavaScript disab
   assert.equal(await page.locator('#fab').isVisible(), false);
 });
 
+test('narrow site layouts stay within the viewport', async t => {
+  for (const width of [320, 375, 600]) {
+    const { page } = await open(t, '/website/', { options: { viewport: { width, height: 780 } } });
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    assert.equal(overflow, 0, `${width}px viewport must not scroll or clip horizontally`);
+  }
+});
+
 test('site tracks system colors until chosen manually and restores mobile focus', async t => {
   const { page } = await open(t, '/website/', { options: { colorScheme: 'light', viewport: { width: 375, height: 780 } } });
   await page.emulateMedia({ colorScheme: 'dark' });
