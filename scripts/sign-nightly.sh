@@ -14,6 +14,8 @@ umask 077
 signing_dir=$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/yipuzzles-signing.XXXXXX")
 trap 'rm -rf -- "$signing_dir"' EXIT
 keystore="$signing_dir/nightly.keystore"
+# Locally an optional secret may be unset rather than exported as an empty value.
+NIGHTLY_KEYSTORE_BASE64=${NIGHTLY_KEYSTORE_BASE64:-}
 if [[ -n ${NIGHTLY_KEYSTORE_BASE64//[[:space:]]/} ]]; then
   : "${NIGHTLY_KEYSTORE_PASSWORD:?Missing nightly keystore password}"
   : "${NIGHTLY_KEY_ALIAS:?Missing nightly key alias}"

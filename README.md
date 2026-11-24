@@ -134,7 +134,7 @@ The browser suite requires Node.js 22 or newer. Install its pinned Playwright ve
 web_tools="$(mktemp -d)"
 npm install --prefix "$web_tools" --no-package-lock playwright@1.65.1
 "$web_tools/node_modules/.bin/playwright" install --with-deps chromium
-NODE_PATH="$web_tools/node_modules" node --test tests/web-regression.cjs
+NODE_PATH="$web_tools/node_modules" node --test tests/*.cjs
 rm -rf "$web_tools"
 ```
 

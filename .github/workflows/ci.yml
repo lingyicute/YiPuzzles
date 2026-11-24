@@ -57,7 +57,7 @@ jobs:
           "$RUNNER_TEMP/web-tests/node_modules/.bin/playwright" install --with-deps chromium
 
       - name: Run browser regression tests
-        run: NODE_PATH="$RUNNER_TEMP/web-tests/node_modules" node --test tests/web-regression.cjs
+        run: NODE_PATH="$RUNNER_TEMP/web-tests/node_modules" node --test tests/*.cjs
 
   publish:
     needs: [verify, web]
