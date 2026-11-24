@@ -111,23 +111,23 @@ public class GameStatistics implements Serializable {
     }
 
     public void undo() {
-        undo++;
+        if (undo < Integer.MAX_VALUE) undo++;
     }
 
     public void moveL() {
-        moves_l++;
+        if (moves_l < Integer.MAX_VALUE) moves_l++;
     }
 
     public void moveR() {
-        moves_r++;
+        if (moves_r < Integer.MAX_VALUE) moves_r++;
     }
 
     public void moveT() {
-        moves_t++;
+        if (moves_t < Integer.MAX_VALUE) moves_t++;
     }
 
     public void moveD() {
-        moves_d++;
+        if (moves_d < Integer.MAX_VALUE) moves_d++;
     }
 
     public int getUndo() {
