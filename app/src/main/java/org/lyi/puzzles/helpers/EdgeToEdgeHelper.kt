@@ -126,7 +126,8 @@ fun applyNavHeaderTopInset(root: View?, headers: List<View?>) {
         val bars = insets.getInsets(
             WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
         )
-        val top = maxOf(bars.top, statusBarHeight)
+        // Live insets are authoritative, including zero in fullscreen or multi-window mode.
+        val top = bars.top
         targets.forEachIndexed { index, header ->
             header.updatePadding(top = initialTops[index] + top)
         }
