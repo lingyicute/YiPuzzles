@@ -371,3 +371,35 @@ for (const inactive of [false, true]) {
     assert.equal(await page.evaluate(() => localStorage.getItem('yp.best.4')), '132');
   });
 }
+
+
+test('restored undo history cannot increase scores or poison the best record', async t => {
+  const { page } = await open(t, '/h5-demo/', { records: {
+    'yp.state.4': { g: board([16]), score: 16, undo: [
+      { g: board([2]), score: 0 }, { g: board([4]), score: 4 },
+      { g: board([8]), score: 12 }, { g: board([4, 4]), score: 8 },
+      { g: board([16]), score: 1000 }
+    ] }
+  } });
+  for (const score of [8, 4, 0]) {
+    await page.locator('#undoBtn').click();
+    assert.equal((await archive(page)).score, score);
+    assert.equal(await page.locator('#best').getAttribute('aria-label'), '16');
+  }
+  assert.equal(await page.locator('#undoBtn').isDisabled(), true);
+});
+
+test('equal-score slides remain undoable even at the score limit', async t => {
+  const score = Number.MAX_SAFE_INTEGER;
+  const { page } = await open(t, '/h5-demo/', { records: {
+    'yp.state.4': { g: board([4]), score, undo: [
+      { g: board([0, 0, 4]), score }, { g: board([0, 4]), score }
+    ] }
+  } });
+  for (const first of [[0, 4, 0, 0], [0, 0, 4, 0]]) {
+    await page.locator('#undoBtn').click();
+    assert.deepEqual((await archive(page)).g[0], first);
+    assert.equal((await archive(page)).score, score);
+  }
+  assert.equal(await page.locator('#undoBtn').isDisabled(), true);
+});

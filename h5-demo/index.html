@@ -773,15 +773,20 @@
     }
     return out;
   }
-  function fixUndo(list) {
+  function fixUndo(list, currentScore) {
     if (!Array.isArray(list)) return [];
     const out = [];
-    for (const s of list.slice(-UNDO_LIMIT)) {
+    let ceiling = currentScore;
+    // Validate newest first: undo may keep or lower a score, never raise it.
+    for (const s of list.slice(-UNDO_LIMIT).reverse()) {
       if (!s || typeof s !== 'object') continue;
       const g = fixGrid(s.g), score = readScore(s.score);
-      if (g && hasTiles(g) && canMove(g) && score !== null) out.push({ g, score, won: hasWinningTile(g) });
+      if (g && hasTiles(g) && canMove(g) && score !== null && score <= ceiling) {
+        out.push({ g, score, won: hasWinningTile(g) });
+        ceiling = score;
+      }
     }
-    return out;
+    return out.reverse();
   }
 
   function init(size) {
@@ -798,7 +803,7 @@
       won = hasWinningTile(saved);
       winPending = won && st.winPending === true;
       over = !canMove(saved);
-      undoStack = fixUndo(st.undo);
+      undoStack = fixUndo(st.undo, score);
       updateHud();
       bestAtRoundStart = Math.min(readScore(st.bestAtRoundStart) ?? best, best);
       if (winPending || over) showOverlay(winPending ? 'win' : 'over');
